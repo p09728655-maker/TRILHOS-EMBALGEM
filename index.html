@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dimensionamento dos trilhos — Embalagem | Patrimar Móveis</title>
+<style>
+:root{
+  --vermelho:#DB2126; --bordeaux:#A8140F; --areia:#F7ECC0; --grafite:#1F2328;
+  --esteira:#2E5E8C; --esteira2:#5B8DB8;
+  --bg:#EDEEF0; --surface:#FFFFFF; --linha:#E1E4E7; --linha2:#F0F1F3;
+  --texto:#1F2328; --muted:#71787F; --muted2:#9AA1A8;
+  --atencao:#9A5B00; --atencao-bg:#FFF7E8; --atencao-br:#E9CE9A;
+  --ff:'Calibri','Carlito','Segoe UI',system-ui,-apple-system,sans-serif;
+  --r:8px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{font-family:var(--ff);background:var(--bg);color:var(--texto);font-size:15px;line-height:1.45;
+     -webkit-font-smoothing:antialiased}
+.tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- topo ---------- */
+.topo{background:var(--grafite);color:#fff;position:sticky;top:0;z-index:20}
+.topo-in{max-width:1560px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.marca{display:flex;align-items:center;gap:14px;flex:0 0 auto}
+.marca img{height:30px;width:auto;display:block;background:#fff;padding:5px 8px;border-radius:5px}
+.marca h1{margin:0;font-size:15.5px;font-weight:700;letter-spacing:-.1px;white-space:nowrap}
+.marca p{margin:0;font-size:11.5px;color:#9AA1A8;letter-spacing:.3px}
+
+.seg{display:flex;background:#2C3238;border-radius:7px;padding:3px;gap:2px;margin-left:auto}
+.seg button{font:inherit;font-size:13px;padding:6px 13px;border:0;background:transparent;color:#C3C8CD;
+            border-radius:5px;cursor:pointer;white-space:nowrap;line-height:1.15}
+.seg button:hover{color:#fff}
+.seg button:focus-visible{outline:2px solid #7FA8CC;outline-offset:1px}
+.seg button[aria-pressed="true"]{background:var(--vermelho);color:#fff;font-weight:700}
+.seg button b{display:block;font-weight:inherit}
+.seg button span{display:block;font-size:10.5px;opacity:.72;font-weight:400;letter-spacing:.2px}
+
+.acoes-topo{display:flex;gap:6px}
+.ghost{font:inherit;font-size:12.5px;padding:7px 11px;border:1px solid #3C434A;background:transparent;
+       color:#C3C8CD;border-radius:6px;cursor:pointer}
+.ghost:hover{border-color:#5A626A;color:#fff}
+.ghost:focus-visible{outline:2px solid #7FA8CC;outline-offset:1px}
+.ghost.claro{width:100%;border-color:var(--linha);color:var(--muted);font-size:13px;padding:8px 10px}
+.ghost.claro:hover{border-color:#C6CBD0;color:var(--texto);background:#FAFBFB}
+
+/* ---------- layout ---------- */
+.app{max-width:1560px;margin:0 auto;padding:18px 20px 40px;display:grid;
+     grid-template-columns:284px minmax(0,1fr);gap:18px;align-items:start}
+
+.painel{background:var(--surface);border:1px solid var(--linha);border-radius:var(--r);
+        position:sticky;top:70px;max-height:calc(100vh - 88px);overflow:auto}
+.painel h2,.bloco h2{margin:0;font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;
+                     color:var(--muted2)}
+.painel-sec{padding:14px 16px;border-bottom:1px solid var(--linha2)}
+.painel-sec:last-child{border-bottom:0}
+
+.campo{margin-top:11px}
+.campo:first-of-type{margin-top:10px}
+.campo label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+.campo input,.campo select{width:100%;font:inherit;font-size:15px;padding:7px 9px;border:1px solid var(--linha);
+   border-radius:6px;background:var(--surface);color:var(--texto);font-variant-numeric:tabular-nums}
+.campo input:hover,.campo select:hover{border-color:#C6CBD0}
+.campo input:focus,.campo select:focus{outline:0;border-color:var(--esteira);box-shadow:0 0 0 3px rgba(46,94,140,.14)}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.nota{font-size:11.5px;color:var(--muted2);margin-top:3px;line-height:1.35}
+
+details.geo summary{list-style:none;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:1.1px;
+                    text-transform:uppercase;color:var(--muted2);display:flex;align-items:center;gap:6px}
+details.geo summary::-webkit-details-marker{display:none}
+details.geo summary::before{content:"▸";font-size:12px;transition:transform .15s}
+details.geo[open] summary::before{transform:rotate(90deg)}
+details.geo summary:focus-visible{outline:2px solid var(--esteira);outline-offset:3px;border-radius:3px}
+
+/* ---------- palco ---------- */
+.palco{background:var(--surface);border:1px solid var(--linha);border-radius:var(--r);overflow:hidden}
+
+.faixa{display:flex;border-bottom:1px solid var(--linha)}
+.met{flex:1 1 0;padding:13px 18px;border-right:1px solid var(--linha2);min-width:0}
+.met:last-child{border-right:0}
+.met .v{font-size:29px;font-weight:700;line-height:1.02;letter-spacing:-.7px;white-space:nowrap}
+.met .v .u{font-size:14px;font-weight:400;color:var(--muted);letter-spacing:0}
+.met .l{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.3}
+.met.pri .v{color:var(--vermelho)}
+
+.desenho{padding:16px 18px 8px;background:var(--surface)}
+svg#svg{display:block;width:100%;height:auto;max-height:58vh}
+.leg{display:flex;gap:18px;flex-wrap:wrap;padding:6px 18px 14px;font-size:12px;color:var(--muted)}
+.leg span{display:inline-flex;align-items:center;gap:6px}
+.leg i{width:11px;height:11px;border-radius:2px;display:inline-block;flex:0 0 auto}
+
+.avisos{padding:0 18px}
+.aviso{display:flex;gap:10px;align-items:flex-start;background:var(--atencao-bg);border:1px solid var(--atencao-br);
+       border-radius:6px;padding:9px 12px;font-size:13.5px;color:#4A3300;margin-bottom:10px;line-height:1.4}
+.aviso .ic{flex:0 0 auto;width:17px;height:17px;border-radius:50%;background:var(--atencao);color:#fff;
+           font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.aviso b{color:var(--atencao)}
+
+/* ---------- blocos inferiores ---------- */
+.abaixo{grid-column:2 / -1;display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:2px}
+.bloco{background:var(--surface);border:1px solid var(--linha);border-radius:var(--r);overflow:hidden}
+.bloco-hd{padding:13px 18px;border-bottom:1px solid var(--linha);display:flex;align-items:baseline;gap:10px}
+.bloco-hd p{margin:0;font-size:12px;color:var(--muted2)}
+
+.comp{padding:6px 0 10px}
+.linha-comp{display:grid;grid-template-columns:1fr 132px;gap:14px;align-items:center;
+            padding:9px 18px;border-bottom:1px solid var(--linha2)}
+.linha-comp:last-child{border-bottom:0}
+.linha-comp.sel{background:#FDF3F3;box-shadow:inset 3px 0 0 var(--vermelho)}
+.linha-comp.ref{background:#F7F8F9}
+.lc-nome{font-size:14px;font-weight:700;line-height:1.2}
+.lc-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.lc-bar{height:7px;border-radius:4px;background:var(--linha);overflow:hidden;margin-top:7px}
+.lc-bar i{display:block;height:100%;border-radius:4px}
+.lc-num{text-align:right}
+.lc-num .m{font-size:19px;font-weight:700;line-height:1;letter-spacing:-.3px}
+.lc-num .t{font-size:11.5px;color:var(--muted);margin-top:3px}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 18px;border-bottom:1px solid var(--linha2)}
+th{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted2);font-weight:700;
+   position:sticky;top:0;background:var(--surface);z-index:1}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:hover td{background:#FAFBFB}
+tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
+.rolagem{max-height:352px;overflow:auto}
+
+.rodape{grid-column:2 / -1;font-size:12px;color:var(--muted2);padding:6px 2px 0;line-height:1.55}
+
+@media (max-width:1080px){
+  .app{grid-template-columns:1fr}
+  .abaixo,.rodape{grid-column:1 / -1}
+  .painel{position:static}
+  .abaixo{grid-template-columns:1fr}
+  .faixa{flex-wrap:wrap}
+  .met{flex:1 1 44%;border-bottom:1px solid var(--linha2)}
+  .seg{margin-left:0;width:100%;overflow-x:auto}
+}
+@media (max-width:620px){
+  .met{flex:1 1 100%}
+  .met .v{font-size:25px}
+  .marca p{display:none}
+}
+/* ---------- cabeçalho de impressão ---------- */
+.print-only{display:none}
+
+@media print{
+  html,body{background:#fff}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:10px;line-height:1.35}
+  .topo,.painel,.acoes-topo,.seg{display:none!important}
+  .print-only{display:block}
+
+  .app{display:block;max-width:none;padding:0;gap:0}
+
+  .phd{display:flex;align-items:flex-start;gap:12px;border-bottom:2px solid var(--grafite);
+       padding-bottom:6px;margin-bottom:8px}
+  .phd img{height:26px;width:auto}
+  .phd .tt{flex:1}
+  .phd h1{margin:0;font-size:15px;font-weight:700}
+  .phd .cen{margin:2px 0 0;font-size:10.5px;color:#444}
+  .phd .dt{font-size:9.5px;color:#666;text-align:right;white-space:nowrap;padding-top:2px}
+
+  .pparams{display:flex;flex-wrap:wrap;gap:0 18px;font-size:9.5px;color:#333;margin-bottom:8px}
+  .pparams b{color:#000}
+
+  .palco{border:0;overflow:visible}
+  .faixa{border:1px solid #C8CCD0;border-radius:5px;margin-bottom:7px;break-inside:avoid}
+  .met{padding:7px 11px;border-right:1px solid #E2E5E8}
+  .met .v{font-size:17px}
+  .met .v .u{font-size:9.5px}
+  .met .l{font-size:8.5px;margin-top:1px}
+
+  .avisos{padding:0}
+  .aviso{font-size:9.5px;padding:5px 8px;margin-bottom:5px;break-inside:avoid}
+  .aviso .ic{width:13px;height:13px;font-size:9px}
+
+  .desenho{padding:0}
+  svg#svg{max-height:96mm}
+  .leg{padding:5px 0 0;font-size:9px;gap:14px}
+
+  .abaixo{display:grid;grid-template-columns:1.15fr 1fr;gap:7mm;margin:0;
+          page-break-before:always;break-before:page}
+  .bloco{border:1px solid #C8CCD0;break-inside:avoid}
+  .bloco-hd{padding:7px 11px}
+  .bloco-hd h2{font-size:9.5px}
+  .bloco-hd p{font-size:9px}
+
+  .linha-comp{padding:6px 11px;grid-template-columns:1fr 92px;gap:9px;break-inside:avoid}
+  .lc-nome{font-size:10.5px}.lc-sub{font-size:9px}
+  .lc-num .m{font-size:13px}.lc-num .t{font-size:8.5px}
+  .lc-bar{height:5px}
+
+  .rolagem{max-height:none;overflow:visible}
+  table{font-size:9px}
+  th,td{padding:3px 11px}
+  th{font-size:8px;position:static}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
+
+  .rodape{font-size:8.5px;margin-top:6px;padding:5px 0 0;border-top:1px solid #C8CCD0}
+
+  @page{size:A4 landscape;margin:9mm}
+}
+</style>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1F2328">
+  <link rel="icon" href="icon-192.png">
+</head>
+<body>
+
+<div class="topo">
+  <div class="topo-in">
+    <div class="marca">
+      <img id="logo" alt="Patrimar Móveis">
+      <div>
+        <h1>Dimensionamento dos trilhos — Embalagem</h1>
+        <p>Ocupação dentro do alcance das duas esteiras · geometria medida no DWG</p>
+      </div>
+    </div>
+    <div class="seg" role="group" aria-label="Cenário" id="seg"></div>
+    <div class="acoes-topo">
+      <button class="ghost" id="btnCsv" type="button">CSV</button>
+      <button class="ghost" id="btnSvg" type="button">SVG</button>
+      <button class="ghost" id="btnLink" type="button">Copiar link</button>
+      <button class="ghost" id="btnPrint" type="button">Imprimir</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+  <div class="print-only" id="printHd" style="grid-column:1 / -1"></div>
+
+
+  <aside class="painel">
+    <div class="painel-sec">
+      <h2>Arranjo</h2>
+      <div class="campo">
+        <label for="pModo">Como o trilho é montado</label>
+        <select id="pModo">
+          <option value="par">Em par — dois trilhos formam a via</option>
+          <option value="solto">Independentes — um trilho cada</option>
+        </select>
+      </div>
+      <div class="campo" id="fGI">
+        <label for="pGI">Vão dentro do par</label>
+        <input id="pGI" type="number" min="0" max="1000" step="10" value="200">
+        <div class="nota">Não muda o apoio da prancha (um trilho), mas define a base da peça larga apoiada nos dois.</div>
+      </div>
+      <div class="campo">
+        <label for="pP">Largura da prancha</label>
+        <input id="pP" type="number" min="50" max="2000" step="10" value="450">
+        <div class="nota">A prancha apoia em um trilho. É ela que define a folga.</div>
+      </div>
+      <div class="campo">
+        <label for="pGE">Vão entre pares</label>
+        <input id="pGE" type="number" min="0" max="2000" step="10" value="500">
+        <div class="nota">Espaço de circulação. Mínimo definido: 500 mm.</div>
+      </div>
+      <div class="campo">
+        <label for="pPass">Passagem para retirar prancha</label>
+        <select id="pPass">
+          <option value="meio">Uma, no meio do banco</option>
+          <option value="duas">Duas, distribuídas</option>
+          <option value="none">Nenhuma</option>
+        </select>
+        <div class="nota">Recebe toda a sobra do banco, sem custar via.</div>
+      </div>
+    </div>
+
+    <div class="painel-sec">
+      <button class="ghost claro" id="btnReset" type="button">Restaurar valores do DWG</button>
+    </div>
+
+    <div class="painel-sec">
+      <details class="geo">
+        <summary>Geometria do DWG</summary>
+        <div class="campo">
+          <label for="pW">Largura do trilho</label>
+          <input id="pW" type="number" min="100" max="2000" step="10" value="500">
+        </div>
+        <div class="campo">
+          <label>Comprimento do trilho — esteira 1</label>
+          <div class="dupla">
+            <input id="pL1" type="number" min="500" max="20000" step="100" value="6000" aria-label="Lado A, coluna C1">
+            <input id="pL2" type="number" min="500" max="20000" step="100" value="4000" aria-label="Lado B, coluna C2">
+          </div>
+          <div class="nota">Lado A (C1) e lado B (C2).</div>
+        </div>
+        <div class="campo">
+          <label for="pL3">Comprimento do trilho — esteira 2</label>
+          <input id="pL3" type="number" min="500" max="20000" step="100" value="4000">
+          <div class="nota">Coluna C3. No DWG estão 3.000 mm — confirmar.</div>
+        </div>
+      </details>
+    </div>
+  </aside>
+
+  <main class="palco">
+    <div class="faixa" id="faixa"></div>
+    <div class="avisos" id="avisos"></div>
+    <div class="desenho">
+      <svg id="svg" role="img" aria-labelledby="svgTit" preserveAspectRatio="xMidYMid meet">
+        <title id="svgTit">Planta dos trilhos e das duas esteiras da Embalagem</title>
+      </svg>
+    </div>
+    <div class="leg">
+      <span><i style="background:#DB2126"></i>Trilho / pista — lado A (C1)</span>
+      <span><i style="background:#A8140F"></i>Trilho — lado B (C2 e C3)</span>
+      <span><i style="background:#2E5E8C"></i>Esteira</span>
+      <span><i style="background:#F7ECC0;border:1px solid #A8140F"></i>Passagem</span>
+    </div>
+  </main>
+
+  <div class="abaixo">
+    <section class="bloco">
+      <div class="bloco-hd"><h2>Comparativo</h2><p>metragem linear de trilho no conjunto</p></div>
+      <div class="comp" id="comp"></div>
+    </section>
+
+    <section class="bloco">
+      <div class="bloco-hd"><h2>Cotas · esteira 1</h2><p id="cotasSub"></p></div>
+      <div class="rolagem">
+        <table id="tabCotas">
+          <thead><tr><th>Grupo</th><th>Pista</th><th class="num">Início</th><th class="num">Fim</th><th class="num">Vão ant.</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <p class="rodape">
+    Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b> · Esteira 1: 840&nbsp;×&nbsp;23.940&nbsp;mm ·
+    Esteira 2: 850&nbsp;×&nbsp;23.975&nbsp;mm, defasada 8.170&nbsp;mm · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
+    Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> todos os cenários de referência vêm do desenho. O passo executado no chão de fábrica ainda não foi medido e pode divergir do DWG.
+  </p>
+</div>
+
+<script>
+"use strict";
+
+const E1 = { ini:0,    len:23940, larg:840 };
+const E2 = { ini:8170, len:23975, larg:850 };
+const GAP_COL = 1590;
+const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
+
+const PRESETS = [
+  { id:"v1", nome:"Versão 1", sub:"par 200 · vão 500",      W:500, modo:"par",   GI:200, GE:500 },
+  { id:"v2", nome:"Versão 2", sub:"par encostado · vão 500", W:500, modo:"par",   GI:0,   GE:500 },
+  { id:"v3", nome:"Versão 3", sub:"sem par · vão 500",       W:500, modo:"solto", GI:0,   GE:500 },
+  { id:"at", nome:"Passo do DWG", sub:"par 200 · vão 400",   W:500, modo:"par",   GI:200, GE:400 }
+];
+
+const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000 };
+const CAMPOS = ["pW","pP","pModo","pGI","pGE","pPass","pL1","pL2","pL3"];
+const MAPA   = { pW:"W", pP:"P", pModo:"modo", pGI:"GI", pGE:"GE", pPass:"pass", pL1:"L1", pL2:"L2", pL3:"L3" };
+
+const $ = s => document.querySelector(s);
+const fmt = n => Math.round(n).toLocaleString("pt-BR");
+
+/* ---------------- cálculo ---------------- */
+function calcula(env, p){
+  const bloco = p.modo === "par" ? (2*p.W + p.GI) : p.W;
+  if (!(bloco > 0)) return null;
+  let n = 0;
+  while ((n+1)*bloco + n*p.GE <= env.len) n++;
+  if (n === 0) return null;
+
+  const ocupado = n*bloco + (n-1)*p.GE;
+  const sobra   = env.len - ocupado;
+
+  let nPass = p.pass === "none" ? 0 : (p.pass === "duas" ? 2 : 1);
+  if (n-1 < nPass) nPass = Math.max(0, n-1);
+  const idxPass = [];
+  if (nPass === 1) idxPass.push(Math.round(n/2));
+  if (nPass === 2){
+    const a = Math.round(n/3), b = Math.round(2*n/3);
+    idxPass.push(a); idxPass.push(b === a ? a+1 : b);
+  }
+  const larguraPass = nPass ? p.GE + sobra/nPass : p.GE;
+
+  const grupos = []; let x = env.ini;
+  for (let i = 0; i < n; i++){
+    const ini = x;
+    const trilhos = p.modo === "par" ? [x, x + p.W + p.GI] : [x];
+    x += bloco;
+    grupos.push({ ini, fim:x, trilhos });
+    if (i < n-1) x += idxPass.includes(i+1) ? larguraPass : p.GE;
+  }
+  return { n, ocupado, sobra, idxPass, larguraPass, grupos, fim:x,
+           viaUtil: bloco, trilhosPorLado: p.modo === "par" ? n*2 : n };
+}
+
+function lerParams(){
+  const modo = $("#pModo").value;
+  return {
+    W:  Math.max(1, +$("#pW").value  || 0),
+    P:  Math.max(1, +$("#pP").value  || 0),
+    GI: modo === "par" ? Math.max(0, +$("#pGI").value || 0) : 0,
+    GE: Math.max(0, +$("#pGE").value || 0),
+    modo, pass: $("#pPass").value,
+    L1: Math.max(1, +$("#pL1").value || 0),
+    L2: Math.max(1, +$("#pL2").value || 0),
+    L3: Math.max(1, +$("#pL3").value || 0)
+  };
+}
+function metragem(p, r1, r2){
+  return (r1.trilhosPorLado*(p.L1 + p.L2) + r2.trilhosPorLado*p.L3) / 1000;
+}
+
+/* ---------------- desenho ---------------- */
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, a, t){
+  const e = document.createElementNS(NS, tag);
+  for (const k in a) e.setAttribute(k, a[k]);
+  if (t != null) e.textContent = t;
+  return e;
+}
+function cotaV(g, x, y, h, txt, cor){
+  g.appendChild(el("line", { x1:x, y1:y, x2:x, y2:y+h, stroke:cor, "stroke-width":36 }));
+  [y, y+h].forEach(v => g.appendChild(el("line", { x1:x-160, y1:v, x2:x+160, y2:v, stroke:cor, "stroke-width":36 })));
+  g.appendChild(el("text", { x:x-260, y:y+h/2, "font-size":400, "font-weight":"700", fill:cor,
+    "text-anchor":"middle", transform:`rotate(-90 ${x-260} ${y+h/2})` }, txt));
+}
+function cotaH(g, x0, x1, y, txt, cor, acima){
+  g.appendChild(el("line", { x1:x0, y1:y, x2:x1, y2:y, stroke:cor, "stroke-width":40 }));
+  [x0, x1].forEach(v => g.appendChild(el("line", { x1:v, y1:y-160, x2:v, y2:y+160, stroke:cor, "stroke-width":40 })));
+  g.appendChild(el("text", { x:(x0+x1)/2, y:acima ? y-260 : y+700, "font-size":430, "font-weight":"700",
+    fill:cor, "text-anchor":"middle" }, txt));
+}
+
+function desenha(p, r1, r2){
+  const svg = $("#svg");
+  while (svg.childNodes.length > 1) svg.removeChild(svg.lastChild);
+
+  const yC1 = 0, yE1 = p.L1, yC2 = p.L1 + E1.larg;
+  const yC3 = yC2 + p.L2 + GAP_COL, yE2 = yC3 + p.L3;
+  const H = yE2 + E2.larg;
+  const larg = Math.max(E1.ini + E1.len, E2.ini + E2.len);
+  const ML = 2400, MR = 900, MT = 2400, MB = 2900;
+  svg.setAttribute("viewBox", `${-ML} ${-MT} ${larg + ML + MR} ${H + MT + MB}`);
+
+  const g = el("g", { "font-family":"Calibri, Carlito, Segoe UI, sans-serif" });
+  svg.appendChild(g);
+  const fsNum = r1.n > 18 ? 400 : 440;
+
+  // passagens (por baixo das esteiras)
+  const pintaPass = (r, faixas) => r.idxPass.forEach(i => {
+    const x0 = r.grupos[i-1].fim, w = r.larguraPass;
+    faixas.forEach(([y,h]) => g.appendChild(el("rect",
+      { x:x0, y, width:w, height:h, fill:"#F7ECC0", stroke:"#A8140F", "stroke-width":36 })));
+    const [y0,h0] = faixas[0];
+    g.appendChild(el("text", { x:x0 + w/2, y:y0 + h0/2, "font-size":400, "font-weight":"700",
+      fill:"#A8140F", "text-anchor":"middle",
+      transform:`rotate(-90 ${x0 + w/2} ${y0 + h0/2})` }, `PASSAGEM ${fmt(w)}`));
+  });
+  pintaPass(r1, [[yC1,p.L1],[yC2,p.L2]]);
+  pintaPass(r2, [[yC3,p.L3]]);
+
+  // trilhos
+  r1.grupos.forEach((gr,i) => {
+    gr.trilhos.forEach(x => {
+      g.appendChild(el("rect", { x, y:yC1, width:p.W, height:p.L1, fill:"#DB2126", stroke:"#fff", "stroke-width":26 }));
+      g.appendChild(el("rect", { x, y:yC2, width:p.W, height:p.L2, fill:"#A8140F", stroke:"#fff", "stroke-width":26 }));
+    });
+    g.appendChild(el("text", { x:(gr.ini+gr.fim)/2, y:yC1-520, "font-size":fsNum, "font-weight":"700",
+      fill:"#71787F", "text-anchor":"middle" }, String(i+1)));
+  });
+  r2.grupos.forEach((gr,i) => {
+    gr.trilhos.forEach(x =>
+      g.appendChild(el("rect", { x, y:yC3, width:p.W, height:p.L3, fill:"#A8140F", stroke:"#fff", "stroke-width":26 })));
+    g.appendChild(el("text", { x:(gr.ini+gr.fim)/2, y:H+900, "font-size":fsNum, "font-weight":"700",
+      fill:"#71787F", "text-anchor":"middle" }, String(i+1)));
+  });
+
+  // esteiras
+  const barra = (x,y,w,h,cor,txt) => {
+    g.appendChild(el("rect", { x, y, width:w, height:h, fill:cor }));
+    g.appendChild(el("text", { x:x + w*0.25, y:y + h*0.70, "font-size":470, "font-weight":"700",
+      fill:"#fff", "text-anchor":"middle", "letter-spacing":40 }, txt));
+  };
+  barra(E1.ini, yE1, E1.len, E1.larg, "#2E5E8C", `ESTEIRA 1 · ${fmt(E1.larg)} × ${fmt(E1.len)} mm`);
+  barra(E2.ini, yE2, E2.len, E2.larg, "#5B8DB8", `ESTEIRA 2 · ${fmt(E2.larg)} × ${fmt(E2.len)} mm`);
+
+  // cotas
+  cotaV(g, -1000, yC1, p.L1, `C1  ${fmt(p.L1)}`, "#DB2126");
+  cotaV(g, -1000, yE1, E1.larg, String(E1.larg), "#2E5E8C");
+  cotaV(g, -1000, yC2, p.L2, `C2  ${fmt(p.L2)}`, "#A8140F");
+  cotaV(g, -1000, yC2+p.L2, GAP_COL, fmt(GAP_COL), "#9AA1A8");
+  cotaV(g, -1000, yC3, p.L3, `C3  ${fmt(p.L3)}`, "#A8140F");
+  cotaV(g, -1000, yE2, E2.larg, String(E2.larg), "#5B8DB8");
+
+  const un = p.modo === "par" ? "vias" : "trilhos";
+  cotaH(g, E1.ini, E1.ini+E1.len, yC1-1500,
+        `${fmt(E1.len)} mm · ${r1.n} ${un} · vão ${fmt(p.GE)} mm`, "#2E5E8C", true);
+  cotaH(g, E2.ini, E2.ini+E2.len, H+1800,
+        `${fmt(E2.len)} mm · ${r2.n} ${un} · defasada ${fmt(E2.ini)} mm`, "#5B8DB8", false);
+}
+
+/* ---------------- render ---------------- */
+let atual = {};
+
+function render(){
+  const p = lerParams();
+  $("#fGI").style.display = p.modo === "par" ? "" : "none";
+
+  const r1 = calcula(E1, p), r2 = calcula(E2, p);
+  const av = $("#avisos");
+  if (!r1 || !r2){
+    av.innerHTML = '<div class="aviso"><span class="ic">!</span><div>Com esses valores nenhum trilho cabe no alcance da esteira. Revise a largura do trilho e os vãos.</div></div>';
+    $("#faixa").innerHTML = ""; return;
+  }
+
+  const avisos = [];
+  if (p.GE < 500)
+    avisos.push(`Vão entre pares em <b>${fmt(p.GE)} mm</b>, abaixo dos 500 mm adotados como mínimo de circulação.`);
+  if (p.pass !== "none" && r1.larguraPass < 800)
+    avisos.push(`Passagem com <b>${fmt(r1.larguraPass)} mm</b>. Abaixo de 800 mm não passa uma pessoa carregando prancha.`);
+  if (p.pass === "none" && r1.sobra > 0)
+    avisos.push(`Sobram <b>${fmt(r1.sobra)} mm</b> de esteira sem trilho na ponta do banco.`);
+  const folga = p.W - p.P;
+  const apoioD = 2*p.W + (p.modo === "par" ? p.GI : p.GE);
+  if (folga < 0)
+    avisos.push(`A prancha tem <b>${fmt(p.P)} mm</b> e o trilho <b>${fmt(p.W)} mm</b>. A prancha não apoia.`);
+  else if (folga < 30)
+    avisos.push(`Folga de <b>${fmt(folga)} mm</b> (${fmt(folga/2)} mm por lado). Sem guia lateral, a prancha desalinha e trava.`);
+  if (p.modo === "par" && p.GI === 0)
+    avisos.push(`Com os trilhos encostados, a peça larga apoiada nos dois trilhos ganha <b>${fmt(apoioD)} mm</b> de base, contra 1.200 mm do arranjo de hoje.`);
+  if (p.modo === "solto")
+    avisos.push(`Sem par, a peça larga teria que vencer um vão de <b>${fmt(p.GE)} mm</b> entre os dois trilhos de apoio.`);
+  av.innerHTML = avisos.map(t => `<div class="aviso"><span class="ic">!</span><div>${t}</div></div>`).join("");
+
+  const m = metragem(p, r1, r2);
+  const apoioDuplo = 2*p.W + (p.modo === "par" ? p.GI : p.GE);
+  const tot = r1.trilhosPorLado*2 + r2.trilhosPorLado;
+  const un = p.modo === "par" ? "vias" : "trilhos";
+  const dTri = tot - REF.trilhos, dMet = m - REF.metros;
+  const sinal = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v));
+
+  $("#faixa").innerHTML = `
+    <div class="met pri"><div class="v tnum">${r1.trilhosPorLado} <span class="u">pistas</span></div>
+      <div class="l">por lado da esteira 1 · ${r2.trilhosPorLado} na esteira 2</div></div>
+    <div class="met"><div class="v tnum">${folga >= 0 ? fmt(folga) : "−"+fmt(-folga)} <span class="u">mm</span></div>
+      <div class="l">folga da prancha no trilho</div></div>
+    <div class="met"><div class="v tnum">${fmt(apoioDuplo)} <span class="u">mm</span></div>
+      <div class="l">apoio da peça larga em 2 trilhos</div></div>
+    <div class="met"><div class="v tnum">${tot}</div>
+      <div class="l">trilhos · ${sinal(dTri)} vs. DWG</div></div>
+    <div class="met pri"><div class="v tnum">${fmt(m)} <span class="u">m</span></div>
+      <div class="l">metragem · ${sinal(dMet)} m vs. DWG</div></div>
+    <div class="met"><div class="v tnum">${p.pass === "none" ? "—" : fmt(r1.larguraPass) + ' <span class="u">mm</span>'}</div>
+      <div class="l">${p.pass === "none" ? "sem passagem" : "passagem · " + r1.idxPass.length + " no banco"}</div></div>`;
+
+  montaPrintHd(p, r1, r2, m, tot);
+  desenha(p, r1, r2);
+  montaCotas(p, r1);
+  montaComparativo(p);
+  atual = { p, r1, r2 };
+}
+
+function montaPrintHd(p, r1, r2, m, tot){
+  const pr = PRESETS.find(x => x.W===p.W && x.GI===p.GI && x.GE===p.GE && x.modo===p.modo);
+  const cen = pr ? `${pr.nome} — ${pr.sub}` : "Cenário personalizado";
+  const passTxt = p.pass === "none" ? "sem passagem"
+                : `${r1.idxPass.length} passagem${r1.idxPass.length>1?"ns":""} de ${fmt(r1.larguraPass)} mm`;
+  const it = [
+    ["Trilho", fmt(p.W)+" mm"], ["Prancha", fmt(p.P)+" mm"], ["Folga", fmt(p.W-p.P)+" mm"],
+    ["Arranjo", p.modo==="par" ? "em par" : "independentes"],
+    ["Vão no par", p.modo==="par" ? fmt(p.GI)+" mm" : "—"],
+    ["Vão entre pares", fmt(p.GE)+" mm"], ["Apoio em 2 trilhos", fmt(2*p.W + (p.modo==="par"?p.GI:p.GE))+" mm"], ["Passagem", passTxt],
+    ["Trilhos C1 / C2 / C3", `${fmt(p.L1)} / ${fmt(p.L2)} / ${fmt(p.L3)} mm`],
+    ["Pistas por lado", `${r1.trilhosPorLado} na esteira 1 · ${r2.trilhosPorLado} na esteira 2`],
+    ["Conjunto", `${tot} trilhos · ${fmt(m)} m`]
+  ];
+  $("#printHd").innerHTML = `
+    <div class="phd">
+      <img src="${$("#logo").src}" alt="">
+      <div class="tt">
+        <h1>Dimensionamento dos trilhos — Embalagem</h1>
+        <p class="cen"><b>${cen}</b> · prancha de ${fmt(p.P)} mm apoiada em um trilho</p>
+      </div>
+      <div class="dt">Patrimar Móveis · PPCP<br>${new Date().toLocaleDateString("pt-BR")}</div>
+    </div>
+    <div class="pparams">${it.map(([k,v]) => `${k}: <b>${v}</b>`).join("")}</div>`;
+}
+
+function montaCotas(p, r){
+  const linhas = [];
+  let ant = null;
+  r.grupos.forEach((gr,i) => {
+    if (r.idxPass.includes(i) && ant !== null)
+      linhas.push(`<tr class="passagem"><td colspan="4">Passagem</td><td class="num">${fmt(gr.ini - ant)}</td></tr>`);
+    gr.trilhos.forEach((x,k) => {
+      linhas.push(`<tr><td>${p.modo === "par" ? i+1 : "—"}</td><td>${p.modo === "par" ? i*2+k+1 : i+1}</td>`
+        + `<td class="num">${fmt(x)}</td><td class="num">${fmt(x + p.W)}</td>`
+        + `<td class="num">${ant === null ? "—" : fmt(x - ant)}</td></tr>`);
+      ant = x + p.W;
+    });
+  });
+  $("#tabCotas tbody").innerHTML = linhas.join("");
+  $("#cotasSub").textContent = `${r.trilhosPorLado} pistas por lado · fecha em ${fmt(r.fim)} mm`;
+}
+
+function montaComparativo(pa){
+  const itens = [];
+  PRESETS.forEach(pr => {
+    const p = { W:pr.W, GI:pr.GI, GE:pr.GE, modo:pr.modo, pass:pa.pass, L1:pa.L1, L2:pa.L2, L3:pa.L3 };
+    const a = calcula(E1, p), b = calcula(E2, p);
+    if (!a || !b) return;
+    itens.push({
+      nome: pr.nome,
+      sub: `${pr.sub} · ${a.trilhosPorLado} pistas por lado · apoio duplo ${fmt(2*p.W + (p.modo==="par"?p.GI:p.GE))} mm`,
+      metros: metragem(p, a, b),
+      trilhos: a.trilhosPorLado*2 + b.trilhosPorLado,
+      cor: pr.id === "at" ? "#71787F" : (pr.id === "v3" ? "#B8BEC4" : "#DB2126"),
+      sel: pr.W === pa.W && pr.GI === pa.GI && pr.GE === pa.GE && pr.modo === pa.modo
+    });
+  });
+  itens.unshift({ nome:REF.nome, sub:REF.sub, metros:REF.metros,
+                  trilhos:REF.trilhos, cor:"#9AA1A8", ref:true });
+
+  const max = Math.max(...itens.map(i => i.metros)) || 1;
+  $("#comp").innerHTML = itens.map(i => `
+    <div class="linha-comp ${i.sel ? "sel" : ""} ${i.ref ? "ref" : ""}">
+      <div>
+        <div class="lc-nome">${i.nome}</div>
+        <div class="lc-sub">${i.sub}</div>
+        <div class="lc-bar"><i style="width:${(i.metros/max*100).toFixed(1)}%;background:${i.cor}"></i></div>
+      </div>
+      <div class="lc-num"><div class="m tnum">${fmt(i.metros)} m</div><div class="t tnum">${i.trilhos} trilhos</div></div>
+    </div>`).join("");
+}
+
+/* ---------------- cenários ---------------- */
+function montaSeg(){
+  $("#seg").innerHTML = PRESETS.map(p =>
+    `<button type="button" data-id="${p.id}" aria-pressed="false"><b>${p.nome}</b><span>${p.sub}</span></button>`).join("");
+  $("#seg").addEventListener("click", ev => {
+    const b = ev.target.closest("button[data-id]"); if (!b) return;
+    const p = PRESETS.find(x => x.id === b.dataset.id);
+    $("#pW").value = p.W; $("#pModo").value = p.modo; $("#pGI").value = p.GI; $("#pGE").value = p.GE;
+    render(); marca(); gravaHash();
+  });
+}
+function marca(){
+  const p = lerParams();
+  document.querySelectorAll("#seg button").forEach(b => {
+    const x = PRESETS.find(v => v.id === b.dataset.id);
+    b.setAttribute("aria-pressed", String(x.W === p.W && x.GI === p.GI && x.GE === p.GE && x.modo === p.modo));
+  });
+}
+
+/* ---------------- exportação ---------------- */
+function baixa(nome, conteudo, tipo){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([conteudo], { type:tipo }));
+  a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function csvCotas(){
+  const { r1, p } = atual; if (!r1) return;
+  const l = ["VIA;TRILHO;COTA_INICIO_mm;COTA_FIM_mm;VAO_ANTERIOR_mm;COMPR_LADO_A_mm;COMPR_LADO_B_mm"];
+  let ant = null;
+  r1.grupos.forEach((gr,i) => gr.trilhos.forEach((x,k) => {
+    l.push([ p.modo === "par" ? i+1 : "", p.modo === "par" ? i*2+k+1 : i+1,
+             Math.round(x), Math.round(x + p.W), ant === null ? "" : Math.round(x - ant),
+             p.L1, p.L2 ].join(";"));
+    ant = x + p.W;
+  }));
+  l.push(`;TOTAL;0;${Math.round(r1.fim)};;;`);
+  baixa("trilhos_cotas_esteira1.csv", "\uFEFF" + l.join("\r\n"), "text/csv;charset=utf-8");
+}
+
+function aplica(v){
+  CAMPOS.forEach(id => { const k = MAPA[id]; if (v[k] !== undefined && v[k] !== "") $("#"+id).value = v[k]; });
+}
+function gravaHash(){
+  const v = {}; CAMPOS.forEach(id => v[MAPA[id]] = $("#"+id).value);
+  history.replaceState(null, "", "#" + new URLSearchParams(v).toString());
+}
+function leHash(){
+  if (!location.hash || location.hash.length < 4) return;
+  const q = new URLSearchParams(location.hash.slice(1));
+  const v = {}; q.forEach((val, k) => v[k] = val);
+  aplica(v);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  $("#logo").src = "data:image/png;base64,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";
+  montaSeg();
+  CAMPOS.forEach(id =>
+    $("#"+id).addEventListener("input", () => { render(); marca(); gravaHash(); }));
+  $("#btnReset").addEventListener("click", () => { aplica(PADRAO); render(); marca(); gravaHash(); });
+  $("#btnLink").addEventListener("click", async ev => {
+    gravaHash();
+    const b = ev.currentTarget, t = b.textContent;
+    try { await navigator.clipboard.writeText(location.href); b.textContent = "Copiado"; }
+    catch { b.textContent = "Copie da barra"; }
+    setTimeout(() => b.textContent = t, 1800);
+  });
+  $("#btnCsv").addEventListener("click", csvCotas);
+  $("#btnSvg").addEventListener("click", () => {
+    const s = $("#svg").cloneNode(true);
+    s.setAttribute("xmlns", NS);
+    baixa("planta_trilhos.svg", new XMLSerializer().serializeToString(s), "image/svg+xml");
+  });
+  $("#btnPrint").addEventListener("click", () => window.print());
+  leHash(); render(); marca();
+});
+</script>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
+</script>
+</body>
+</html>
