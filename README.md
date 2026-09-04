@@ -22,7 +22,7 @@ dentro do alcance das duas esteiras.
 | Comprimento C1 / C2 / C3 | 6.000 / 4.000 / 4.000 mm | informado pela Produção |
 | Esteira 1 | 840 × 23.940 mm | medido no DWG |
 | Esteira 2 | 850 × 23.975 mm, defasada 8.170 mm | medido no DWG |
-| Vão entre as colunas C2 e C3 | 1.590 mm | DWG · fixo no código, não ajustável na tela |
+| Corredor entre C2 e C3 (circulação de carrinho) | 1.590 mm | DWG · confirmado pela Produção · fixo no código |
 
 ## Regras de aviso
 
@@ -46,8 +46,12 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 - No DWG a coluna C1 aparece com trilhos de 7.000 mm e a C3 com 3.000 mm, divergindo
   da informação de campo (6.000 e 4.000 mm).
 - A largura da peça mais larga apoiada nos dois trilhos ainda não foi levantada.
-- O vão de 1.590 mm entre C2 e C3 foi tomado do DWG e não é editável na tela. Se a
-  medida de campo divergir, o desenho e as cotas verticais ficam errados.
+- O corredor de 1.590 mm entre C2 e C3 é a circulação do carrinho e não pode ser
+  reduzido. Com C2 = 4.000 e C3 = 4.000 (Produção) a distância entre as esteiras
+  seria 9.590 mm; com C3 = 3.000 (DWG) é 8.590 mm. As esteiras são fixas, então
+  uma das duas informações está errada: medir a distância entre as esteiras
+  (borda a borda) para saber qual — se for 8.590 e a C3 tiver 4.000, o corredor
+  real é de 590 mm e o carrinho não passa.
 
 ## Stack
 
