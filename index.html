@@ -575,11 +575,14 @@ function pintaCotas(g, p, r1, r2, y, H){
         `${fmt(E2.len)} mm · ${r2.n} ${un} · defasada ${fmt(E2.ini)} mm`, COR.esteira2, false);
 }
 
-/** Troca o conteúdo do SVG preservando o <title> usado pelo aria-labelledby. */
+/** Troca o conteúdo do SVG preservando o <title> usado pelo aria-labelledby.
+    Sem replaceChildren: tablets de chão de fábrica podem rodar Chrome antigo. */
 function trocaConteudoSvg(conteudo){
   const svg = $("#svg");
   const titulo = svg.querySelector("title");
-  svg.replaceChildren(...(titulo ? [titulo, ...conteudo] : conteudo));
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  if (titulo) svg.appendChild(titulo);
+  conteudo.forEach(n => svg.appendChild(n));
 }
 
 function desenha(r){
