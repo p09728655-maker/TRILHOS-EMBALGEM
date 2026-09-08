@@ -27,7 +27,7 @@ dentro do alcance das duas esteiras.
 | Esteira 2 | 850 × 28.975 mm, defasada 7.850 mm | DWG: 23.975 mm; defasagem medida no eixo da esteira 1; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
 | Vão entre as colunas C2 e C3 | 2.100 mm | medido no DWG · fixo no código, não ajustável na tela |
 | Trilho de abastecimento (carrinho) | 1.570 mm de largura | faixa acima da C1 e centrada no vão C2–C3 · no DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1 |
-| Trilho de abastecimento lateral | 2.500 mm antes da esteira 1 | mesma largura dos outros; distância é hipótese, a confirmar no DWG |
+| Trilho de abastecimento lateral | 3.200 mm de largura, a 800 mm da esteira 1 | lido do DWG (faixa entre 0,8 m e 4,0 m antes da esteira 1), precisão de uns 300 mm; ambos editáveis |
 | Barracão | 55.210 × 24.900 mm · esteira 1 a 6.470 mm da parede esquerda e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento e afastamento esquerdo cotados no DWG; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1) |
 
 ## Regras de aviso
@@ -66,8 +66,8 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 - O aumento de 5 m da esteira 2 foi desenhado no final da esteira (lado oposto ao início),
   mantendo a defasagem de 7.850 mm. Se o acréscimo for no início, a defasagem muda e
   o código precisa ser ajustado (`E2.ini`).
-- A posição do trilho de abastecimento lateral (2.500 mm antes da esteira 1) é hipótese. No DWG
-  há linhas fora de esquadro nessa região e não foi possível identificar o trilho com segurança.
+- O trilho de abastecimento lateral foi lido do DWG entre 0,8 m e 4,0 m antes da esteira 1, com
+  precisão de uns 300 mm, porque as linhas dessa região estão fora de esquadro. Confirmar em campo.
 - A largura da faixa do trilho de abastecimento (carrinho) está em 1.570 mm, medida no DWG entre os
   rails do vão C2–C3, editável na tela. Só o desenho usa esse valor; ele não entra na contagem de pistas
   nem na metragem. A simulação avisa se a largura passar do vão de 2.100 mm entre C2 e C3.
