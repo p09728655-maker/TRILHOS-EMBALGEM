@@ -11,7 +11,7 @@
   --abast:#5C6670; --abast-bg:#E6E9EC; --aumento:#1F8A4C;
   --bg:#EDEEF0; --surface:#FFFFFF; --linha:#E1E4E7; --linha2:#F0F1F3;
   --texto:#1F2328; --muted:#71787F; --muted2:#9AA1A8;
-  --cinza:#B8BEC4;
+  --cinza:#B8BEC4; --area:#7A5CA8; --area-bg:#F2EEF8;
   --atencao:#9A5B00; --atencao-bg:#FFF7E8; --atencao-br:#E9CE9A;
   --ff:'Calibri','Carlito','Segoe UI',system-ui,-apple-system,sans-serif;
   --r:8px;
@@ -120,6 +120,28 @@ svg#svg{display:block;width:100%;height:auto;max-height:calc(100vh - 200px);marg
 .abaixo{grid-column:2 / -1;display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:2px}
 .bloco{background:var(--surface);border:1px solid var(--linha);border-radius:var(--r);overflow:hidden}
 .bloco-hd{padding:13px 18px;border-bottom:1px solid var(--linha);display:flex;align-items:baseline;gap:10px}
+.abas{display:flex;gap:4px;flex:0 0 auto}
+.abas button{font:inherit;font-size:13.5px;font-weight:700;letter-spacing:.2px;padding:4px 10px;border:0;
+     background:transparent;color:var(--muted);border-radius:5px;cursor:pointer;white-space:nowrap}
+.abas button:hover{color:var(--texto);background:var(--linha2)}
+.abas button:focus-visible{outline:2px solid var(--esteira);outline-offset:1px}
+.abas button[aria-selected="true"]{background:var(--grafite);color:#fff}
+.area-nota{padding:11px 18px;font-size:12px;color:var(--muted);line-height:1.5;border-bottom:1px solid var(--linha2)}
+.area-acoes{display:flex;gap:8px;padding:11px 18px}
+#tabAreas input{font:inherit;font-size:13px;width:100%;padding:4px 6px;border:1px solid var(--linha);
+     border-radius:4px;background:var(--surface);color:var(--texto)}
+#tabAreas input:focus{outline:0;border-color:var(--esteira);box-shadow:0 0 0 2px rgba(46,94,140,.14)}
+#tabAreas input.num{text-align:right;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+#tabAreas input.num::-webkit-outer-spin-button,
+#tabAreas input.num::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+#tabAreas td{vertical-align:middle;padding-left:7px;padding-right:7px}
+#tabAreas th:nth-child(n+2):nth-child(-n+5),
+#tabAreas td:nth-child(n+2):nth-child(-n+5){width:76px}
+#tabAreas th:last-child,#tabAreas td:last-child{width:1%;white-space:nowrap}
+#tabAreas .rm{font:inherit;font-size:13px;line-height:1;padding:4px 8px;border:1px solid var(--linha);
+     border-radius:4px;background:var(--surface);color:var(--muted);cursor:pointer}
+#tabAreas .rm:hover{border-color:var(--vermelho);color:var(--vermelho)}
+#tabAreas .vazio{color:var(--muted2);font-style:italic}
 .bloco-hd p{margin:0;font-size:12px;color:var(--muted2)}
 
 .rec{padding:12px 18px;border-bottom:1px solid var(--linha);background:#F3F8F3}
@@ -412,6 +434,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       <span><i style="background:repeating-linear-gradient(45deg,var(--aumento) 0 3px,var(--esteira2) 3px 5px)"></i>Aumento da esteira 2 (+5 m)</span>
       <span><i style="background:var(--areia);border:1px solid var(--bordeaux)"></i>Passagem</span>
       <span><i style="background:var(--abast-bg);border:1px solid var(--abast)"></i>Trilho de abastecimento (carrinho)</span>
+      <span><i style="background:var(--area-bg);border:1px dashed var(--area)"></i>Outra máquina / área demarcada</span>
     </div>
   </main>
 
@@ -423,12 +446,41 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
     </section>
 
     <section class="bloco">
-      <div class="bloco-hd"><h2>Cotas · esteira 1</h2><p id="cotasSub"></p></div>
-      <div class="rolagem">
-        <table id="tabCotas">
-          <thead><tr><th>Grupo</th><th>Pista</th><th class="num">Início</th><th class="num">Fim</th><th class="num">Vão ant.</th></tr></thead>
-          <tbody></tbody>
-        </table>
+      <div class="bloco-hd">
+        <div class="abas" role="tablist">
+          <button type="button" role="tab" id="abaCotas" aria-selected="true" aria-controls="pnCotas">Cotas · esteira 1</button>
+          <button type="button" role="tab" id="abaAreas" aria-selected="false" aria-controls="pnAreas">Áreas e máquinas</button>
+        </div>
+        <p id="cotasSub"></p>
+      </div>
+
+      <div id="pnCotas" role="tabpanel" aria-labelledby="abaCotas">
+        <div class="rolagem">
+          <table id="tabCotas">
+            <thead><tr><th>Grupo</th><th>Pista</th><th class="num">Início</th><th class="num">Fim</th><th class="num">Vão ant.</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="pnAreas" role="tabpanel" aria-labelledby="abaAreas" hidden>
+        <div class="area-nota">
+          Outras máquinas e espaços demarcados do barracão. <b>O DWG não pôde ser lido</b> — o arquivo é
+          AC1032 com as seções comprimidas —, então as áreas são digitadas aqui. Origem das coordenadas:
+          <b>X</b> no sentido das esteiras, zero no início da esteira 1; <b>Y</b> no sentido dos trilhos,
+          zero no trilho de abastecimento acima da C1. Valores negativos ficam à esquerda e acima.
+          Elas aparecem na planta e a simulação avisa quando alguma invade o conjunto.
+        </div>
+        <div class="rolagem">
+          <table id="tabAreas">
+            <thead><tr><th>Nome</th><th class="num">X</th><th class="num">Y</th><th class="num">Largura</th><th class="num">Altura</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="area-acoes">
+          <button type="button" class="ghost claro" id="btnAreaAdd">Adicionar área</button>
+          <button type="button" class="ghost claro" id="btnAreaLimpa">Limpar todas</button>
+        </div>
       </div>
     </section>
   </div>
@@ -468,7 +520,7 @@ const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v13";
+const VERSAO = "v14";
 const VERSAO_DATA = "08/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -490,6 +542,27 @@ const PADRAO = { W:500, P:450, modo:"par", GI:50, GE:500, pass:"meio", L1:7000, 
 // Enquanto isso não for resolvido em campo, a sobra no comprimento é otimista nesses 2.220.
 // Largura 24.900 e afastamento 700 são HIPÓTESE: parede do lado da C1 tomada na linha de pilares a 11,0 m da esteira 1;
 // a cota de 23.570 do DWG não fecha com o trilho de abastecimento (rails a 10,3 m da esteira 1).
+
+/* Outras máquinas e espaços demarcados do barracão, digitados na aba "Áreas".
+   Coordenadas no mesmo sistema da planta: X no sentido das esteiras com zero no início da
+   esteira 1, Y no sentido dos trilhos com zero no trilho de abastecimento acima da C1.
+   Não saem do DWG: o arquivo é AC1032 com as seções comprimidas e não foi possível lê-lo. */
+let AREAS = [];
+
+const areaLimpa = t => String(t == null ? "" : t).replace(/[|~]/g, " ").trim().slice(0, 40);
+
+/** Serializa para o link: nome~x~y~w~h separados por |. */
+const areasParaTexto = () =>
+  AREAS.map(a => [areaLimpa(a.nome), a.x, a.y, a.w, a.h].join("~")).join("|");
+
+function areasDeTexto(txt){
+  if (!txt) return [];
+  return txt.split("|").map(bloco => {
+    const [nome, x, y, w, h] = bloco.split("~");
+    const n = v => { const k = Number(v); return Number.isFinite(k) ? Math.round(k) : 0; };
+    return { nome: areaLimpa(nome), x: n(x), y: n(y), w: Math.max(0, n(w)), h: Math.max(0, n(h)) };
+  }).filter(a => a.w > 0 && a.h > 0);
+}
 
 /* id do campo no formulário -> chave do parâmetro */
 const CAMPOS = { pW:"W", pP:"P", pModo:"modo", pGI:"GI", pGE:"GE", pPass:"pass", pL1:"L1", pL2:"L2", pL3:"L3", pAB:"AB",
@@ -516,7 +589,10 @@ const COR = {
   abastBg:  token("--abast-bg"),
   cota:     token("--muted2"),
   numero:   token("--muted"),
-  neutra:   token("--cinza")
+  neutra:   token("--cinza"),
+  area:     token("--area"),
+  areaBg:   token("--area-bg"),
+  vermelho: token("--vermelho")
 };
 
 /* ---------------- cálculo ---------------- */
@@ -575,6 +651,20 @@ const bordaLateral = p => E1.ini - p.AX - p.AL;
 
 /** Altura do conjunto no sentido dos trilhos: do trilho de abastecimento da C1 à esteira 2. */
 const alturaConjunto = p => p.AB + p.L1 + E1.larg + p.L2 + GAP_COL + p.L3 + E2.larg;
+
+/** Retângulo ocupado pelo conjunto, no mesmo sistema das áreas. */
+function caixaConjunto(p, e2){
+  return { x0: bordaLateral(p), x1: Math.max(E1.ini + E1.len, e2.ini + e2.len),
+           y0: 0, y1: alturaConjunto(p) };
+}
+
+/** Sobreposição entre uma área e o conjunto, em mm por eixo. Zero em qualquer eixo = não invade. */
+function invasao(a, c){
+  return {
+    x: Math.min(a.x + a.w, c.x1) - Math.max(a.x, c.x0),
+    y: Math.min(a.y + a.h, c.y1) - Math.max(a.y, c.y0)
+  };
+}
 
 /** Extensão ocupada pelo conjunto: do trilho lateral ao fim mais distante das esteiras, e do trilho acima da C1 à esteira 2. */
 function extensao(p, e2){
@@ -741,6 +831,24 @@ function pintaAbastecimento(g, x0, x1, yy, h, txt){
     fill:COR.abast, "text-anchor":"middle", "letter-spacing":40 }, txt));
 }
 
+/** Outras máquinas e áreas demarcadas. Desenhadas por cima do conjunto e translúcidas,
+    para a sobreposição aparecer em vez de ficar escondida atrás de um retângulo opaco. */
+function pintaAreas(g, p, e2){
+  if (!AREAS.length) return;
+  const cx = caixaConjunto(p, e2);
+  AREAS.forEach(a => {
+    const s = invasao(a, cx), bate = s.x > 0 && s.y > 0;
+    g.appendChild(el("rect", { x:a.x, y:a.y, width:a.w, height:a.h, fill:COR.areaBg, "fill-opacity":.72,
+      stroke: bate ? COR.vermelho : COR.area, "stroke-width": bate ? 90 : 60, "stroke-dasharray":"500 260" }));
+    const fs = Math.min(440, a.w / Math.max(4, (a.nome || "").length) * 1.7, a.h * 0.5);
+    if (a.nome && fs > 120)
+      g.appendChild(el("text", { x:a.x + a.w/2, y:a.y + a.h/2 + fs*0.34, "font-size":fs, "font-weight":"700",
+        fill: bate ? COR.vermelho : COR.area, "text-anchor":"middle", "letter-spacing":20 }, a.nome));
+    g.appendChild(el("text", { x:a.x + a.w/2, y:a.y + a.h - 220, "font-size":330, fill:COR.area,
+      "text-anchor":"middle" }, `${fmt(a.w)} × ${fmt(a.h)}`));
+  });
+}
+
 /** Contorno do barracão com cotas. A origem do desenho é o início da esteira 1 / topo do trilho de abastecimento. */
 function pintaBarracao(g, p, e2, H, xL, xR, yT){
   const x = xL - p.BX, yy = -p.BY, e = 60;   // traço desenhado por fora da face interna da parede
@@ -834,6 +942,10 @@ function desenha(r){
     vx1 = Math.max(vx1, xL - p.BX + p.BC + 2600);
     vy1 = Math.max(vy1, -p.BY + p.BL + 900);
   }
+  AREAS.forEach(a => {   // uma área fora do conjunto não pode sair do quadro
+    vx0 = Math.min(vx0, a.x - 900);        vy0 = Math.min(vy0, a.y - 900);
+    vx1 = Math.max(vx1, a.x + a.w + 900);  vy1 = Math.max(vy1, a.y + a.h + 900);
+  });
   $("#svg").setAttribute("viewBox", `${vx0} ${vy0} ${vx1 - vx0} ${vy1 - vy0}`);
 
   const g = el("g", { "font-family":"Calibri, Carlito, Segoe UI, sans-serif" });
@@ -854,6 +966,7 @@ function desenha(r){
   pintaAbastecimentoV(g, xL, y.ab1, H, p.AL, `TRILHO DE ABASTECIMENTO LATERAL · CARRINHO · ${fmt(p.AL)} mm`);
   pintaEsteiras(g, y, e2);
   pintaCotas(g, p, r1, r2, y, H, e2, xC, yT);
+  pintaAreas(g, p, e2);
   trocaConteudoSvg([g]);
 }
 
@@ -869,6 +982,14 @@ function montaAvisos(r){
     t.push(`O conjunto não cabe no comprimento do barracão: falta <b>${fmt(-r.barracao.sobraX)} mm</b>.`);
   if (r.barracao && r.barracao.base < 0)
     t.push(`O conjunto passa da parede do lado da esteira 2 em <b>${fmt(-r.barracao.base)} mm</b>. Encurte um trilho ou o corredor.`);
+
+  const cx = caixaConjunto(p, r.e2);
+  AREAS.forEach(a => {
+    const s = invasao(a, cx);
+    if (s.x > 0 && s.y > 0)
+      t.push(`<b>${a.nome || "Área sem nome"}</b> invade o conjunto: sobrepõe `
+        + `<b>${fmt(s.x)} mm</b> no sentido das esteiras e <b>${fmt(s.y)} mm</b> no sentido dos trilhos.`);
+  });
 
   // O que o usuário acrescenta num trilho tem que sair de algum lugar: as duas esteiras são
   // equipamento fixo, então ou a esteira 2 se desloca, ou o corredor central fecha.
@@ -1043,6 +1164,14 @@ function linhasConferencia(r){
 }
 
 function montaConferencia(r){
+  const areas = AREAS.length
+    ? `<p class="pe"><b>Outras máquinas e áreas demarcadas</b> (X e Y a partir do início da esteira 1 e do
+         trilho de abastecimento da C1):</p>
+       <table><thead><tr><th>Área</th><th>X</th><th>Y</th><th>Largura</th><th>Altura</th><th>Confere?</th></tr></thead>
+       <tbody>${AREAS.map(a => `<tr><td>${a.nome || "—"}</td><td class="n">${fmt(a.x)}</td>
+         <td class="n">${fmt(a.y)}</td><td class="n">${fmt(a.w)}</td><td class="n">${fmt(a.h)}</td>
+         <td class="med"></td></tr>`).join("")}</tbody></table>`
+    : "";
   const linhas = linhasConferencia(r).map(l => `
     <tr class="${l.chk ? "chk" : ""}">
       <td>${l.medida}</td>
@@ -1064,6 +1193,7 @@ function montaConferencia(r){
          continua vindo desse mesmo desenho, então a sobra no fim da esteira 2 herda o erro — é ela
          que diz se o aumento de 5 m cabe. O passo executado hoje e a largura da peça mais larga
          nunca foram levantados, e são eles que sustentam a comparação entre os arranjos.</p>
+      ${areas}
       <p class="pe">Conferido por: ______________________________
          &nbsp;&nbsp;&nbsp; Data: ______ / ______ / __________</p>
     </div>`;
@@ -1075,6 +1205,61 @@ function imprimeConferencia(){
   document.body.classList.add("conf");
   window.print();
   setTimeout(() => { document.body.classList.remove("conf"); $("#printConf").innerHTML = ""; }, 500);
+}
+
+/* ---------------- aba Áreas ---------------- */
+
+function montaAreas(){
+  const tb = $("#tabAreas tbody");
+  if (!AREAS.length){
+    tb.innerHTML = `<tr><td colspan="6" class="vazio">Nenhuma área cadastrada.
+      Clique em "Adicionar área" e transcreva do DWG ou meça em campo.</td></tr>`;
+    return;
+  }
+  tb.innerHTML = AREAS.map((a, i) => `
+    <tr data-i="${i}">
+      <td><input data-c="nome" value="${a.nome.replace(/"/g, "&quot;")}" placeholder="ex.: Grampeadora"></td>
+      <td><input data-c="x" class="num" type="number" step="10" value="${a.x}"></td>
+      <td><input data-c="y" class="num" type="number" step="10" value="${a.y}"></td>
+      <td><input data-c="w" class="num" type="number" step="10" min="0" value="${a.w}"></td>
+      <td><input data-c="h" class="num" type="number" step="10" min="0" value="${a.h}"></td>
+      <td><button type="button" class="rm" aria-label="Remover ${a.nome || "área"}">Remover</button></td>
+    </tr>`).join("");
+}
+
+function ligaAreas(){
+  const tb = $("#tabAreas tbody");
+  tb.addEventListener("input", ev => {
+    const inp = ev.target.closest("input[data-c]");
+    if (!inp) return;
+    const i = +inp.closest("tr").dataset.i, c = inp.dataset.c;
+    AREAS[i][c] = c === "nome" ? areaLimpa(inp.value) : Math.round(Number(inp.value) || 0);
+    atualiza();                     // redesenha sem remontar a tabela: não perde o foco do campo
+  });
+  tb.addEventListener("click", ev => {
+    if (!ev.target.closest(".rm")) return;
+    AREAS.splice(+ev.target.closest("tr").dataset.i, 1);
+    montaAreas(); atualiza();
+  });
+  $("#btnAreaAdd").addEventListener("click", () => {
+    AREAS.push({ nome:"", x:0, y:0, w:2000, h:2000 });
+    montaAreas(); atualiza();
+    const ult = tb.querySelector("tr:last-child input");
+    if (ult) ult.focus();
+  });
+  $("#btnAreaLimpa").addEventListener("click", () => {
+    if (!AREAS.length) return;
+    AREAS = []; montaAreas(); atualiza();
+  });
+  const abas = [["#abaCotas", "#pnCotas"], ["#abaAreas", "#pnAreas"]];
+  abas.forEach(([ab]) => $(ab).addEventListener("click", () => {
+    abas.forEach(([b, pn]) => {
+      const sel = b === ab;
+      $(b).setAttribute("aria-selected", String(sel));
+      $(pn).hidden = !sel;
+    });
+    $("#cotasSub").hidden = ab !== "#abaCotas";
+  }));
 }
 
 /* ---------------- ciclo de atualização ---------------- */
@@ -1124,6 +1309,7 @@ function marcaCenario(){
 function gravaHash(){
   const v = new URLSearchParams();
   IDS.forEach(id => v.set(CAMPOS[id], $("#" + id).value));
+  if (AREAS.length) v.set("areas", areasParaTexto());
   v.set("app", VERSAO);   // carimbo da versão: um link antigo passa a ser reconhecido ao abrir
   history.replaceState(null, "", "#" + v.toString());
 }
@@ -1145,6 +1331,7 @@ function leHash(){
   const v = {};
   new URLSearchParams(location.hash.slice(1)).forEach((val, k) => { v[k] = val; });
   aplica(v);
+  AREAS = areasDeTexto(v.areas);
   if (v.app === VERSAO) return [];   // link desta versão: o que estiver diferente foi o usuário quem mudou
   const difs = [];
   Object.keys(MEDIDAS).forEach(id => {
@@ -1326,7 +1513,9 @@ function inicia(){
   $("#btnSvg").addEventListener("click", svgPlanta);
   $("#btnPrint").addEventListener("click", () => window.print());
   $("#btnConf").addEventListener("click", imprimeConferencia);
+  ligaAreas();
   const difs = leHash();
+  montaAreas();
   atualiza();          // já recarimba a URL com a versão atual
   avisaLinkAntigo(difs);
 }
