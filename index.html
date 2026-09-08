@@ -15,6 +15,7 @@
   --atencao:#9A5B00; --atencao-bg:#FFF7E8; --atencao-br:#E9CE9A;
   --ff:'Calibri','Carlito','Segoe UI',system-ui,-apple-system,sans-serif;
   --r:8px;
+  --topo-h:60px;   /* medida em tempo real: a barra do topo quebra em duas linhas em tela estreita */
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;height:100%}
@@ -47,7 +48,16 @@ body{font-family:var(--ff);background:var(--bg);color:var(--texto);font-size:15p
 .seg button b{display:block;font-weight:inherit}
 .seg button span{display:block;font-size:10.5px;opacity:.72;font-weight:400;letter-spacing:.2px}
 
-.acoes-topo{display:flex;gap:6px}
+.acoes-topo{display:flex;gap:6px;align-items:center;margin-left:auto}
+.menu{position:relative}
+.menu>summary{list-style:none;display:block}
+.menu>summary::-webkit-details-marker{display:none}
+.menu-in{position:absolute;right:0;top:calc(100% + 7px);z-index:30;background:var(--surface);
+     border:1px solid var(--linha);border-radius:var(--r);box-shadow:0 10px 28px rgba(31,35,40,.22);
+     padding:6px;display:grid;gap:3px;min-width:186px}
+.menu-in .ghost{text-align:left;white-space:nowrap;width:100%;font-size:13px;padding:8px 10px;
+     border-color:var(--linha);color:var(--muted)}
+.menu-in .ghost:hover{border-color:#C6CBD0;color:var(--texto);background:#FAFBFB}
 .ghost{font:inherit;font-size:12.5px;padding:7px 11px;border:1px solid #3C434A;background:transparent;
        color:#C3C8CD;border-radius:6px;cursor:pointer}
 .ghost:hover{border-color:#5A626A;color:#fff}
@@ -58,9 +68,13 @@ body{font-family:var(--ff);background:var(--bg);color:var(--texto);font-size:15p
 /* ---------- layout ---------- */
 .app{max-width:none;margin:0 auto;padding:18px 20px 40px;display:grid;
      grid-template-columns:284px minmax(0,1fr);gap:18px;align-items:start}
+/* planta e blocos de baixo na mesma coluna: só assim a planta pode ficar fixa
+   enquanto se digita a medida da máquina lá embaixo */
+.coluna{display:grid;gap:18px;align-content:start;min-width:0}
 
 .painel{background:var(--surface);border:1px solid var(--linha);border-radius:var(--r);
-        position:sticky;top:70px;max-height:calc(100vh - 88px);overflow:auto}
+        position:sticky;top:calc(var(--topo-h) + 10px);
+        max-height:calc(100vh - var(--topo-h) - 28px);overflow:auto}
 .painel h2,.bloco h2{margin:0;font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;
                      color:var(--muted2)}
 .painel-sec{padding:14px 16px;border-bottom:1px solid var(--linha2)}
@@ -76,7 +90,18 @@ body{font-family:var(--ff);background:var(--bg);color:var(--texto);font-size:15p
 .campo input[readonly]:hover{border-color:var(--linha)}
 .campo input:focus,.campo select:focus{outline:0;border-color:var(--esteira);box-shadow:0 0 0 3px rgba(46,94,140,.14)}
 .dupla{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.nota{font-size:11.5px;color:var(--muted2);margin-top:3px;line-height:1.35}
+.nota{font-size:11.5px;color:var(--muted2);margin-top:3px;line-height:1.35;display:none}
+/* a explicação do campo é lida uma vez, não a cada uso: aparece no campo em foco,
+   e o botão "Explicações" fixa todas para quem está conhecendo a ferramenta */
+.campo:focus-within>.nota{display:block}
+body.notas .nota{display:block}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mini{font:inherit;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+      color:var(--muted2);background:transparent;border:1px solid var(--linha);border-radius:5px;
+      padding:2px 7px;cursor:pointer;white-space:nowrap}
+.mini:hover{color:var(--texto);border-color:#C6CBD0}
+.mini[aria-pressed="true"]{color:var(--esteira);border-color:#B9CFE2;background:#EDF3F9}
+.mini:focus-visible{outline:2px solid var(--esteira);outline-offset:1px}
 
 details.geo summary{list-style:none;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:1.1px;
                     text-transform:uppercase;color:var(--muted2);display:flex;align-items:center;gap:6px}
@@ -98,6 +123,8 @@ details.geo summary:focus-visible{outline:2px solid var(--esteira);outline-offse
 
 .desenho{padding:16px 18px 8px;background:var(--surface)}
 svg#svg{display:block;width:100%;height:auto;max-height:calc(100vh - 200px);margin:0 auto}
+/* área em edição: traço cheio e mais grosso, para achar na planta o que se está digitando */
+#svg .foco{stroke-dasharray:none!important}
 .leg{display:flex;gap:18px;flex-wrap:wrap;padding:6px 18px 14px;font-size:12px;color:var(--muted)}
 .leg span{display:inline-flex;align-items:center;gap:6px}
 .leg i{width:11px;height:11px;border-radius:2px;display:inline-block;flex:0 0 auto}
@@ -116,32 +143,51 @@ svg#svg{display:block;width:100%;height:auto;max-height:calc(100vh - 200px);marg
        border:1px solid var(--esteira);border-radius:5px;background:var(--esteira);color:#fff}
 .aviso.link button:hover{background:#24496D}
 
+/* ---------- camada de detalhe: justificativa não disputa espaço com decisão ---------- */
+details.mais>summary{list-style:none;cursor:pointer;font-size:11.5px;font-weight:700;color:var(--muted);
+     padding:8px 18px;display:flex;align-items:center;gap:6px;border-top:1px solid var(--linha2)}
+details.mais>summary::-webkit-details-marker{display:none}
+details.mais>summary::before{content:"\25B8";font-size:11px;transition:transform .15s}
+details.mais[open]>summary::before{transform:rotate(90deg)}
+details.mais>summary:hover{color:var(--texto);background:#FAFBFB}
+details.mais>summary:focus-visible{outline:2px solid var(--esteira);outline-offset:-2px}
+.mais-in{padding:2px 18px 12px;font-size:12px;color:var(--muted);line-height:1.5}
+
 /* ---------- blocos inferiores ---------- */
-.abaixo{grid-column:2 / -1;display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:2px}
+.abaixo{display:grid;grid-template-columns:1.25fr 1fr;gap:18px}
 .bloco{background:var(--surface);border:1px solid var(--linha);border-radius:var(--r);overflow:hidden}
 .bloco-hd{padding:13px 18px;border-bottom:1px solid var(--linha);display:flex;align-items:baseline;gap:10px}
-.abas{display:flex;gap:4px;flex:0 0 auto}
-.abas button{font:inherit;font-size:13.5px;font-weight:700;letter-spacing:.2px;padding:4px 10px;border:0;
-     background:transparent;color:var(--muted);border-radius:5px;cursor:pointer;white-space:nowrap}
-.abas button:hover{color:var(--texto);background:var(--linha2)}
-.abas button:focus-visible{outline:2px solid var(--esteira);outline-offset:1px}
-.abas button[aria-selected="true"]{background:var(--grafite);color:#fff}
-.area-nota{padding:11px 18px;font-size:12px;color:var(--muted);line-height:1.5;border-bottom:1px solid var(--linha2)}
+/* Cadastro de máquinas na lateral: entrada fica ao lado da planta, e não mil pixels
+   abaixo dela — dá para digitar a medida e ver a máquina andar no desenho. */
+.eixos{font-size:11px;color:var(--muted2);line-height:1.4;margin-top:8px}
+.eixos b{color:var(--muted)}
+.eixos .alerta{color:var(--atencao)}
+.area-card{border:1px solid var(--linha);border-radius:6px;padding:8px 9px;margin-top:9px;background:#FCFCFD}
+.area-card:focus-within{border-color:var(--esteira);box-shadow:0 0 0 3px rgba(46,94,140,.10);background:var(--surface)}
+.area-hd{display:flex;gap:6px;align-items:center}
+.area-hd input{flex:1 1 auto;min-width:0;font-weight:700}
+.area-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;margin-top:7px}
+.area-grid label{display:block;font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+     color:var(--muted2);margin-bottom:2px}
+.area-card input{width:100%;font:inherit;font-size:13.5px;padding:5px 7px;border:1px solid var(--linha);
+     border-radius:5px;background:var(--surface);color:var(--texto)}
+.area-card input.num{text-align:right;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.area-card input.num::-webkit-outer-spin-button,
+.area-card input.num::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.area-card input:focus{outline:0;border-color:var(--esteira);box-shadow:0 0 0 2px rgba(46,94,140,.14)}
+.area-card .rm{flex:0 0 auto;font:inherit;font-size:15px;line-height:1;padding:4px 8px;border:1px solid var(--linha);
+     border-radius:5px;background:var(--surface);color:var(--muted2);cursor:pointer}
+.area-card .rm:hover{border-color:var(--vermelho);color:var(--vermelho)}
+.area-card.bate{border-color:var(--atencao-br);background:var(--atencao-bg);
+     box-shadow:inset 3px 0 0 var(--atencao)}
+.area-card.bate:focus-within{background:var(--atencao-bg);
+     box-shadow:inset 3px 0 0 var(--atencao),0 0 0 3px rgba(46,94,140,.10)}
+.area-vazio{font-size:11.5px;color:var(--muted2);line-height:1.4;margin-top:9px}
+.area-acoes{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.area-acoes .larga{grid-column:1 / -1}
+.conta{font-size:10.5px;font-weight:700;color:var(--muted2);background:var(--linha2);border-radius:9px;
+     padding:1px 7px;font-variant-numeric:tabular-nums}
 .area-acoes{display:flex;gap:8px;padding:11px 18px}
-#tabAreas input{font:inherit;font-size:13px;width:100%;padding:4px 6px;border:1px solid var(--linha);
-     border-radius:4px;background:var(--surface);color:var(--texto)}
-#tabAreas input:focus{outline:0;border-color:var(--esteira);box-shadow:0 0 0 2px rgba(46,94,140,.14)}
-#tabAreas input.num{text-align:right;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
-#tabAreas input.num::-webkit-outer-spin-button,
-#tabAreas input.num::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-#tabAreas td{vertical-align:middle;padding-left:7px;padding-right:7px}
-#tabAreas th:nth-child(n+2):nth-child(-n+5),
-#tabAreas td:nth-child(n+2):nth-child(-n+5){width:76px}
-#tabAreas th:last-child,#tabAreas td:last-child{width:1%;white-space:nowrap}
-#tabAreas .rm{font:inherit;font-size:13px;line-height:1;padding:4px 8px;border:1px solid var(--linha);
-     border-radius:4px;background:var(--surface);color:var(--muted);cursor:pointer}
-#tabAreas .rm:hover{border-color:var(--vermelho);color:var(--vermelho)}
-#tabAreas .vazio{color:var(--muted2);font-style:italic}
 .bloco-hd p{margin:0;font-size:12px;color:var(--muted2)}
 
 .rec{padding:12px 18px;border-bottom:1px solid var(--linha);background:#F3F8F3}
@@ -150,8 +196,11 @@ svg#svg{display:block;width:100%;height:auto;max-height:calc(100vh - 200px);marg
 .rec .nome{font-size:15px;font-weight:700;margin-left:8px}
 .rec .num{margin:5px 0 0;font-size:13px;color:var(--texto)}
 .rec .num b{font-size:15px}
-.rec .crit{margin:6px 0 0;font-size:11.5px;color:var(--muted);line-height:1.45}
-.rec .fora{margin:5px 0 0;padding-left:16px;font-size:11.5px;color:var(--muted);line-height:1.45}
+.rec .crit{margin:0;font-size:11.5px;color:var(--muted);line-height:1.45}
+.rec .fora{margin:6px 0 0;padding-left:16px;font-size:11.5px;color:var(--muted);line-height:1.45}
+.rec details.mais{margin:10px -18px -12px}
+.rec details.mais>summary{border-top-color:#DCE7DC}
+.rec details.mais>summary:hover{background:#EDF4ED}
 .rec .chave{margin:7px 0 0;font-size:12px;color:#4A3300;background:var(--atencao-bg);
      border:1px solid var(--atencao-br);border-radius:5px;padding:7px 10px;line-height:1.45}
 .rec .chave b{color:var(--atencao)}
@@ -177,12 +226,23 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 tbody tr:hover td{background:#FAFBFB}
 tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 .rolagem{max-height:352px;overflow:auto}
+/* a tabela de cotas ocupa a altura que o comparativo ao lado já impõe, em vez de
+   deixar meio bloco em branco */
+.abaixo>.bloco{display:flex;flex-direction:column}
+.abaixo>.bloco>.rolagem{flex:1 1 0;min-height:140px;max-height:none}
 
-.rodape{grid-column:2 / -1;font-size:12px;color:var(--muted2);padding:6px 2px 0;line-height:1.55}
+.rodape{font-size:12px;color:var(--muted2);padding:6px 2px 0;line-height:1.55}
+.rodape>summary{list-style:none;cursor:pointer;display:flex;gap:7px;align-items:baseline}
+.rodape>summary::-webkit-details-marker{display:none}
+.rodape>summary::before{content:"\25B8";font-size:11px;color:var(--muted2);transition:transform .15s}
+.rodape[open]>summary::before{transform:rotate(90deg)}
+.rodape>summary:hover{color:var(--muted)}
+.rodape>summary:focus-visible{outline:2px solid var(--esteira);outline-offset:3px;border-radius:3px}
+.rodape .abre{color:var(--esteira);font-weight:700;white-space:nowrap}
+.rodape-in{padding:7px 0 0 18px}
 
 @media (max-width:1080px){
   .app{grid-template-columns:1fr}
-  .abaixo,.rodape{grid-column:1 / -1}
   .painel{position:static}
   .abaixo{grid-template-columns:1fr}
   .faixa{flex-wrap:wrap}
@@ -220,6 +280,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
   /* página 1: coluna de altura fixa; o desenho ocupa o que sobra entre cabeçalho, faixa, avisos e legenda */
   .palco{border:0;border-radius:0;height:193mm;display:flex;flex-direction:column;overflow:hidden;break-after:page}
+  .coluna{display:block}
   .faixa{border:1px solid #C8CCD0;border-radius:5px;margin-bottom:5px;break-inside:avoid}
   .met{padding:5px 11px;border-right:1px solid #E2E5E8}
   .met .v{font-size:15px}
@@ -235,7 +296,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   .leg{padding:4px 0 0;font-size:9px;gap:14px;justify-content:center}
 
   .abaixo{display:grid;grid-template-columns:1.15fr 1fr;gap:7mm;margin:0}
-  .bloco{border:1px solid #C8CCD0;break-inside:avoid}
+  .bloco,.abaixo>.bloco{border:1px solid #C8CCD0;break-inside:avoid;display:block}
   .bloco-hd{padding:7px 11px}
   .bloco-hd h2{font-size:9.5px}
   .bloco-hd p{font-size:9px}
@@ -268,6 +329,13 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   tr{break-inside:avoid}
 
   .rodape{font-size:8.5px;margin-top:6px;padding:5px 0 0;border-top:1px solid #C8CCD0}
+  /* no papel a camada recolhida vira só um título: seta e link de abrir não fazem sentido */
+  details.mais>summary::before,.rodape>summary::before{display:none}
+  .rodape .abre{display:none}
+  .rodape-in{padding-left:0}
+  details.mais>summary{border-top:0;padding:6px 11px 1px;color:#333;font-size:9.5px}
+  .mais-in{padding:0 11px 7px;font-size:9px}
+  .rec details.mais{margin:6px -11px 0}
 
   @page{size:A4 landscape;margin:8mm}
 }
@@ -284,17 +352,22 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       <img id="logo" alt="Patrimar Móveis">
       <div>
         <h1>Dimensionamento dos trilhos — Embalagem</h1>
-        <p>Ocupação dentro do alcance das duas esteiras · geometria do DWG com as distâncias da parede medidas em campo</p>
+        <p>Ocupação dentro do alcance das duas esteiras</p>
       </div>
     </div>
     <div class="ver" id="ver" title="Versão do aplicativo publicada (não confundir com os cenários Versão 1, 2 e 3). Se o número não bater com a última alteração, atualize a página com Ctrl+F5."></div>
     <div class="seg" role="group" aria-label="Cenário" id="seg"></div>
     <div class="acoes-topo">
-      <button class="ghost" id="btnCsv" type="button">CSV</button>
-      <button class="ghost" id="btnSvg" type="button">SVG</button>
       <button class="ghost" id="btnLink" type="button">Copiar link</button>
-      <button class="ghost" id="btnConf" type="button">Conferir em campo</button>
       <button class="ghost" id="btnPrint" type="button">Imprimir</button>
+      <details class="menu" id="menuAcoes">
+        <summary class="ghost" role="button" aria-label="Mais ações">Mais ▾</summary>
+        <div class="menu-in">
+          <button class="ghost" id="btnConf" type="button">Conferir em campo</button>
+          <button class="ghost" id="btnCsv" type="button">Cotas em CSV</button>
+          <button class="ghost" id="btnSvg" type="button">Planta em SVG</button>
+        </div>
+      </details>
     </div>
   </div>
 </div>
@@ -304,7 +377,11 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
   <aside class="painel">
     <div class="painel-sec">
-      <h2>Arranjo</h2>
+      <div class="sec-hd">
+        <h2>Arranjo</h2>
+        <button type="button" class="mini" id="btnNotas" aria-pressed="false"
+                title="Mostra o texto de apoio de todos os campos. Fora daqui, a explicação aparece no campo em que se está mexendo.">Explicações</button>
+      </div>
       <div class="campo">
         <label for="pModo">Como o trilho é montado</label>
         <select id="pModo">
@@ -340,6 +417,33 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
     <div class="painel-sec">
       <button class="ghost claro" id="btnReset" type="button">Restaurar medidas atuais</button>
+    </div>
+
+    <div class="painel-sec">
+      <details class="geo" id="detAreas">
+        <summary>Máquinas e áreas <span class="conta" id="areaConta">0</span></summary>
+        <div class="eixos">
+          <b>X</b> segue as esteiras (0 = início da esteira 1) · <b>Y</b> segue os trilhos
+          (0 = abastecimento da C1). Negativo fica à esquerda e acima.
+          <span class="alerta">Y herda o erro do desenho — conferir em campo.</span>
+        </div>
+        <div id="listaAreas"></div>
+        <div class="area-acoes">
+          <button type="button" class="ghost claro" id="btnAreaAdd">Adicionar</button>
+          <button type="button" class="ghost claro" id="btnAreaDwg" title="Traz as cinco áreas extraídas do DWG">Do DWG</button>
+          <button type="button" class="ghost claro larga" id="btnAreaLimpa">Limpar todas</button>
+        </div>
+        <details class="mais">
+          <summary>De onde vêm estas áreas</summary>
+          <div class="mais-in">
+            Outras máquinas e espaços demarcados do barracão. As cinco do botão <b>vieram do DWG</b>,
+            extraídas da geometria do desenho; as sem nome estão sem rótulo no arquivo. Elas aparecem
+            na planta e a simulação avisa quando alguma invade o conjunto — separando quem pega
+            trilho, que custa pista, de quem só ocupa um vão. Todas saem na folha de conferência
+            em campo.
+          </div>
+        </details>
+      </details>
     </div>
 
     <div class="painel-sec">
@@ -417,6 +521,8 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
     </div>
   </aside>
 
+  <div class="coluna">
+
   <main class="palco">
     <div class="print-only" id="printHd"></div>
     <div class="faixa" id="faixa"></div>
@@ -446,55 +552,30 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
     </section>
 
     <section class="bloco">
-      <div class="bloco-hd">
-        <div class="abas" role="tablist">
-          <button type="button" role="tab" id="abaCotas" aria-selected="true" aria-controls="pnCotas">Cotas · esteira 1</button>
-          <button type="button" role="tab" id="abaAreas" aria-selected="false" aria-controls="pnAreas">Áreas e máquinas</button>
-        </div>
-        <p id="cotasSub"></p>
-      </div>
-
-      <div id="pnCotas" role="tabpanel" aria-labelledby="abaCotas">
-        <div class="rolagem">
-          <table id="tabCotas">
-            <thead><tr><th>Grupo</th><th>Pista</th><th class="num">Início</th><th class="num">Fim</th><th class="num">Vão ant.</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="pnAreas" role="tabpanel" aria-labelledby="abaAreas" hidden>
-        <div class="area-nota">
-          Outras máquinas e espaços demarcados do barracão. As cinco do botão <b>vieram do DWG</b>,
-          extraídas da geometria do desenho; as sem nome estão sem rótulo no arquivo. Origem das
-          coordenadas: <b>X</b> no sentido das esteiras, zero no início da esteira 1; <b>Y</b> no
-          sentido dos trilhos, zero no trilho de abastecimento acima da C1. Valores negativos ficam
-          à esquerda e acima. Elas aparecem na planta e a simulação avisa quando alguma invade o
-          conjunto. <b>A posição no sentido dos trilhos herda o erro do desenho</b>, que já se
-          mostrou deslocado nessa direção — conferir em campo antes de decidir layout.
-        </div>
-        <div class="rolagem">
-          <table id="tabAreas">
-            <thead><tr><th>Nome</th><th class="num">X</th><th class="num">Y</th><th class="num">Largura</th><th class="num">Altura</th><th></th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="area-acoes">
-          <button type="button" class="ghost claro" id="btnAreaDwg">Carregar do DWG</button>
-          <button type="button" class="ghost claro" id="btnAreaAdd">Adicionar área</button>
-          <button type="button" class="ghost claro" id="btnAreaLimpa">Limpar todas</button>
-        </div>
+      <div class="bloco-hd"><h2>Cotas · esteira 1</h2><p id="cotasSub"></p></div>
+      <div class="rolagem">
+        <table id="tabCotas">
+          <thead><tr><th>Grupo</th><th>Pista</th><th class="num">Início</th><th class="num">Fim</th><th class="num">Vão ant.</th></tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
     </section>
   </div>
 
   <div class="print-only" id="printConf"></div>
 
-  <p class="rodape">
-    Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b>, <b>desenho desatualizado</b>, com as distâncias da parede corrigidas em campo · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
-    Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 5.550&nbsp;mm medidos em campo (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm de comprimento e 7.850&nbsp;mm de defasagem) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 24.900&nbsp;mm (largura a confirmar) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
-    Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> o DWG está desatualizado. As medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem dele em 2.220 e 4.520&nbsp;mm, e prevalecem. O comprimento de 55.210&nbsp;mm do barracão, porém, <b>continua vindo desse mesmo desenho</b> e a partir dessa mesma parede — então a sobra no fim da esteira 2 herda o erro e não deve embasar decisão de layout até ser medida em campo. O passo executado no chão de fábrica também não foi medido.
-  </p>
+  <details class="rodape">
+    <summary><span><b>O DWG está desatualizado</b> — onde há medida de campo, ela prevalece. O comprimento do
+      barracão ainda vem do desenho e não deve embasar decisão de layout.</span>
+      <span class="abre">origem das medidas</span></summary>
+    <div class="rodape-in">
+      Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b>, <b>desenho desatualizado</b>, com as distâncias da parede corrigidas em campo · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
+      Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 5.550&nbsp;mm medidos em campo (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm de comprimento e 7.850&nbsp;mm de defasagem) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 21.850&nbsp;mm de largura, deduzidos das três medidas de campo (500 + 19.900 + 1.450) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
+      Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> as medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem do desenho em 2.220 e 4.520&nbsp;mm, e prevalecem. O comprimento de 55.210&nbsp;mm do barracão, porém, <b>continua vindo desse mesmo desenho</b> e a partir dessa mesma parede — então a sobra no fim da esteira 2 herda o erro e não deve embasar decisão de layout até ser medida em campo. O passo executado no chão de fábrica também não foi medido.
+    </div>
+  </details>
+
+  </div>
 </div>
 
 <script>
@@ -523,7 +604,7 @@ const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v15";
+const VERSAO = "v16";
 const VERSAO_DATA = "08/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -799,9 +880,11 @@ function aplica(v){
 /* ---------------- desenho ---------------- */
 const NS = "http://www.w3.org/2000/svg";
 
+let areaFoco = -1;   // linha da tabela de áreas em edição: destacada na planta
+
 function el(tag, attrs, texto){
   const e = document.createElementNS(NS, tag);
-  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  for (const k in attrs) if (attrs[k] != null) e.setAttribute(k, attrs[k]);
   if (texto != null) e.textContent = texto;
   return e;
 }
@@ -874,10 +957,12 @@ function pintaAbastecimento(g, x0, x1, yy, h, txt){
 function pintaAreas(g, p, e2){
   if (!AREAS.length) return;
   const cx = caixaConjunto(p, e2);
-  AREAS.forEach(a => {
-    const s = invasao(a, cx), bate = s.x > 0 && s.y > 0;
-    g.appendChild(el("rect", { x:a.x, y:a.y, width:a.w, height:a.h, fill:COR.areaBg, "fill-opacity":.72,
-      stroke: bate ? COR.vermelho : COR.area, "stroke-width": bate ? 90 : 60, "stroke-dasharray":"500 260" }));
+  AREAS.forEach((a, i) => {
+    const s = invasao(a, cx), bate = s.x > 0 && s.y > 0, foco = i === areaFoco;
+    g.appendChild(el("rect", { x:a.x, y:a.y, width:a.w, height:a.h, fill:COR.areaBg,
+      "fill-opacity": foco ? .95 : .72, class: foco ? "foco" : null,
+      stroke: bate ? COR.vermelho : COR.area, "stroke-width": foco ? 140 : (bate ? 90 : 60),
+      "stroke-dasharray":"500 260" }));
     const fs = Math.min(440, a.w / Math.max(4, (a.nome || "").length) * 1.7, a.h * 0.5);
     if (a.nome && fs > 120)
       g.appendChild(el("text", { x:a.x + a.w/2, y:a.y + a.h/2 + fs*0.34, "font-size":fs, "font-weight":"700",
@@ -1252,35 +1337,68 @@ function imprimeConferencia(){
 /* ---------------- aba Áreas ---------------- */
 
 function montaAreas(){
-  const tb = $("#tabAreas tbody");
+  const lista = $("#listaAreas");
+  $("#areaConta").textContent = AREAS.length;
+  $("#areaConta").hidden = !AREAS.length;
   if (!AREAS.length){
-    tb.innerHTML = `<tr><td colspan="6" class="vazio">Nenhuma área cadastrada.
-      Clique em "Adicionar área" e transcreva do DWG ou meça em campo.</td></tr>`;
+    lista.innerHTML = `<p class="area-vazio">Nenhuma máquina cadastrada. Use <b>Do DWG</b> para trazer
+      as cinco do desenho, ou <b>Adicionar</b> e medir em campo.</p>`;
     return;
   }
-  tb.innerHTML = AREAS.map((a, i) => `
-    <tr data-i="${i}">
-      <td><input data-c="nome" value="${a.nome.replace(/"/g, "&quot;")}" placeholder="ex.: Grampeadora"></td>
-      <td><input data-c="x" class="num" type="number" step="10" value="${a.x}"></td>
-      <td><input data-c="y" class="num" type="number" step="10" value="${a.y}"></td>
-      <td><input data-c="w" class="num" type="number" step="10" min="0" value="${a.w}"></td>
-      <td><input data-c="h" class="num" type="number" step="10" min="0" value="${a.h}"></td>
-      <td><button type="button" class="rm" aria-label="Remover ${a.nome || "área"}">Remover</button></td>
-    </tr>`).join("");
+  const num = (a, i, c, rot, min) =>
+    `<div><label>${rot}</label>
+       <input data-c="${c}" class="num" type="number" step="10"${min ? ' min="0"' : ""} value="${a[c]}"
+              aria-label="${rot} da máquina ${i + 1}"></div>`;
+  lista.innerHTML = AREAS.map((a, i) => `
+    <div class="area-card" data-i="${i}">
+      <div class="area-hd">
+        <input data-c="nome" value="${a.nome.replace(/"/g, "&quot;")}" placeholder="ex.: Grampeadora"
+               aria-label="Nome da máquina ${i + 1}">
+        <button type="button" class="rm" title="Remover" aria-label="Remover ${a.nome || `área ${i + 1}`}">×</button>
+      </div>
+      <div class="area-grid">
+        ${num(a, i, "x", "X")}${num(a, i, "y", "Y")}${num(a, i, "w", "Largura", true)}${num(a, i, "h", "Altura", true)}
+      </div>
+    </div>`).join("");
+}
+
+/** Marca no cadastro quem está invadindo o conjunto: o aviso completo fica no palco. */
+function marcaAreasQueBatem(r){
+  const cx = r ? caixaConjunto(r.p, r.e2) : null;
+  document.querySelectorAll("#listaAreas .area-card").forEach(c => {
+    const a = AREAS[+c.dataset.i];
+    if (!a || !cx) return c.classList.remove("bate");
+    const s = invasao(a, cx);
+    c.classList.toggle("bate", s.x > 0 && s.y > 0);
+  });
 }
 
 function ligaAreas(){
-  const tb = $("#tabAreas tbody");
+  const tb = $("#listaAreas");
   tb.addEventListener("input", ev => {
     const inp = ev.target.closest("input[data-c]");
     if (!inp) return;
-    const i = +inp.closest("tr").dataset.i, c = inp.dataset.c;
+    const i = +inp.closest(".area-card").dataset.i, c = inp.dataset.c;
     AREAS[i][c] = c === "nome" ? areaLimpa(inp.value) : Math.round(Number(inp.value) || 0);
     atualiza();                     // redesenha sem remontar a tabela: não perde o foco do campo
   });
+  // quem está digitando precisa achar na planta a máquina que está mexendo
+  tb.addEventListener("focusin", ev => {
+    const tr = ev.target.closest(".area-card");
+    const i = tr ? +tr.dataset.i : -1;
+    if (i === areaFoco) return;
+    areaFoco = i;
+    atualiza();
+  });
+  tb.addEventListener("focusout", ev => {
+    if (tb.contains(ev.relatedTarget)) return;
+    areaFoco = -1;
+    atualiza();
+  });
   tb.addEventListener("click", ev => {
     if (!ev.target.closest(".rm")) return;
-    AREAS.splice(+ev.target.closest("tr").dataset.i, 1);
+    AREAS.splice(+ev.target.closest(".area-card").dataset.i, 1);
+    areaFoco = -1;
     montaAreas(); atualiza();
   });
   $("#btnAreaDwg").addEventListener("click", () => {
@@ -1290,22 +1408,13 @@ function ligaAreas(){
   $("#btnAreaAdd").addEventListener("click", () => {
     AREAS.push({ nome:"", x:0, y:0, w:2000, h:2000 });
     montaAreas(); atualiza();
-    const ult = tb.querySelector("tr:last-child input");
+    const ult = tb.querySelector(".area-card:last-child input");
     if (ult) ult.focus();
   });
   $("#btnAreaLimpa").addEventListener("click", () => {
     if (!AREAS.length) return;
-    AREAS = []; montaAreas(); atualiza();
+    AREAS = []; areaFoco = -1; montaAreas(); atualiza();
   });
-  const abas = [["#abaCotas", "#pnCotas"], ["#abaAreas", "#pnAreas"]];
-  abas.forEach(([ab]) => $(ab).addEventListener("click", () => {
-    abas.forEach(([b, pn]) => {
-      const sel = b === ab;
-      $(b).setAttribute("aria-selected", String(sel));
-      $(pn).hidden = !sel;
-    });
-    $("#cotasSub").hidden = ab !== "#abaCotas";
-  }));
 }
 
 /* ---------------- ciclo de atualização ---------------- */
@@ -1332,6 +1441,7 @@ function render(){
     $("#avisos").innerHTML = caixaAviso(
       "Com esses valores nenhum trilho cabe no alcance da esteira. Revise a largura do trilho e os vãos.");
     montaComparativo(p);
+    marcaAreasQueBatem(null);
     return;
   }
   atual = r;
@@ -1342,6 +1452,7 @@ function render(){
   montaCotas(r);
   montaComparativo(p);
   montaRecomendacao(p);
+  marcaAreasQueBatem(r);
 }
 
 function marcaCenario(){
@@ -1476,18 +1587,25 @@ function montaRecomendacao(pa){
       ${maisPistas.reprova[0]}. Se esse limite mudar, a recomendação passa a ser a ${maisPistas.pr.nome}.</p>`;
   }
 
+  // Na tela fica o que decide: quem venceu, com que números, e o limite que está custando pistas.
+  // O critério e a lista de descartados são justificativa — leitura de uma vez, atrás do detalhe.
   marcaRecomendado(escolha.pr.id);
   $("#rec").innerHTML = `
     <div><span class="tag">RECOMENDADO</span><span class="nome">${escolha.pr.nome}</span></div>
     <p class="num"><b>${escolha.pistas} pistas</b> · ${fmt(e.metros)} m de trilho ·
        apoio de ${fmt(e.apoio)} mm · passagem de ${fmt(e.r1.larguraPass)} mm · ${escolha.pr.sub}</p>
-    <p class="crit">Critério: mais pistas entre os arranjos que respeitam os limites declarados —
-       circulação de ${fmt(GE_MIN)} mm entre pares, ${fmt(GI_MIN)} mm dentro do par,
-       passagem de ${fmt(PASS_MIN)} mm e folga de ${fmt(FOLGA_MIN)} mm da prancha no trilho.
-       Empate em pistas: vence o de menor metragem. O apoio da peça larga entra como comparação,
-       não como limite: a largura da peça mais larga nunca foi levantada.</p>
-    ${fora ? `<ul class="fora">${fora}</ul>` : ""}
-    ${chave}`;
+    ${chave}
+    <details class="mais">
+      <summary>Critério${fora ? " e arranjos descartados" : ""}</summary>
+      <div class="mais-in">
+        <p class="crit">Mais pistas entre os arranjos que respeitam os limites declarados —
+           circulação de ${fmt(GE_MIN)} mm entre pares, ${fmt(GI_MIN)} mm dentro do par,
+           passagem de ${fmt(PASS_MIN)} mm e folga de ${fmt(FOLGA_MIN)} mm da prancha no trilho.
+           Empate em pistas: vence o de menor metragem. O apoio da peça larga entra como comparação,
+           não como limite: a largura da peça mais larga nunca foi levantada.</p>
+        ${fora ? `<ul class="fora">${fora}</ul>` : ""}
+      </div>
+    </details>`;
 }
 
 /* ---------------- cenários ---------------- */
@@ -1547,6 +1665,65 @@ async function copiaLink(ev){
 }
 
 /* ---------------- início ---------------- */
+/* Explicações dos campos: escondidas por padrão, aparecem no campo em foco. O botão fixa todas
+   e a escolha fica gravada — quem já conhece a ferramenta não relê a mesma nota todo dia. */
+const NOTAS_KEY = "trilhos.notas";
+
+function ligaNotas(){
+  const b = $("#btnNotas");
+  let on = false;
+  try { on = localStorage.getItem(NOTAS_KEY) === "1"; } catch(e){}
+  const pinta = () => {
+    document.body.classList.toggle("notas", on);
+    b.setAttribute("aria-pressed", String(on));
+  };
+  pinta();
+  b.addEventListener("click", () => {
+    on = !on;
+    pinta();
+    try { localStorage.setItem(NOTAS_KEY, on ? "1" : "0"); } catch(e){}
+  });
+}
+
+function ligaMenu(){
+  const m = $("#menuAcoes");
+  m.addEventListener("click", ev => { if (ev.target.closest(".menu-in button")) m.open = false; });
+  document.addEventListener("click", ev => { if (m.open && !m.contains(ev.target)) m.open = false; });
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape" && m.open) m.open = false; });
+}
+
+/* No papel não há clique: tudo que está recolhido na tela volta a aparecer na impressão. */
+function ligaImpressao(){
+  let reabertos = null;   // null = fora de impressão; abrir duas vezes perderia o que reabrir
+  const abre = () => {
+    if (reabertos) return;
+    reabertos = [...document.querySelectorAll("details.mais, details.rodape, details.geo")]
+                  .filter(d => !d.open);
+    reabertos.forEach(d => d.open = true);
+  };
+  const fecha = () => {
+    if (!reabertos) return;
+    reabertos.forEach(d => d.open = false);
+    reabertos = null;
+  };
+  window.addEventListener("beforeprint", abre);
+  window.addEventListener("afterprint", fecha);
+  if (window.matchMedia){                     // Safari não dispara beforeprint
+    const mq = window.matchMedia("print");
+    if (mq.addEventListener) mq.addEventListener("change", ev => ev.matches ? abre() : fecha());
+  }
+}
+
+/* O sticky da lateral e da planta precisa da altura real do topo, que muda quando a barra
+   de cenários quebra de linha. Sem isso, em tela estreita o conteúdo gruda por baixo dela. */
+function mediaTopo(){
+  const topo = document.querySelector(".topo");
+  const mede = () => document.documentElement.style.setProperty("--topo-h", topo.offsetHeight + "px");
+  mede();
+  if (window.ResizeObserver) new ResizeObserver(mede).observe(topo);
+  else window.addEventListener("resize", mede);
+}
+
 function inicia(){
   $("#logo").src = LOGO;
   $("#ver").innerHTML = `app ${VERSAO} <span>· ${VERSAO_DATA}</span>`;
@@ -1560,8 +1737,13 @@ function inicia(){
   $("#btnPrint").addEventListener("click", () => window.print());
   $("#btnConf").addEventListener("click", imprimeConferencia);
   ligaAreas();
+  ligaNotas();
+  ligaMenu();
+  mediaTopo();
+  ligaImpressao();
   const difs = leHash();
   montaAreas();
+  if (AREAS.length) $("#detAreas").open = true;
   atualiza();          // já recarimba a URL com a versão atual
   avisaLinkAntigo(difs);
 }
