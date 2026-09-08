@@ -28,7 +28,7 @@ dentro do alcance das duas esteiras.
 |---|---:|---|
 | Largura do trilho | 500 mm | medido no DWG |
 | Largura da prancha | 450 mm | informado pela Produção |
-| Vão dentro do par | 200 mm | medido no DWG |
+| Vão dentro do par | 50 mm | limite informado pela Produção; no DWG são 200 mm |
 | Vão entre pares | 500 mm | proposta em estudo |
 | Comprimento C1 / C2 / C3 | 6.000 / 4.000 / 4.000 mm | informado pela Produção |
 | Esteira 1 | 850 × 23.940 mm | largura ajustada para 850 mm (DWG: 840); comprimento medido no DWG |
@@ -46,24 +46,28 @@ dentro do alcance das duas esteiras.
 A tela nomeia um dos quatro arranjos como recomendado, acima do comparativo. O critério é
 explícito e está impresso junto com a resposta:
 
-> **Mais pistas entre os arranjos que não pioram nenhum limite.** Empate em pistas, vence o de
-> menor metragem.
+> **Mais pistas entre os arranjos que respeitam os limites declarados.** Empate em pistas, vence o
+> de menor metragem.
 
-Os limites são os mesmos das regras de aviso (`GE_MIN`, `PASS_MIN`, `FOLGA_MIN`) mais um: o apoio
-da peça larga em dois trilhos não pode cair abaixo do que a fábrica já tem hoje (`APOIO_HOJE`,
-1.200 mm). Cada arranjo descartado aparece com o motivo. Com os valores atuais:
+Os limites são os das regras de aviso: `GE_MIN` (500 mm de circulação entre pares), `GI_MIN`
+(50 mm dentro do par, informado pela Produção), `PASS_MIN` (800 mm de passagem) e `FOLGA_MIN`
+(30 mm da prancha no trilho). Cada arranjo descartado aparece com o motivo. Com os valores atuais:
 
-| Arranjo | Pistas | Metragem | Apoio | Situação |
-|---|---:|---:|---:|---|
-| Versão 1 · par 200 · vão 500 | 90 | 416 m | 1.200 mm | **recomendado** |
-| Versão 2 · par encostado · vão 500 | 102 | 472 m | 1.000 mm | fora: apoio abaixo do de hoje |
-| Versão 3 · sem par · vão 500 | 77 | 356 m | 1.500 mm | apto, mas 13 pistas a menos |
-| Passo do DWG · par 200 · vão 400 | 96 | 444 m | 1.200 mm | fora: vão de 400 mm e passagem de 740 mm |
+| Arranjo | Pistas | Metragem | Apoio | Passagem | Situação |
+|---|---:|---:|---:|---:|---|
+| Versão 4 · par 50 · vão 500 | 98 | 452 m | 1.050 mm | 1.690 mm | **recomendado** |
+| Versão 1 · par 200 · vão 500 | 90 | 416 m | 1.200 mm | 1.140 mm | apto, 8 pistas a menos |
+| Versão 2 · par encostado · vão 500 | 102 | 472 m | 1.000 mm | 940 mm | fora: par de 0 mm |
+| Versão 3 · sem par · vão 500 | 77 | 356 m | 1.500 mm | 940 mm | apto, 21 pistas a menos |
+| Passo do DWG · par 200 · vão 400 | 96 | 444 m | 1.200 mm | 740 mm | fora: vão 400 e passagem 740 |
 
-**O `APOIO_HOJE` é o ponto fraco do critério.** A largura da peça mais larga apoiada em dois
-trilhos nunca foi levantada; 1.200 mm é só o que o arranjo atual entrega. A Versão 2 dá 12 pistas
-a mais e está fora só por isso. Quando a peça for medida, essa linha da recomendação muda ou se
-confirma — a tela diz isso na cara, em vez de esconder atrás do número.
+**O apoio da peça larga não é limite, é comparação.** A largura da peça mais larga apoiada em dois
+trilhos nunca foi levantada, e os 1.200 mm do arranjo de hoje são só o que ele entrega — não um
+requisito. Usá-lo como corte reprovaria arranjos por um número que ninguém confirmou. Ele aparece
+no comparativo para a decisão ser tomada com ele à vista.
+
+Quando o arranjo com mais pistas cai por um único limite, a tela diz qual é e quanto custa
+mantê-lo. Hoje é a Versão 2: 4 pistas a mais, fora só pelo par de 0 mm.
 
 ## Folha de conferência em campo
 
@@ -80,9 +84,10 @@ como constantes nomeadas no início do script e valem para todos os cenários.
 | Regra | Limite | O que acontece abaixo dele |
 |---|---:|---|
 | Vão entre pares (`GE_MIN`) | 500 mm | Não há circulação entre as vias. |
+| Vão dentro do par (`GI_MIN`) | 50 mm | Abaixo do que a Produção aceita fechar o par. |
 | Passagem para retirar prancha (`PASS_MIN`) | 800 mm | Não passa uma pessoa carregando prancha. |
 | Folga da prancha no trilho (`FOLGA_MIN`) | 30 mm | Sem guia lateral, a prancha desalinha e trava. |
-| Apoio da peça larga hoje (`APOIO_HOJE`) | 1.200 mm | Referência do arranjo atual para comparar a base da peça apoiada em dois trilhos. |
+| Apoio da peça larga hoje (`APOIO_HOJE`) | 1.200 mm | Referência do arranjo atual para comparar a base da peça apoiada em dois trilhos. Não reprova arranjo: é comparação, não limite. |
 | Trilho de abastecimento no vão (`GAP_COL`) | 2.100 mm | A faixa do carrinho não cabe entre C2 e C3. |
 | Conjunto dentro do barracão | sobra ≥ 0 no comprimento e afastamento do lado da C1 ≥ 0 | O conjunto ultrapassa a parede; o aviso diz quantos mm faltam. |
 
