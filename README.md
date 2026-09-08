@@ -27,10 +27,10 @@ dentro do alcance das duas esteiras.
 | Esteira 2 | 850 × 28.975 mm, defasada 7.850 mm | DWG: 23.975 mm; defasagem medida no eixo da esteira 1; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
 | Vão entre as colunas C2 e C3 | 2.100 mm | medido no DWG · fixo no código, não ajustável na tela |
 | Trilho de abastecimento (carrinho) | 2.100 mm de largura | faixa acima da C1 e no vão C2–C3, informado pela Produção (no DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1) |
-| Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 3.520 mm da esteira 1 | mesma largura dos outros, informada pela Produção; o trilho corre junto à parede, e o vão de 3.520 mm até a esteira 1 é o que sobra da cota de 6.470 mm do DWG; ambos editáveis |
+| Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 1.300 mm da esteira 1 | mesma largura dos outros, informada pela Produção; as duas distâncias foram medidas em campo e somam 4.250 mm da parede à esteira 1, contra 6.470 mm no DWG; ambas editáveis |
 | Posição da esteira 2 | como no DWG (defasada 7.850 mm) | "Alinhada com a esteira 1" ou "Encostada no trilho lateral" deslocam a esteira 2 e a C3 para perto da parede esquerda; não muda a contagem de pistas |
 | Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
-| Barracão | 55.210 × 24.900 mm · parede esquerda a 850 mm da borda externa do trilho lateral (6.470 mm até a esteira 1, cotado no DWG) e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento e afastamento esquerdo cotados no DWG; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1). Com afastamento 0 a parede encosta no conjunto |
+| Barracão | 55.210 × 24.900 mm · parede esquerda a 850 mm da borda externa do trilho lateral (4.250 mm até a esteira 1, medido em campo) e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento cotado no DWG, afastamento esquerdo medido em campo; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1). Com afastamento 0 a parede encosta no conjunto |
 
 ## Regras de aviso
 
@@ -67,12 +67,18 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 - O aumento de 5 m da esteira 2 foi desenhado no final da esteira (lado oposto ao início),
   mantendo a defasagem de 7.850 mm. Se o acréscimo for no início, a defasagem muda e
   o código precisa ser ajustado (`E2.ini`).
-- O trilho de abastecimento lateral corre encostado na parede esquerda: 850 mm da parede à borda
-  externa do trilho, medida informada pela Produção. Até a versão anterior a ordem estava invertida
-  (3.570 mm da parede e 800 mm da esteira 1, leitura do DWG numa região fora de esquadro). O vão de
-  3.520 mm até a esteira 1 é o que sobra dentro da cota de 6.470 mm do DWG (850 + 2.100 + 3.520) e
-  não foi medido em campo — se ele for conferido e der outro valor, é só ajustar a distância até a
-  esteira 1 na tela, sabendo que a cota total até a parede deixa de bater com o DWG.
+- **Divergência aberta de 2.220 mm entre o campo e o DWG, no sentido do comprimento.** O trilho de
+  abastecimento lateral corre encostado na parede esquerda. Medidas de campo: 850 mm da parede à
+  borda externa do trilho e 1.300 mm do trilho até a esteira 1, o que dá 4.250 mm da parede à
+  esteira 1 (850 + 2.100 + 1.300). O DWG cota 6.470 mm nesse mesmo trecho. A simulação adota o
+  campo. Até a versão anterior a ordem estava invertida no desenho (3.570 mm da parede e 800 mm da
+  esteira 1, leitura do DWG numa região fora de esquadro).
+- Consequência da divergência acima: o comprimento do barracão (55.210 mm) foi cotado no DWG a
+  partir da parede esquerda, ou seja, do mesmo ponto que o DWG coloca a 6.470 mm da esteira 1. Com a
+  parede 2.220 mm mais perto, esses 2.220 mm passam a aparecer como sobra a mais no fim da esteira 2.
+  **Essa sobra não está confirmada.** Antes de usá-la para decidir o aumento da esteira 2, é preciso
+  medir em campo a distância do fim da esteira 2 até a parede do fundo, ou confirmar o comprimento
+  interno do barracão. Se o comprimento real for 2.220 mm menor, a folga volta ao que era.
 - A largura da faixa do trilho de abastecimento (carrinho) está em 2.100 mm nas três posições,
   informada pela Produção, editável na tela. Só o desenho usa esse valor; ele não entra na contagem de pistas
   nem na metragem. A simulação avisa se a largura passar do vão de 2.100 mm entre C2 e C3.
