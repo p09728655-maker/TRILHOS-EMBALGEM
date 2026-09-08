@@ -3,6 +3,12 @@
 Ferramenta de simulação da ocupação dos trilhos da Embalagem da Patrimar Móveis,
 dentro do alcance das duas esteiras.
 
+> **Origem das medidas.** O DWG foi a referência inicial, mas **está desatualizado** na região da
+> parede esquerda. Onde há medição de campo, ela prevalece sobre o desenho: distâncias da parede ao
+> trilho lateral e à esteira 1, e a defasagem entre as esteiras. O que ainda vem só do DWG —
+> comprimento do barracão, comprimentos das esteiras, passo dos trilhos — continua sujeito ao mesmo
+> erro e está listado em Pendências.
+
 ## O que faz
 
 - Calcula quantas pistas cabem em cada esteira conforme o arranjo dos trilhos.
@@ -27,7 +33,7 @@ dentro do alcance das duas esteiras.
 | Esteira 2 | 850 × 28.975 mm, defasada 5.550 mm | comprimento do DWG: 23.975 mm; defasagem medida em campo (9.800 mm da parede até a esteira 2, menos os 4.250 mm até a esteira 1) — o DWG traz 7.850 mm, guardados em `E2.iniDwg`; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
 | Vão entre as colunas C2 e C3 | 2.100 mm | medido no DWG · fixo no código, não ajustável na tela |
 | Trilho de abastecimento (carrinho) | 2.100 mm de largura | faixa acima da C1 e no vão C2–C3, informado pela Produção (no DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1) |
-| Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 1.300 mm da esteira 1 | mesma largura dos outros, informada pela Produção; as duas distâncias foram medidas em campo e somam 4.250 mm da parede à esteira 1, contra 6.470 mm no DWG; ambas editáveis |
+| Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 1.300 mm da esteira 1 | mesma largura dos outros, informada pela Produção; as duas distâncias foram medidas em campo e somam 4.250 mm da parede à esteira 1, contra 6.470 mm no DWG — **o DWG está desatualizado nessa região e o campo prevalece**; ambas editáveis |
 | Posição da esteira 2 | como está hoje (defasada 5.550 mm) | "Alinhada com a esteira 1" ou "Encostada no trilho lateral" deslocam a esteira 2 e a C3 para perto da parede esquerda; não muda a contagem de pistas |
 | Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
 | Barracão | 55.210 × 24.900 mm · parede esquerda a 850 mm da borda externa do trilho lateral (4.250 mm até a esteira 1, medido em campo) e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento cotado no DWG, afastamento esquerdo medido em campo; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1). Com afastamento 0 a parede encosta no conjunto |
@@ -98,8 +104,12 @@ chão de fábrica, se a tela está mostrando a versão publicada ou um cache ant
 bater com a última alteração, atualizar a página com Ctrl+F5.
 
 O link de compartilhamento guarda todos os parâmetros no `#` da URL e sobrescreve os padrões ao
-abrir. Um link antigo continua mostrando os valores antigos mesmo na versão nova: abrir a URL sem
-o `#` ou clicar em "Restaurar valores do DWG".
+abrir, então um link salvo antes de uma correção continua mostrando a geometria antiga na versão
+nova. O `#` agora carrega também a chave `app` com a versão que o gravou. Ao abrir um link de
+versão diferente, a tela compara os campos de medida (`MEDIDAS` no script) com os padrões atuais e,
+se algum divergir, mostra um alerta nomeando o campo, o valor do link e o valor de hoje, com um
+botão "Usar as medidas atuais". Link gravado nesta versão não dispara o alerta: ali o que estiver
+diferente foi o usuário quem mudou.
 
 ## Stack
 
