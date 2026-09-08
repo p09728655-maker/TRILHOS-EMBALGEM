@@ -39,8 +39,9 @@ dentro do alcance das duas esteiras.
 | Posição da esteira 2 | como está hoje (defasada 5.550 mm) | "Alinhada com a esteira 1" ou "Encostada no trilho lateral" deslocam a esteira 2 e a C3 para perto da parede esquerda; não muda a contagem de pistas |
 | Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
 | Barracão — comprimento | 55.210 mm | cotado no DWG, desenho desatualizado. Com 0, o contorno não é desenhado |
-| Afastamentos das paredes | 850 mm (esquerda, até o trilho lateral) · 500 mm (lado da C1, até o trilho de abastecimento) · 1.450 mm (lado da esteira 2, até a esteira 2) | os três medidos em campo |
-| Barracão — largura | **calculada: 21.850 mm** | Não é digitada: `500 + altura do conjunto (19.900) + 1.450`. A largura nunca foi medida, então é ela que sai da conta. A hipótese antiga de 24.900 mm, tirada da linha de pilares, foi abandonada |
+| Barracão — largura | 21.850 mm | deduzida das três medidas de campo com o arranjo de hoje (500 + 19.900 + 1.450) e tratada como parede fixa. A hipótese antiga de 24.900 mm, tirada da linha de pilares, foi abandonada |
+| Afastamentos das paredes | 850 mm (esquerda, até o trilho lateral) · 500 mm (lado da C1, até o trilho de abastecimento) | medidos em campo. O conjunto está ancorado no lado da C1: é de lá que ele cresce |
+| Parede do lado da esteira 2 → esteira 2 | **calculado: 1.450 mm** | Não é digitado: `largura − afastamento da C1 − altura do conjunto`. Alongar um trilho reduz este número, que é o espaço sendo consumido. Negativo = não cabe |
 
 ## Recomendação de arranjo
 
@@ -90,6 +91,8 @@ como constantes nomeadas no início do script e valem para todos os cenários.
 |---|---:|---|
 | Vão entre pares (`GE_MIN`) | 500 mm | Não há circulação entre as vias. |
 | Vão dentro do par (`GI_MIN`) | 50 mm | Abaixo do que a Produção aceita fechar o par. |
+| Espaço até a parede da esteira 2 | ≥ 0 | O conjunto passa da parede; o aviso diz quantos mm. |
+| Distância entre as esteiras (`DIST_E1E2`) | 9.100 mm | `C2 + corredor + C3` saiu da distância real entre as esteiras. O aviso diz quanto a esteira 2 teria que se deslocar, ou para quanto o corredor central fecharia. |
 | Passagem para retirar prancha (`PASS_MIN`) | 800 mm | Não passa uma pessoa carregando prancha. |
 | Folga da prancha no trilho (`FOLGA_MIN`) | 30 mm | Sem guia lateral, a prancha desalinha e trava. |
 | Apoio da peça larga hoje (`APOIO_HOJE`) | 1.200 mm | Referência do arranjo atual para comparar a base da peça apoiada em dois trilhos. Não reprova arranjo: é comparação, não limite. |
@@ -115,13 +118,12 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
   24.900 mm, tirada da linha de pilares do DWG, sobrava 3.050 mm sem explicação e foi abandonada.
   Falta conferir com trena se o barracão tem mesmo essa largura: se tiver menos, o conjunto não
   cabe e algum trilho precisa encurtar; se tiver mais, sobra espaço que a simulação não mostra.
-- Alongar um trilho aumenta a largura necessária, e não reduz um dos afastamentos. É o
-  comportamento correto: os afastamentos foram medidos contra equipamento e parede que não saem do
-  lugar. Mas isso esconde uma restrição que a simulação ainda não trava: `trilho da C2 + 2.100 do
-  corredor + trilho da C3` é exatamente a distância entre a esteira 1 e a esteira 2 — hoje
-  9.100 mm. As duas esteiras são equipamento existente, então essa distância é fixa. Aumentar o
-  trilho da C3 sem encurtar o da C2 equivale a simular um layout em que as esteiras foram movidas.
-  Medir a distância real entre elas fecharia a questão.
+- **`C2 + corredor + C3` é a distância entre a esteira 1 e a esteira 2 — hoje 9.100 mm.** As duas
+  esteiras são equipamento existente, então esse número não muda sozinho. Alongar um trilho sem
+  encurtar outro obriga a esteira 2 a descer em direção à parede ou o corredor central a fechar; a
+  simulação não trava, mas avisa qual é o preço em milímetros de cada saída. A distância de
+  9.100 mm veio dos trilhos medidos, não de uma trena entre as esteiras — está na folha de
+  conferência, e é uma medida fácil que valida a C2 de quebra.
 - Barracão: o DWG cota 55.210 mm no sentido das esteiras, a partir de 6.470 mm antes do início
   da esteira 1, e a parede do lado da esteira 2 está a 1.380 mm dela. A cota de 23.570 mm do
   DWG não fecha com o trilho de abastecimento acima da C1 (rails a 10,3 m da esteira 1), então
