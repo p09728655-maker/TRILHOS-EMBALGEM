@@ -23,6 +23,26 @@ dentro do alcance das duas esteiras.
 - Gera as cotas acumuladas em CSV e a planta em SVG.
 - Imprime em A4 paisagem com cabeçalho de parâmetros.
 
+## Densidade da tela
+
+A tela mostra o que decide e guarda a justificativa atrás de um clique. O que fica sempre visível:
+planta, faixa de indicadores, avisos, arranjo recomendado com seus números e o limite que está
+custando pistas, comparativo e cotas.
+
+O que só aparece quando pedido:
+
+| Camada | Onde | Como abre |
+|---|---|---|
+| Texto de apoio dos campos | barra lateral | aparece sozinho no campo em foco; o botão **Explicações** fixa todos e a escolha fica gravada no navegador |
+| Critério da recomendação e arranjos descartados | bloco Comparativo | detalhe "Critério e arranjos descartados" |
+| Procedência das áreas | barra lateral | detalhe "De onde vêm estas áreas" |
+| Geometria e medidas | barra lateral | detalhe "Geometria e medidas" |
+| Origem das medidas e ressalvas do DWG | rodapé | rodapé recolhido, com a ressalva que importa na linha visível |
+| Cotas em CSV, planta em SVG e folha de conferência | topo | menu **Mais** |
+
+**Na impressão nada fica escondido**: as camadas recolhidas abrem sozinhas antes de imprimir e
+voltam a fechar depois.
+
 ## Parâmetros
 
 | Parâmetro | Padrão | Origem |
@@ -78,9 +98,11 @@ mantê-lo. Hoje é a Versão 2: 4 pistas a mais, fora só pelo par de 0 mm.
 
 ## Áreas e máquinas
 
-Aba ao lado das cotas. Cadastra outras máquinas e espaços demarcados do barracão com nome,
-posição e tamanho; eles aparecem na planta e a simulação avisa quando algum entra na área do
-conjunto. O aviso separa dois casos, porque só um deles custa capacidade:
+Seção da barra lateral, ao lado da planta — é entrada, e entrada fica onde estão os outros
+parâmetros. Cada máquina é um cartão com nome, X, Y, largura e altura; o cartão em foco tem a sua
+máquina destacada com traço cheio no desenho, e quem invade o conjunto ganha barra âmbar à
+esquerda. Digitar a medida e ver a máquina andar acontece na mesma tela, sem rolagem. Eles
+aparecem na planta e a simulação avisa quando algum entra na área do conjunto. O aviso separa dois casos, porque só um deles custa capacidade:
 
 - **Pega trilho** — diz quantos, e que ou a máquina sai ou o conjunto perde essas pistas.
 - **Está num vão** — dentro da caixa do conjunto, mas sem atrapalhar trilho nenhum; o aviso pede
@@ -93,7 +115,7 @@ negativos ficam à esquerda e acima.
 As áreas viajam no link junto com o resto (`areas=nome~x~y~w~h|...`) e entram na folha de
 conferência com uma coluna para validar em campo.
 
-O botão **"Carregar do DWG"** traz cinco áreas extraídas do desenho: a Grampeadora (única com
+O botão **"Do DWG"** traz cinco áreas extraídas do desenho: a Grampeadora (única com
 rótulo no arquivo), três máquinas sem nome e a área demarcada de 5,49 × 11,64 m. Elas podem ser
 editadas ou apagadas como qualquer outra.
 
