@@ -297,16 +297,16 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         </div>
         <div class="campo">
           <label for="pAB">Trilho de abastecimento — largura</label>
-          <input id="pAB" type="number" min="200" max="3000" step="10" value="1570">
-          <div class="nota">Faixa do trilho com carrinho que abastece as pistas: acima da C1 e no vão de 2.100 mm entre C2 e C3. No DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1.</div>
+          <input id="pAB" type="number" min="200" max="3000" step="10" value="2100">
+          <div class="nota">Faixa do trilho com carrinho que abastece as pistas: acima da C1 e no vão de 2.100 mm entre C2 e C3. Vale também para o trilho lateral.</div>
         </div>
         <div class="campo">
           <label>Trilho de abastecimento lateral — distância até a esteira 1 × largura</label>
           <div class="dupla">
             <input id="pAX" type="number" min="0" max="20000" step="10" value="800" aria-label="Distância da faixa lateral ao início da esteira 1">
-            <input id="pAL" type="number" min="200" max="10000" step="10" value="3200" aria-label="Largura da faixa lateral">
+            <input id="pAL" type="number" min="200" max="10000" step="10" value="2100" aria-label="Largura da faixa lateral">
           </div>
-          <div class="nota">Terceiro trilho, no sentido dos trilhos, à esquerda do início da esteira 1, cobrindo da C1 à esteira 2. Lido do DWG entre 0,8 m e 4,0 m antes da esteira 1, precisão de uns 300 mm.</div>
+          <div class="nota">Terceiro trilho, no sentido dos trilhos, à esquerda do início da esteira 1, cobrindo da C1 à esteira 2. Mesma largura dos outros (2.100 mm), a 800 mm da esteira 1 conforme o DWG.</div>
         </div>
         <div class="campo">
           <label>Barracão — comprimento × largura</label>
@@ -315,6 +315,15 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
             <input id="pBL" type="number" min="0" max="200000" step="10" value="24900" aria-label="Largura do barracão, no sentido dos trilhos">
           </div>
           <div class="nota">Comprimento cotado no DWG (55.210). Largura é hipótese: parede do lado da C1 na linha de pilares. Com 0, o contorno não é desenhado.</div>
+        </div>
+        <div class="campo">
+          <label for="pPos2">Posição da esteira 2</label>
+          <select id="pPos2">
+            <option value="dwg">Como no DWG — defasada 7.850 mm</option>
+            <option value="alinhada">Alinhada com a esteira 1</option>
+            <option value="lateral">Encostada no trilho lateral — mais perto da parede</option>
+          </select>
+          <div class="nota">Desloca a esteira 2 e a coluna C3 no sentido do comprimento. Não muda a quantidade de pistas.</div>
         </div>
         <div class="campo">
           <label for="pPos">Posição do conjunto no barracão</label>
@@ -327,7 +336,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         <div class="campo">
           <label>Barracão — afastamento da esteira 1 até as paredes</label>
           <div class="dupla">
-            <input id="pBX" type="number" min="0" max="100000" step="10" value="2470" aria-label="Distância da parede esquerda à borda externa do trilho de abastecimento lateral">
+            <input id="pBX" type="number" min="0" max="100000" step="10" value="3570" aria-label="Distância da parede esquerda à borda externa do trilho de abastecimento lateral">
             <input id="pBY" type="number" min="0" max="100000" step="10" value="700" aria-label="Distância da parede superior ao trilho de abastecimento da C1">
           </div>
           <div class="nota">Esquerda: da parede à borda externa do trilho lateral (DWG: 6.470 até a esteira 1, menos o trilho lateral). Cima: da parede ao trilho de abastecimento da C1 (hipótese). Com 0 a parede encosta no conjunto.</div>
@@ -407,16 +416,16 @@ const PRESETS = [
   { id:"at", nome:"Passo do DWG", sub:"par 200 · vão 400",   W:500, modo:"par",   GI:200, GE:400 }
 ];
 
-const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:1570,
-                 BC:55210, BL:24900, BX:2470, BY:700, AX:800, AL:3200, pos:"dwg" };
+const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:2100,
+                 BC:55210, BL:24900, BX:3570, BY:700, AX:800, AL:2100, pos:"dwg", pos2:"dwg" };
 // Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota);
-// BX é medido da parede à borda externa do trilho lateral, por isso 6.470 − 800 − 3.200 = 2.470.
+// BX é medido da parede à borda externa do trilho lateral, por isso 6.470 − 800 − 2.100 = 3.570.
 // Largura 24.900 e afastamento 700 são HIPÓTESE: parede do lado da C1 tomada na linha de pilares a 11,0 m da esteira 1;
 // a cota de 23.570 do DWG não fecha com o trilho de abastecimento (rails a 10,3 m da esteira 1).
 
 /* id do campo no formulário -> chave do parâmetro */
 const CAMPOS = { pW:"W", pP:"P", pModo:"modo", pGI:"GI", pGE:"GE", pPass:"pass", pL1:"L1", pL2:"L2", pL3:"L3", pAB:"AB",
-                 pBC:"BC", pBL:"BL", pBX:"BX", pBY:"BY", pAX:"AX", pAL:"AL", pPos:"pos" };
+                 pBC:"BC", pBL:"BL", pBX:"BX", pBY:"BY", pAX:"AX", pAL:"AL", pPos:"pos", pPos2:"pos2" };
 const IDS = Object.keys(CAMPOS);
 
 const LOGO = "data:image/png;base64,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";
@@ -487,25 +496,35 @@ function calcula(env, p){
 const apoioDuplo = p => 2*p.W + (p.modo === "par" ? p.GI : p.GE);
 const metragem = (p, r1, r2) => (r1.trilhosPorLado*(p.L1 + p.L2) + r2.trilhosPorLado*p.L3) / 1000;
 
-/** Extensão ocupada pelo conjunto: da esteira 1 ao fim da esteira 2, e do trilho de abastecimento ao fim da esteira 2. */
-function extensao(p){
+/** Esteira 2 na posição escolhida: DWG (defasada), alinhada com a esteira 1 ou encostada no trilho lateral. */
+function esteira2(p){
+  const ini = p.pos2 === "alinhada" ? E1.ini : (p.pos2 === "lateral" ? E1.ini - p.AX : E2.ini);
+  return { ini, len:E2.len, larg:E2.larg, lenDwg:E2.lenDwg };
+}
+
+/** Borda externa do trilho de abastecimento lateral, referência da parede esquerda. */
+const bordaLateral = p => E1.ini - p.AX - p.AL;
+
+/** Extensão ocupada pelo conjunto: do trilho lateral ao fim mais distante das esteiras, e do trilho acima da C1 à esteira 2. */
+function extensao(p, e2){
   return {
-    larg: Math.max(E1.ini + E1.len, E2.ini + E2.len) - Math.min(E1.ini, E2.ini) + p.AX + p.AL,
+    larg: Math.max(E1.ini + E1.len, e2.ini + e2.len) - bordaLateral(p),
     alt:  p.AB + p.L1 + E1.larg + p.L2 + GAP_COL + p.L3 + E2.larg
   };
 }
 
 /** Reúne num objeto só tudo que tela, impressão, comparativo e exports consomem. */
 function avalia(p){
-  const r1 = calcula(E1, p), r2 = calcula(E2, p);
+  const e2 = esteira2(p);
+  const r1 = calcula(E1, p), r2 = calcula(e2, p);
   if (!r1 || !r2) return null;
-  const r2dwg = calcula({ ini:E2.ini, len:E2.lenDwg }, p);   // esteira 2 no comprimento do DWG, para medir o ganho
-  const ext = extensao(p);
+  const r2dwg = calcula({ ini:e2.ini, len:e2.lenDwg }, p);   // esteira 2 no comprimento do DWG, para medir o ganho
+  const ext = extensao(p, e2);
   const barracao = p.BC > 0 && p.BL > 0
     ? { sobraX: p.BC - p.BX - ext.larg, sobraY: p.BL - p.BY - ext.alt }   // negativo = não cabe
     : null;
   return {
-    barracao,
+    e2, barracao,
     p, r1, r2,
     ganhoE2: r2.trilhosPorLado - (r2dwg ? r2dwg.trilhosPorLado : 0),
     metros:  metragem(p, r1, r2),
@@ -529,6 +548,7 @@ function numCampo(id){
 function lerParams(){
   const modo = $("#pModo").value || PADRAO.modo;
   const pos = $("#pPos").value || PADRAO.pos;
+  const pos2 = $("#pPos2").value || PADRAO.pos2;
   return {
     W:  numCampo("pW"),
     P:  numCampo("pP"),
@@ -541,7 +561,7 @@ function lerParams(){
     L3: numCampo("pL3"),
     AB: numCampo("pAB"),  // largura do trilho de abastecimento (carrinho)
     BC: numCampo("pBC"), BL: numCampo("pBL"),   // barracão: comprimento (x) e largura (y)
-    pos,
+    pos, pos2,
     BX: pos === "parede" ? 0 : numCampo("pBX"),  // encostado na parede: afastamento esquerdo zero
     BY: numCampo("pBY"),                          // afastamento do conjunto à parede superior
     AX: numCampo("pAX"),  // distância do trilho de abastecimento lateral ao início da esteira 1
@@ -605,7 +625,7 @@ function pintaPassagens(g, r, faixas){
   });
 }
 
-function pintaTrilhos(g, p, r1, r2, y, H){
+function pintaTrilhos(g, p, r1, r2, y, H, yT){
   const fs = r1.n > 18 ? 400 : 440;
   const rotulo = (x, yy, txt) => g.appendChild(el("text",
     { x, y:yy, "font-size":fs, "font-weight":"700", fill:COR.numero, "text-anchor":"middle" }, txt));
@@ -615,7 +635,7 @@ function pintaTrilhos(g, p, r1, r2, y, H){
       g.appendChild(el("rect", { x, y:y.c1, width:p.W, height:p.L1, fill:COR.ladoA, stroke:"#fff", "stroke-width":26 }));
       g.appendChild(el("rect", { x, y:y.c2, width:p.W, height:p.L2, fill:COR.ladoB, stroke:"#fff", "stroke-width":26 }));
     });
-    rotulo((gr.ini + gr.fim)/2, y.ab1 - 520, String(i + 1));
+    rotulo((gr.ini + gr.fim)/2, yT - 520, String(i + 1));
   });
   r2.grupos.forEach((gr, i) => {
     gr.trilhos.forEach(x =>
@@ -644,56 +664,58 @@ function pintaAbastecimento(g, x0, x1, yy, h, txt){
 }
 
 /** Contorno do barracão com cotas. A origem do desenho é o início da esteira 1 / topo do trilho de abastecimento. */
-function pintaBarracao(g, p, H, xL, xR){
+function pintaBarracao(g, p, e2, H, xL, xR, yT){
   const x = xL - p.BX, yy = -p.BY, e = 60;   // traço desenhado por fora da face interna da parede
   g.appendChild(el("rect", { x:x - e, y:yy - e, width:p.BC + 2*e, height:p.BL + 2*e, fill:"none", stroke:COR.barracao,
     "stroke-width":90, "stroke-dasharray":"900 450" }));
-  g.appendChild(el("text", { x:x + 500, y:yy + p.BL - 400, "font-size":480, "font-weight":"700", fill:COR.barracao,
-    "letter-spacing":60 }, `BARRACÃO · ${fmt(p.BC)} × ${fmt(p.BL)} mm`));
-  cotaH(g, x, x + p.BC, yy - 2700, `${fmt(p.BC)} mm`, COR.barracao, true);
+  g.appendChild(el("text", { x:x + p.BC - 500, y:yy + p.BL - 400, "font-size":480, "font-weight":"700", fill:COR.barracao,
+    "letter-spacing":60, "text-anchor":"end" }, `BARRACÃO · ${fmt(p.BC)} × ${fmt(p.BL)} mm`));
+  cotaH(g, x, x + p.BC, yT - 2700, `${fmt(p.BC)} mm`, COR.barracao, true);
   cotaV(g, x + p.BC + 1300, yy, p.BL, `${fmt(p.BL)} mm`, COR.barracao);
-  // cotas na base: da parede esquerda até cada esteira e até o trilho lateral
-  cotaH(g, x, E1.ini, H + 1800, `${fmt(E1.ini - x)} · parede → esteira 1`, COR.barracao, false);
-  cotaH(g, x, E2.ini, H + 3000, `${fmt(E2.ini - x)} · parede → esteira 2`, COR.barracao, false);
-  if (p.BX > 0) cotaH(g, x, xL, -700, fmt(p.BX), COR.barracao, true);   // na linha das cotas 3.200 e 800
+  // da parede esquerda até cada esteira: esteira 1 na linha superior (ao lado da cota da esteira 1), esteira 2 na base
+  cotaH(g, x, E1.ini, yT - 1500, `${fmt(E1.ini - x)} · parede → esteira 1`, COR.barracao, true);
+  cotaH(g, x, e2.ini, H + 3000, `${fmt(e2.ini - x)} · parede → esteira 2`, COR.barracao, false);
+  if (p.BX > 0) cotaH(g, x, xL, yT - 700, fmt(p.BX), COR.barracao, true);   // na linha das cotas 3.200 e 800
   if (p.BY > 0) cotaV(g, xR + 1200, yy, p.BY, fmt(p.BY), COR.barracao);   // à direita do conjunto, longe das cotas da esquerda
 }
 
-function pintaEsteiras(g, y){
+function pintaEsteiras(g, y, e2){
   const barra = (e, yy, cor, txt) => {
     g.appendChild(el("rect", { x:e.ini, y:yy, width:e.len, height:e.larg, fill:cor }));
     g.appendChild(el("text", { x:e.ini + e.len*0.25, y:yy + e.larg*0.70, "font-size":470, "font-weight":"700",
       fill:"#fff", "text-anchor":"middle", "letter-spacing":40 }, txt));
   };
   barra(E1, y.e1, COR.esteira1, `ESTEIRA 1 · ${fmt(E1.larg)} × ${fmt(E1.len)} mm`);
-  barra(E2, y.e2, COR.esteira2, `ESTEIRA 2 · ${fmt(E2.larg)} × ${fmt(E2.len)} mm`);
+  barra(e2, y.e2, COR.esteira2, `ESTEIRA 2 · ${fmt(e2.larg)} × ${fmt(e2.len)} mm`);
 
   // trecho acrescido da esteira 2: hachura no final e rótulo próprio
-  const xa = E2.ini + E2.lenDwg;
+  const xa = e2.ini + e2.lenDwg;
   g.appendChild(el("rect", { x:xa, y:y.e2, width:E2_AUMENTO, height:E2.larg, fill:"url(#hachAumento)",
     stroke:COR.aumento, "stroke-width":50 }));
   g.appendChild(el("text", { x:xa + E2_AUMENTO/2, y:y.e2 + E2.larg*0.70, "font-size":440, "font-weight":"700",
     fill:"#fff", "text-anchor":"middle", "letter-spacing":30 }, `+${fmt(E2_AUMENTO)} mm`));
 }
 
-function pintaCotas(g, p, r1, r2, y, H){
-  // cotas verticais à esquerda do trilho de abastecimento lateral
-  cotaV(g, -1000 - p.AX - p.AL, y.ab1, p.AB, `ABAST.  ${fmt(p.AB)}`, COR.abast);
-  cotaV(g, -1000 - p.AX - p.AL, y.c1, p.L1, `C1  ${fmt(p.L1)}`, COR.ladoA);
-  cotaV(g, -1000 - p.AX - p.AL, y.e1, E1.larg, String(E1.larg), COR.esteira1);
-  cotaV(g, -1000 - p.AX - p.AL, y.c2, p.L2, `C2  ${fmt(p.L2)}`, COR.ladoB);
-  cotaV(g, -1000 - p.AX - p.AL, y.c2 + p.L2, GAP_COL, fmt(GAP_COL), COR.cota);
-  cotaV(g, -1000 - p.AX - p.AL, y.c3, p.L3, `C3  ${fmt(p.L3)}`, COR.ladoB);
-  cotaV(g, -1000 - p.AX - p.AL, y.e2, E2.larg, String(E2.larg), COR.esteira2);
+function pintaCotas(g, p, r1, r2, y, H, e2, xC, yT){
+  // cotas verticais na coluna xC, à esquerda do trilho lateral (ou fora da parede, quando ela está perto)
+  cotaV(g, xC, y.ab1, p.AB, `ABAST.  ${fmt(p.AB)}`, COR.abast);
+  cotaV(g, xC, y.c1, p.L1, `C1  ${fmt(p.L1)}`, COR.ladoA);
+  cotaV(g, xC, y.e1, E1.larg, String(E1.larg), COR.esteira1);
+  cotaV(g, xC, y.c2, p.L2, `C2  ${fmt(p.L2)}`, COR.ladoB);
+  cotaV(g, xC, y.c2 + p.L2, GAP_COL, fmt(GAP_COL), COR.cota);
+  cotaV(g, xC, y.c3, p.L3, `C3  ${fmt(p.L3)}`, COR.ladoB);
+  cotaV(g, xC, y.e2, e2.larg, String(e2.larg), COR.esteira2);
 
   const un = p.modo === "par" ? "vias" : "trilhos";
-  cotaH(g, -p.AX - p.AL, -p.AX, y.ab1 - 700, fmt(p.AL), COR.abast, true);
-  cotaH(g, -p.AX, 0, y.ab1 - 700, fmt(p.AX), COR.abast, true);
-  cotaH(g, E1.ini, E1.ini + E1.len, y.ab1 - 1500,
+  cotaH(g, E1.ini - p.AX - p.AL, E1.ini - p.AX, yT - 700, fmt(p.AL), COR.abast, true);
+  cotaH(g, E1.ini - p.AX, E1.ini, yT - 700, fmt(p.AX), COR.abast, true);
+  cotaH(g, E1.ini, E1.ini + E1.len, yT - 1500,
         `${fmt(E1.len)} mm · ${r1.n} ${un} · vão ${fmt(p.GE)} mm`, COR.esteira1, true);
-  cotaH(g, E2.ini, E2.ini + E2.len, H + 1800,
-        `${fmt(E2.len)} mm · ${r2.n} ${un} · defasada ${fmt(E2.ini)} mm · era ${fmt(E2.lenDwg)} mm no DWG`, COR.esteira2, false);
-  cotaH(g, E2.ini + E2.lenDwg, E2.ini + E2.len, H + 3000, `+${fmt(E2_AUMENTO)} mm`, COR.aumento, false);
+  const d = e2.ini - E1.ini;
+  const posTxt = d > 0 ? `defasada ${fmt(d)} mm` : (d < 0 ? `${fmt(-d)} mm antes da esteira 1` : "alinhada com a esteira 1");
+  cotaH(g, e2.ini, e2.ini + e2.len, H + 1800,
+        `${fmt(e2.len)} mm · ${r2.n} ${un} · ${posTxt} · era ${fmt(e2.lenDwg)} mm no DWG`, COR.esteira2, false);
+  cotaH(g, e2.ini + e2.lenDwg, e2.ini + e2.len, H + 3000, `+${fmt(E2_AUMENTO)} mm`, COR.aumento, false);
 }
 
 /** Troca o conteúdo do SVG preservando o <title> usado pelo aria-labelledby.
@@ -707,23 +729,25 @@ function trocaConteudoSvg(conteudo){
 }
 
 function desenha(r){
-  const { p, r1, r2 } = r;
+  const { p, r1, r2, e2 } = r;
   const y = { ab1:0, c1:p.AB };                 // trilho de abastecimento encostado na cabeça da C1
   y.e1 = y.c1 + p.L1;
   y.c2 = y.e1 + E1.larg;
   y.ab2 = y.c2 + p.L2 + Math.max(0, (GAP_COL - p.AB)/2);   // centrado no vão C2–C3
   y.c3 = y.c2 + p.L2 + GAP_COL;
   y.e2 = y.c3 + p.L3;
-  const H = y.e2 + E2.larg;
-  const x0 = Math.min(E1.ini, E2.ini), larg = Math.max(E1.ini + E1.len, E2.ini + E2.len);
+  const H = y.e2 + e2.larg;
+  const x0 = Math.min(E1.ini, e2.ini), larg = Math.max(E1.ini + E1.len, e2.ini + e2.len);
   const M = { esq:2600, dir:900, topo:2400, base:4100 };
   const temBarracao = !!r.barracao;
+  const xL = bordaLateral(p);                                  // borda externa do trilho de abastecimento lateral
+  const yT = temBarracao ? -p.BY - 200 : 0;                    // linha acima da parede: números e cotas ficam fora dela
+  const xC = temBarracao && p.BX < 1600 ? xL - p.BX - 1000 : xL - 1000;   // coluna das cotas verticais
   // caixa visível: conjunto mais margens, ampliada para envolver o barracão quando informado
-  const xL = x0 - p.AX - p.AL;   // borda externa do trilho de abastecimento lateral
-  let vx0 = -M.esq - p.AX - p.AL, vy0 = -M.topo, vx1 = larg + M.dir, vy1 = H + M.base;
+  let vx0 = xC - 1600, vy0 = yT - M.topo, vx1 = larg + M.dir, vy1 = H + M.base;
   if (temBarracao){
     vx0 = Math.min(vx0, xL - p.BX - 900);
-    vy0 = Math.min(vy0, -p.BY - 3600);
+    vy0 = Math.min(vy0, yT - 3600);
     vx1 = Math.max(vx1, xL - p.BX + p.BC + 2600);
     vy1 = Math.max(vy1, -p.BY + p.BL + 900);
   }
@@ -737,16 +761,16 @@ function desenha(r){
   pat.appendChild(el("rect", { width:160, height:400, fill:COR.esteira2 }));
   defs.appendChild(pat);
   g.appendChild(defs);
-  if (temBarracao) pintaBarracao(g, p, H, xL, larg);
+  if (temBarracao) pintaBarracao(g, p, e2, H, xL, larg, yT);
   pintaPassagens(g, r1, [[y.c1, p.L1], [y.c2, p.L2]]);   // passagens por baixo dos trilhos
   pintaPassagens(g, r2, [[y.c3, p.L3]]);
-  pintaTrilhos(g, p, r1, r2, y, H);
+  pintaTrilhos(g, p, r1, r2, y, H, yT);
   const abTxt = `TRILHO DE ABASTECIMENTO · CARRINHO · ${fmt(p.AB)} mm`;
   pintaAbastecimento(g, E1.ini, E1.ini + E1.len, y.ab1, p.AB, abTxt);
   pintaAbastecimento(g, x0, larg, y.ab2, p.AB, abTxt);
-  pintaAbastecimentoV(g, x0 - p.AX - p.AL, y.ab1, H, p.AL, `TRILHO DE ABASTECIMENTO LATERAL · CARRINHO · ${fmt(p.AL)} mm`);
-  pintaEsteiras(g, y);
-  pintaCotas(g, p, r1, r2, y, H);
+  pintaAbastecimentoV(g, xL, y.ab1, H, p.AL, `TRILHO DE ABASTECIMENTO LATERAL · CARRINHO · ${fmt(p.AL)} mm`);
+  pintaEsteiras(g, y, e2);
+  pintaCotas(g, p, r1, r2, y, H, e2, xC, yT);
   trocaConteudoSvg([g]);
 }
 
@@ -863,7 +887,8 @@ function montaPrintHd(r){
     ["Passagem", passTxt],
     ["Trilhos C1 / C2 / C3", `${fmt(p.L1)} / ${fmt(p.L2)} / ${fmt(p.L3)} mm`],
     ["Trilho de abastecimento", `${fmt(p.AB)} mm · acima da C1 e no vão C2–C3 (${fmt(GAP_COL)} mm) · lateral de ${fmt(p.AL)} mm a ${fmt(p.AX)} mm da esteira 1`],
-    ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre o DWG (${fmt(E2.lenDwg)} mm)`],
+    ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre o DWG (${fmt(E2.lenDwg)} mm) · `
+      + ({ dwg:"defasada 7.850 mm como no DWG", alinhada:"alinhada com a esteira 1", lateral:"encostada no trilho lateral" })[p.pos2]],
     ["Barracão", r.barracao
       ? `${fmt(p.BC)} × ${fmt(p.BL)} mm · ${p.pos === "parede" ? "conjunto encostado na parede esquerda" : "posição do DWG"}`
         + ` · sobra ${fmt(r.barracao.sobraX)} mm no comprimento e ${fmt(r.barracao.sobraY)} mm na largura`
