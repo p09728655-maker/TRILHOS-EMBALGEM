@@ -285,8 +285,8 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       </div>
       <div class="campo" id="fGI">
         <label for="pGI">Vão dentro do par</label>
-        <input id="pGI" type="number" min="0" max="1000" step="10" value="200">
-        <div class="nota">Não muda o apoio da prancha (um trilho), mas define a base da peça larga apoiada nos dois.</div>
+        <input id="pGI" type="number" min="0" max="1000" step="10" value="50">
+        <div class="nota">Não muda o apoio da prancha (um trilho), mas define a base da peça larga apoiada nos dois. A Produção aceita fechar o par até 50 mm; abaixo disso a simulação avisa.</div>
       </div>
       <div class="campo">
         <label for="pP">Largura da prancha</label>
@@ -448,25 +448,27 @@ const GAP_COL = 2100;                           // vão entre a coluna C2 e a co
 
 /* ---------------- regras de aceitação ---------------- */
 const GE_MIN     = 500;    // circulação mínima entre pares
+const GI_MIN     = 50;     // o par pode fechar até 50 mm — informado pela Produção
 const PASS_MIN   = 800;    // passagem mínima para uma pessoa carregando prancha
 const FOLGA_MIN  = 30;     // folga mínima da prancha no trilho sem guia lateral
 const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v8";
+const VERSAO = "v9";
 const VERSAO_DATA = "08/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
 
 const PRESETS = [
+  { id:"v4", nome:"Versão 4", sub:"par 50 · vão 500",        W:500, modo:"par",   GI:50,  GE:500 },
   { id:"v1", nome:"Versão 1", sub:"par 200 · vão 500",       W:500, modo:"par",   GI:200, GE:500 },
   { id:"v2", nome:"Versão 2", sub:"par encostado · vão 500", W:500, modo:"par",   GI:0,   GE:500 },
   { id:"v3", nome:"Versão 3", sub:"sem par · vão 500",       W:500, modo:"solto", GI:0,   GE:500 },
   { id:"at", nome:"Passo do DWG", sub:"par 200 · vão 400",   W:500, modo:"par",   GI:200, GE:400 }
 ];
 
-const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:2100,
+const PADRAO = { W:500, P:450, modo:"par", GI:50, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:2100,
                  BC:55210, BL:24900, BX:850, BE:1450, AX:1300, AL:2100, pos:"dwg", pos2:"dwg" };
 // Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota);
 // o trilho lateral corre COLADO na parede: BX = 850 da parede à borda externa e AX = 1.300 de vão livre
@@ -863,8 +865,8 @@ function montaAvisos(r){
     t.push(`A prancha tem <b>${fmt(p.P)} mm</b> e o trilho <b>${fmt(p.W)} mm</b>. A prancha não apoia.`);
   else if (folga < FOLGA_MIN)
     t.push(`Folga de <b>${fmt(folga)} mm</b> (${fmt(folga/2)} mm por lado). Sem guia lateral, a prancha desalinha e trava.`);
-  if (p.modo === "par" && p.GI === 0)
-    t.push(`Com os trilhos encostados, a peça larga apoiada nos dois trilhos ganha <b>${fmt(apoio)} mm</b> de base, contra ${fmt(APOIO_HOJE)} mm do arranjo de hoje.`);
+  if (p.modo === "par" && p.GI < GI_MIN)
+    t.push(`Vão de <b>${fmt(p.GI)} mm</b> dentro do par, abaixo dos ${fmt(GI_MIN)} mm que a Produção aceita. A base da peça larga cai para ${fmt(apoio)} mm, contra ${fmt(APOIO_HOJE)} mm do arranjo de hoje.`);
   if (p.modo === "solto")
     t.push(`Sem par, a peça larga teria que vencer um vão de <b>${fmt(p.GE)} mm</b> entre os dois trilhos de apoio.`);
   $("#avisos").innerHTML = t.map(caixaAviso).join("");
@@ -1142,9 +1144,11 @@ function atualiza(){
 
 /* ---------------- recomendação ---------------- */
 
-/* Motivos que tiram um arranjo da disputa. Os quatro primeiros são os limites de
-   aceitação já usados nos avisos; o apoio entra porque um arranjo que reduz a base
-   da peça larga abaixo da de hoje troca capacidade por risco de processo. */
+/* Motivos que tiram um arranjo da disputa: os limites de aceitação declarados como
+   constantes. O apoio da peça larga NÃO entra aqui — ele é informação comparativa,
+   porque a largura da peça mais larga nunca foi levantada e o valor de hoje é só o
+   que o arranjo atual entrega, não um requisito. O que a Produção declarou é o vão
+   mínimo dentro do par: 50 mm. */
 function reprovaCenario(p, r){
   const f = [];
   if (p.GE < GE_MIN)
@@ -1153,8 +1157,8 @@ function reprovaCenario(p, r){
     f.push(`passagem de ${fmt(r.r1.larguraPass)} mm, abaixo dos ${fmt(PASS_MIN)} mm`);
   if (r.folga < FOLGA_MIN)
     f.push(`folga de ${fmt(r.folga)} mm da prancha no trilho`);
-  if (r.apoio < APOIO_HOJE)
-    f.push(`apoio de ${fmt(r.apoio)} mm na peça larga, contra ${fmt(APOIO_HOJE)} mm de hoje`);
+  if (p.modo === "par" && p.GI < GI_MIN)
+    f.push(`vão de ${fmt(p.GI)} mm dentro do par, abaixo dos ${fmt(GI_MIN)} mm que a Produção aceita`);
   return f;
 }
 
@@ -1184,25 +1188,25 @@ function montaRecomendacao(pa){
   const fora = av.filter(c => c.reprova.length)
     .map(c => `<li><b>${c.pr.nome}</b> — ${c.reprova.join("; ")}</li>`).join("");
 
-  // O arranjo com mais pistas pode estar fora só pelo apoio da peça larga, que ainda não foi
-  // levantado. Nesse caso a medição da peça, e não o algoritmo, é que decide.
+  // Quando o arranjo com mais pistas cai por um único limite, quem decide é rever esse
+  // limite, não o algoritmo. Dizer qual é e quanto custa mantê-lo é mais útil que o veredito.
   let chave = "";
   if (maisPistas && maisPistas.pr.id !== escolha.pr.id && maisPistas.pistas > escolha.pistas
-      && maisPistas.reprova.length === 1 && maisPistas.reprova[0].startsWith("apoio")){
+      && maisPistas.reprova.length === 1){
     chave = `<p class="chave">A <b>${maisPistas.pr.nome}</b> daria
-      <b>${maisPistas.pistas - escolha.pistas} pistas a mais</b> e só está fora pelo apoio da peça larga
-      (${fmt(maisPistas.r.apoio)} mm contra ${fmt(APOIO_HOJE)} mm de hoje). A largura da peça mais larga
-      apoiada em dois trilhos <b>ainda não foi levantada</b>: se ela couber em ${fmt(maisPistas.r.apoio)} mm,
-      a recomendação passa a ser a ${maisPistas.pr.nome}. É a medida que decide.</p>`;
+      <b>${maisPistas.pistas - escolha.pistas} pistas a mais</b> e está fora por um único limite:
+      ${maisPistas.reprova[0]}. Se esse limite mudar, a recomendação passa a ser a ${maisPistas.pr.nome}.</p>`;
   }
 
   $("#rec").innerHTML = `
     <div><span class="tag">RECOMENDADO</span><span class="nome">${escolha.pr.nome}</span></div>
     <p class="num"><b>${escolha.pistas} pistas</b> · ${fmt(e.metros)} m de trilho ·
        apoio de ${fmt(e.apoio)} mm · passagem de ${fmt(e.r1.larguraPass)} mm · ${escolha.pr.sub}</p>
-    <p class="crit">Critério: mais pistas entre os arranjos que não pioram nenhum limite —
-       circulação de ${fmt(GE_MIN)} mm, passagem de ${fmt(PASS_MIN)} mm, folga de ${fmt(FOLGA_MIN)} mm
-       e apoio da peça larga não menor que os ${fmt(APOIO_HOJE)} mm de hoje. Empate em pistas: vence o de menor metragem.</p>
+    <p class="crit">Critério: mais pistas entre os arranjos que respeitam os limites declarados —
+       circulação de ${fmt(GE_MIN)} mm entre pares, ${fmt(GI_MIN)} mm dentro do par,
+       passagem de ${fmt(PASS_MIN)} mm e folga de ${fmt(FOLGA_MIN)} mm da prancha no trilho.
+       Empate em pistas: vence o de menor metragem. O apoio da peça larga entra como comparação,
+       não como limite: a largura da peça mais larga nunca foi levantada.</p>
     ${fora ? `<ul class="fora">${fora}</ul>` : ""}
     ${chave}`;
 }
