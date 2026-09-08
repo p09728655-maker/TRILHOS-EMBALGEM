@@ -8,6 +8,7 @@
 :root{
   --vermelho:#DB2126; --bordeaux:#A8140F; --areia:#F7ECC0; --grafite:#1F2328;
   --esteira:#2E5E8C; --esteira2:#5B8DB8;
+  --abast:#5C6670; --abast-bg:#E6E9EC; --aumento:#1F8A4C;
   --bg:#EDEEF0; --surface:#FFFFFF; --linha:#E1E4E7; --linha2:#F0F1F3;
   --texto:#1F2328; --muted:#71787F; --muted2:#9AA1A8;
   --cinza:#B8BEC4;
@@ -23,7 +24,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--texto);font-size:15p
 
 /* ---------- topo ---------- */
 .topo{background:var(--grafite);color:#fff;position:sticky;top:0;z-index:20}
-.topo-in{max-width:1560px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.topo-in{max-width:none;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .marca{display:flex;align-items:center;gap:14px;flex:0 0 auto}
 .marca img{height:30px;width:auto;display:block;background:#fff;padding:5px 8px;border-radius:5px}
 .marca h1{margin:0;font-size:15.5px;font-weight:700;letter-spacing:-.1px;white-space:nowrap}
@@ -47,7 +48,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--texto);font-size:15p
 .ghost.claro:hover{border-color:#C6CBD0;color:var(--texto);background:#FAFBFB}
 
 /* ---------- layout ---------- */
-.app{max-width:1560px;margin:0 auto;padding:18px 20px 40px;display:grid;
+.app{max-width:none;margin:0 auto;padding:18px 20px 40px;display:grid;
      grid-template-columns:284px minmax(0,1fr);gap:18px;align-items:start}
 
 .painel{background:var(--surface);border:1px solid var(--linha);border-radius:var(--r);
@@ -86,7 +87,7 @@ details.geo summary:focus-visible{outline:2px solid var(--esteira);outline-offse
 .met.pri .v{color:var(--vermelho)}
 
 .desenho{padding:16px 18px 8px;background:var(--surface)}
-svg#svg{display:block;width:100%;height:auto;max-height:58vh}
+svg#svg{display:block;width:100%;height:auto;max-height:calc(100vh - 200px);margin:0 auto}
 .leg{display:flex;gap:18px;flex-wrap:wrap;padding:6px 18px 14px;font-size:12px;color:var(--muted)}
 .leg span{display:inline-flex;align-items:center;gap:6px}
 .leg i{width:11px;height:11px;border-radius:2px;display:inline-block;flex:0 0 auto}
@@ -294,6 +295,27 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
           <input id="pL3" type="number" min="500" max="20000" step="100" value="4000">
           <div class="nota">Coluna C3. No DWG estão 3.000 mm — confirmar.</div>
         </div>
+        <div class="campo">
+          <label for="pAB">Trilho de abastecimento — largura</label>
+          <input id="pAB" type="number" min="200" max="3000" step="50" value="1000">
+          <div class="nota">Faixa do trilho com carrinho que abastece as pistas: acima da C1 e no vão entre C2 e C3 (2.000 mm). Largura a confirmar com a Produção.</div>
+        </div>
+        <div class="campo">
+          <label>Barracão — comprimento × largura</label>
+          <div class="dupla">
+            <input id="pBC" type="number" min="0" max="200000" step="100" value="0" aria-label="Comprimento do barracão, no sentido das esteiras">
+            <input id="pBL" type="number" min="0" max="200000" step="100" value="0" aria-label="Largura do barracão, no sentido dos trilhos">
+          </div>
+          <div class="nota">Comprimento no sentido das esteiras, largura no sentido dos trilhos. Com 0, o contorno não é desenhado.</div>
+        </div>
+        <div class="campo">
+          <label>Barracão — afastamento da esteira 1 até as paredes</label>
+          <div class="dupla">
+            <input id="pBX" type="number" min="0" max="100000" step="100" value="0" aria-label="Distância da parede esquerda ao início da esteira 1">
+            <input id="pBY" type="number" min="0" max="100000" step="100" value="0" aria-label="Distância da parede superior ao trilho de abastecimento da C1">
+          </div>
+          <div class="nota">Esquerda: da parede ao início da esteira 1. Cima: da parede ao trilho de abastecimento da C1.</div>
+        </div>
       </details>
     </div>
   </aside>
@@ -310,7 +332,9 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       <span><i style="background:var(--vermelho)"></i>Trilho / pista — lado A (C1)</span>
       <span><i style="background:var(--bordeaux)"></i>Trilho — lado B (C2 e C3)</span>
       <span><i style="background:var(--esteira)"></i>Esteira</span>
+      <span><i style="background:repeating-linear-gradient(45deg,var(--aumento) 0 3px,var(--esteira2) 3px 5px)"></i>Aumento da esteira 2 (+5 m)</span>
       <span><i style="background:var(--areia);border:1px solid var(--bordeaux)"></i>Passagem</span>
+      <span><i style="background:var(--abast-bg);border:1px solid var(--abast)"></i>Trilho de abastecimento (carrinho)</span>
     </div>
   </main>
 
@@ -332,8 +356,8 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   </div>
 
   <p class="rodape">
-    Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b> · Esteira 1: 840&nbsp;×&nbsp;23.940&nbsp;mm ·
-    Esteira 2: 850&nbsp;×&nbsp;23.975&nbsp;mm, defasada 8.170&nbsp;mm · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
+    Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b> · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
+    Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 8.170&nbsp;mm (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm) · Vão C2–C3: 2.000&nbsp;mm · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
     Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> todos os cenários de referência vêm do desenho. O passo executado no chão de fábrica ainda não foi medido e pode divergir do DWG.
   </p>
 </div>
@@ -347,9 +371,10 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
    ============================================================ */
 
 /* ---------------- geometria fixa (DWG) ---------------- */
-const E1 = { ini:0,    len:23940, larg:840 };   // esteira 1
-const E2 = { ini:8170, len:23975, larg:850 };   // esteira 2, defasada 8.170 mm
-const GAP_COL = 1590;                           // vão entre a coluna C2 e a coluna C3
+const E1 = { ini:0,    len:23940, larg:850 };   // esteira 1 (DWG: 840; ajustado para 850 mm)
+const E2_AUMENTO = 5000;                        // acréscimo de 5 m na esteira 2 (decisão em estudo)
+const E2 = { ini:8170, len:23975 + E2_AUMENTO, larg:850, lenDwg:23975 };   // esteira 2, defasada 8.170 mm; aumento no final
+const GAP_COL = 2000;                           // vão entre a coluna C2 e a coluna C3 (DWG: 1.590; ajustado para 2.000 mm)
 
 /* ---------------- regras de aceitação ---------------- */
 const GE_MIN     = 500;    // circulação mínima entre pares
@@ -366,10 +391,12 @@ const PRESETS = [
   { id:"at", nome:"Passo do DWG", sub:"par 200 · vão 400",   W:500, modo:"par",   GI:200, GE:400 }
 ];
 
-const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000 };
+const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:1000,
+                 BC:0, BL:0, BX:0, BY:0 };   // barracão: 0 = medidas não informadas
 
 /* id do campo no formulário -> chave do parâmetro */
-const CAMPOS = { pW:"W", pP:"P", pModo:"modo", pGI:"GI", pGE:"GE", pPass:"pass", pL1:"L1", pL2:"L2", pL3:"L3" };
+const CAMPOS = { pW:"W", pP:"P", pModo:"modo", pGI:"GI", pGE:"GE", pPass:"pass", pL1:"L1", pL2:"L2", pL3:"L3", pAB:"AB",
+                 pBC:"BC", pBL:"BL", pBX:"BX", pBY:"BY" };
 const IDS = Object.keys(CAMPOS);
 
 const LOGO = "data:image/png;base64,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";
@@ -386,6 +413,10 @@ const COR = {
   esteira1: token("--esteira"),
   esteira2: token("--esteira2"),
   passagem: token("--areia"),
+  abast:    token("--abast"),
+  aumento:  token("--aumento"),
+  barracao: token("--grafite"),
+  abastBg:  token("--abast-bg"),
   cota:     token("--muted2"),
   numero:   token("--muted"),
   neutra:   token("--cinza")
@@ -436,12 +467,27 @@ function calcula(env, p){
 const apoioDuplo = p => 2*p.W + (p.modo === "par" ? p.GI : p.GE);
 const metragem = (p, r1, r2) => (r1.trilhosPorLado*(p.L1 + p.L2) + r2.trilhosPorLado*p.L3) / 1000;
 
+/** Extensão ocupada pelo conjunto: da esteira 1 ao fim da esteira 2, e do trilho de abastecimento ao fim da esteira 2. */
+function extensao(p){
+  return {
+    larg: Math.max(E1.ini + E1.len, E2.ini + E2.len) - Math.min(E1.ini, E2.ini),
+    alt:  p.AB + p.L1 + E1.larg + p.L2 + GAP_COL + p.L3 + E2.larg
+  };
+}
+
 /** Reúne num objeto só tudo que tela, impressão, comparativo e exports consomem. */
 function avalia(p){
   const r1 = calcula(E1, p), r2 = calcula(E2, p);
   if (!r1 || !r2) return null;
+  const r2dwg = calcula({ ini:E2.ini, len:E2.lenDwg }, p);   // esteira 2 no comprimento do DWG, para medir o ganho
+  const ext = extensao(p);
+  const barracao = p.BC > 0 && p.BL > 0
+    ? { sobraX: p.BC - p.BX - ext.larg, sobraY: p.BL - p.BY - ext.alt }   // negativo = não cabe
+    : null;
   return {
+    barracao,
     p, r1, r2,
+    ganhoE2: r2.trilhosPorLado - (r2dwg ? r2dwg.trilhosPorLado : 0),
     metros:  metragem(p, r1, r2),
     apoio:   apoioDuplo(p),
     folga:   p.W - p.P,
@@ -471,7 +517,10 @@ function lerParams(){
     pass: $("#pPass").value || PADRAO.pass,
     L1: numCampo("pL1"),
     L2: numCampo("pL2"),
-    L3: numCampo("pL3")
+    L3: numCampo("pL3"),
+    AB: numCampo("pAB"),  // largura do trilho de abastecimento (carrinho)
+    BC: numCampo("pBC"), BL: numCampo("pBL"),   // barracão: comprimento (x) e largura (y)
+    BX: numCampo("pBX"), BY: numCampo("pBY")    // afastamento da esteira 1 às paredes esquerda e superior
   };
 }
 
@@ -541,13 +590,36 @@ function pintaTrilhos(g, p, r1, r2, y, H){
       g.appendChild(el("rect", { x, y:y.c1, width:p.W, height:p.L1, fill:COR.ladoA, stroke:"#fff", "stroke-width":26 }));
       g.appendChild(el("rect", { x, y:y.c2, width:p.W, height:p.L2, fill:COR.ladoB, stroke:"#fff", "stroke-width":26 }));
     });
-    rotulo((gr.ini + gr.fim)/2, y.c1 - 520, String(i + 1));
+    rotulo((gr.ini + gr.fim)/2, y.ab1 - 520, String(i + 1));
   });
   r2.grupos.forEach((gr, i) => {
     gr.trilhos.forEach(x =>
       g.appendChild(el("rect", { x, y:y.c3, width:p.W, height:p.L3, fill:COR.ladoB, stroke:"#fff", "stroke-width":26 })));
     rotulo((gr.ini + gr.fim)/2, H + 900, String(i + 1));
   });
+}
+
+/** Faixa do trilho de abastecimento com carrinho: retângulo, linha central (trilho) e rótulo. */
+function pintaAbastecimento(g, x0, x1, yy, h, txt){
+  g.appendChild(el("rect", { x:x0, y:yy, width:x1 - x0, height:h, fill:COR.abastBg, stroke:COR.abast, "stroke-width":36 }));
+  g.appendChild(el("line", { x1:x0, y1:yy + h/2, x2:x1, y2:yy + h/2, stroke:COR.abast, "stroke-width":60,
+    "stroke-dasharray":"600 300" }));
+  const fs = Math.min(430, h*0.42);
+  g.appendChild(el("text", { x:(x0 + x1)/2, y:yy + h/2 - fs*0.45, "font-size":fs, "font-weight":"700",
+    fill:COR.abast, "text-anchor":"middle", "letter-spacing":40 }, txt));
+}
+
+/** Contorno do barracão com cotas. A origem do desenho é o início da esteira 1 / topo do trilho de abastecimento. */
+function pintaBarracao(g, p){
+  const x = -p.BX, yy = -p.BY;
+  g.appendChild(el("rect", { x, y:yy, width:p.BC, height:p.BL, fill:"none", stroke:COR.barracao,
+    "stroke-width":90, "stroke-dasharray":"900 450" }));
+  g.appendChild(el("text", { x:x + 500, y:yy + 700, "font-size":480, "font-weight":"700", fill:COR.barracao,
+    "letter-spacing":60 }, `BARRACÃO · ${fmt(p.BC)} × ${fmt(p.BL)} mm`));
+  cotaH(g, x, x + p.BC, yy - 1300, `${fmt(p.BC)} mm`, COR.barracao, true);
+  cotaV(g, x + p.BC + 1300, yy, p.BL, `${fmt(p.BL)} mm`, COR.barracao);
+  if (p.BX > 0) cotaH(g, x, 0, -700, fmt(p.BX), COR.barracao, true);
+  if (p.BY > 0) cotaV(g, -1000, yy, p.BY, fmt(p.BY), COR.barracao);
 }
 
 function pintaEsteiras(g, y){
@@ -558,9 +630,17 @@ function pintaEsteiras(g, y){
   };
   barra(E1, y.e1, COR.esteira1, `ESTEIRA 1 · ${fmt(E1.larg)} × ${fmt(E1.len)} mm`);
   barra(E2, y.e2, COR.esteira2, `ESTEIRA 2 · ${fmt(E2.larg)} × ${fmt(E2.len)} mm`);
+
+  // trecho acrescido da esteira 2: hachura no final e rótulo próprio
+  const xa = E2.ini + E2.lenDwg;
+  g.appendChild(el("rect", { x:xa, y:y.e2, width:E2_AUMENTO, height:E2.larg, fill:"url(#hachAumento)",
+    stroke:COR.aumento, "stroke-width":50 }));
+  g.appendChild(el("text", { x:xa + E2_AUMENTO/2, y:y.e2 + E2.larg*0.70, "font-size":440, "font-weight":"700",
+    fill:"#fff", "text-anchor":"middle", "letter-spacing":30 }, `+${fmt(E2_AUMENTO)} mm`));
 }
 
 function pintaCotas(g, p, r1, r2, y, H){
+  cotaV(g, -1000, y.ab1, p.AB, `ABAST.  ${fmt(p.AB)}`, COR.abast);
   cotaV(g, -1000, y.c1, p.L1, `C1  ${fmt(p.L1)}`, COR.ladoA);
   cotaV(g, -1000, y.e1, E1.larg, String(E1.larg), COR.esteira1);
   cotaV(g, -1000, y.c2, p.L2, `C2  ${fmt(p.L2)}`, COR.ladoB);
@@ -569,10 +649,11 @@ function pintaCotas(g, p, r1, r2, y, H){
   cotaV(g, -1000, y.e2, E2.larg, String(E2.larg), COR.esteira2);
 
   const un = p.modo === "par" ? "vias" : "trilhos";
-  cotaH(g, E1.ini, E1.ini + E1.len, y.c1 - 1500,
+  cotaH(g, E1.ini, E1.ini + E1.len, y.ab1 - 1500,
         `${fmt(E1.len)} mm · ${r1.n} ${un} · vão ${fmt(p.GE)} mm`, COR.esteira1, true);
   cotaH(g, E2.ini, E2.ini + E2.len, H + 1800,
-        `${fmt(E2.len)} mm · ${r2.n} ${un} · defasada ${fmt(E2.ini)} mm`, COR.esteira2, false);
+        `${fmt(E2.len)} mm · ${r2.n} ${un} · defasada ${fmt(E2.ini)} mm · era ${fmt(E2.lenDwg)} mm no DWG`, COR.esteira2, false);
+  cotaH(g, E2.ini + E2.lenDwg, E2.ini + E2.len, H + 3000, `+${fmt(E2_AUMENTO)} mm`, COR.aumento, false);
 }
 
 /** Troca o conteúdo do SVG preservando o <title> usado pelo aria-labelledby.
@@ -587,20 +668,41 @@ function trocaConteudoSvg(conteudo){
 
 function desenha(r){
   const { p, r1, r2 } = r;
-  const y = { c1:0, e1:p.L1, c2:p.L1 + E1.larg };
+  const y = { ab1:0, c1:p.AB };                 // trilho de abastecimento encostado na cabeça da C1
+  y.e1 = y.c1 + p.L1;
+  y.c2 = y.e1 + E1.larg;
+  y.ab2 = y.c2 + p.L2 + Math.max(0, (GAP_COL - p.AB)/2);   // centrado no vão C2–C3
   y.c3 = y.c2 + p.L2 + GAP_COL;
   y.e2 = y.c3 + p.L3;
   const H = y.e2 + E2.larg;
-  const larg = Math.max(E1.ini + E1.len, E2.ini + E2.len);
-  const M = { esq:2400, dir:900, topo:2400, base:2900 };
-
-  $("#svg").setAttribute("viewBox",
-    `${-M.esq} ${-M.topo} ${larg + M.esq + M.dir} ${H + M.topo + M.base}`);
+  const x0 = Math.min(E1.ini, E2.ini), larg = Math.max(E1.ini + E1.len, E2.ini + E2.len);
+  const M = { esq:2600, dir:900, topo:2400, base:4100 };
+  const temBarracao = !!r.barracao;
+  // caixa visível: conjunto mais margens, ampliada para envolver o barracão quando informado
+  let vx0 = -M.esq, vy0 = -M.topo, vx1 = larg + M.dir, vy1 = H + M.base;
+  if (temBarracao){
+    vx0 = Math.min(vx0, -p.BX - 900);
+    vy0 = Math.min(vy0, -p.BY - 2400);
+    vx1 = Math.max(vx1, -p.BX + p.BC + 2600);
+    vy1 = Math.max(vy1, -p.BY + p.BL + 900);
+  }
+  $("#svg").setAttribute("viewBox", `${vx0} ${vy0} ${vx1 - vx0} ${vy1 - vy0}`);
 
   const g = el("g", { "font-family":"Calibri, Carlito, Segoe UI, sans-serif" });
+  const defs = el("defs", {});
+  const pat = el("pattern", { id:"hachAumento", width:400, height:400, patternUnits:"userSpaceOnUse",
+    patternTransform:"rotate(45)" });
+  pat.appendChild(el("rect", { width:400, height:400, fill:COR.aumento }));
+  pat.appendChild(el("rect", { width:160, height:400, fill:COR.esteira2 }));
+  defs.appendChild(pat);
+  g.appendChild(defs);
+  if (temBarracao) pintaBarracao(g, p);
   pintaPassagens(g, r1, [[y.c1, p.L1], [y.c2, p.L2]]);   // passagens por baixo dos trilhos
   pintaPassagens(g, r2, [[y.c3, p.L3]]);
   pintaTrilhos(g, p, r1, r2, y, H);
+  const abTxt = `TRILHO DE ABASTECIMENTO · CARRINHO · ${fmt(p.AB)} mm`;
+  pintaAbastecimento(g, E1.ini, E1.ini + E1.len, y.ab1, p.AB, abTxt);
+  pintaAbastecimento(g, x0, larg, y.ab2, p.AB, abTxt);
   pintaEsteiras(g, y);
   pintaCotas(g, p, r1, r2, y, H);
   trocaConteudoSvg([g]);
@@ -614,6 +716,14 @@ function montaAvisos(r){
   const t = [];
   if (p.GE < GE_MIN)
     t.push(`Vão entre pares em <b>${fmt(p.GE)} mm</b>, abaixo dos ${fmt(GE_MIN)} mm adotados como mínimo de circulação.`);
+  if (r.barracao && (r.barracao.sobraX < 0 || r.barracao.sobraY < 0)){
+    const f = [];
+    if (r.barracao.sobraX < 0) f.push(`<b>${fmt(-r.barracao.sobraX)} mm</b> no comprimento`);
+    if (r.barracao.sobraY < 0) f.push(`<b>${fmt(-r.barracao.sobraY)} mm</b> na largura`);
+    t.push(`O conjunto não cabe no barracão: falta ${f.join(" e ")}.`);
+  }
+  if (p.AB > GAP_COL)
+    t.push(`Trilho de abastecimento com <b>${fmt(p.AB)} mm</b> não cabe no vão de ${fmt(GAP_COL)} mm entre C2 e C3.`);
   if (p.pass !== "none" && r1.idxPass.length && r1.larguraPass < PASS_MIN)
     t.push(`Passagem com <b>${fmt(r1.larguraPass)} mm</b>. Abaixo de ${fmt(PASS_MIN)} mm não passa uma pessoa carregando prancha.`);
   if (p.pass === "none" && r1.sobra > 0)
@@ -630,14 +740,15 @@ function montaAvisos(r){
 }
 
 function montaFaixa(r){
-  const { r1, r2, folga, apoio, metros, trilhos } = r;
+  const { r1, r2, folga, apoio, metros, trilhos, ganhoE2 } = r;
   const sinal = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v));
   const met = (valor, unid, rotulo, pri) =>
     `<div class="met${pri ? " pri" : ""}"><div class="v tnum">${valor}`
     + `${unid ? ` <span class="u">${unid}</span>` : ""}</div><div class="l">${rotulo}</div></div>`;
 
   $("#faixa").innerHTML = [
-    met(r1.trilhosPorLado, "pistas", `por lado da esteira 1 · ${r2.trilhosPorLado} na esteira 2`, true),
+    met(r1.trilhosPorLado, "pistas", `por lado da esteira 1 · ${r2.trilhosPorLado} na esteira 2 `
+        + `(<b>+${ganhoE2}</b> com o aumento de ${fmt(E2_AUMENTO/1000)} m)`, true),
     met(folga >= 0 ? fmt(folga) : "−" + fmt(-folga), "mm", "folga da prancha no trilho"),
     met(fmt(apoio), "mm", "apoio da peça larga em 2 trilhos"),
     met(trilhos, "", `trilhos · ${sinal(trilhos - REF.trilhos)} vs. DWG`),
@@ -709,7 +820,12 @@ function montaPrintHd(r){
     ["Apoio em 2 trilhos", fmt(apoio) + " mm"],
     ["Passagem", passTxt],
     ["Trilhos C1 / C2 / C3", `${fmt(p.L1)} / ${fmt(p.L2)} / ${fmt(p.L3)} mm`],
-    ["Pistas por lado", `${r1.trilhosPorLado} na esteira 1 · ${r2.trilhosPorLado} na esteira 2`],
+    ["Trilho de abastecimento", `${fmt(p.AB)} mm · acima da C1 e no vão C2–C3 (${fmt(GAP_COL)} mm)`],
+    ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre o DWG (${fmt(E2.lenDwg)} mm)`],
+    ["Barracão", r.barracao
+      ? `${fmt(p.BC)} × ${fmt(p.BL)} mm · sobra ${fmt(r.barracao.sobraX)} mm no comprimento e ${fmt(r.barracao.sobraY)} mm na largura`
+      : "medidas não informadas"],
+    ["Pistas por lado", `${r1.trilhosPorLado} na esteira 1 · ${r2.trilhosPorLado} na esteira 2 (+${r.ganhoE2} com o aumento)`],
     ["Conjunto", `${trilhos} trilhos · ${fmt(metros)} m`]
   ];
   $("#printHd").innerHTML = `
