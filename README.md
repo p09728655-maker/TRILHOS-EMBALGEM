@@ -12,6 +12,8 @@ dentro do alcance das duas esteiras.
 ## O que faz
 
 - Calcula quantas pistas cabem em cada esteira conforme o arranjo dos trilhos.
+- Recomenda explicitamente um dos arranjos e diz por que descartou os outros.
+- Imprime uma folha de conferência em campo com o que ainda precisa de trena.
 - Desenha a planta em escala das três colunas (C1, C2 e C3) e das duas esteiras.
 - Desenha o trilho de abastecimento com carrinho: uma faixa acima da C1, outra no vão entre C2 e C3 e uma lateral, à esquerda do início da esteira 1, no sentido dos trilhos.
 - Destaca o aumento de 5 m da esteira 2 na planta e mostra quantas pistas ele acrescenta.
@@ -36,7 +38,39 @@ dentro do alcance das duas esteiras.
 | Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 1.300 mm da esteira 1 | mesma largura dos outros, informada pela Produção; as duas distâncias foram medidas em campo e somam 4.250 mm da parede à esteira 1, contra 6.470 mm no DWG — **o DWG está desatualizado nessa região e o campo prevalece**; ambas editáveis |
 | Posição da esteira 2 | como está hoje (defasada 5.550 mm) | "Alinhada com a esteira 1" ou "Encostada no trilho lateral" deslocam a esteira 2 e a C3 para perto da parede esquerda; não muda a contagem de pistas |
 | Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
-| Barracão | 55.210 × 24.900 mm · parede esquerda a 850 mm da borda externa do trilho lateral (4.250 mm até a esteira 1, medido em campo) e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento cotado no DWG, afastamento esquerdo medido em campo; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1). Com afastamento 0 a parede encosta no conjunto |
+| Barracão | 55.210 × 24.900 mm · parede esquerda a 850 mm da borda externa do trilho lateral (4.250 mm até a esteira 1) e parede do lado da esteira 2 a 1.450 mm dela | comprimento cotado no DWG; os dois afastamentos digitados foram medidos em campo; a largura é hipótese (linha de pilares). Com afastamento 0 a parede esquerda encosta no conjunto |
+| Afastamento da parede do lado da C1 | derivado | Não é digitado: é `largura do barracão − altura do conjunto − afastamento do lado da esteira 2`. Sai negativo quando o conjunto não cabe na largura, e é assim que o erro aparece do lado que ninguém mediu, em vez de sumir |
+
+## Recomendação de arranjo
+
+A tela nomeia um dos quatro arranjos como recomendado, acima do comparativo. O critério é
+explícito e está impresso junto com a resposta:
+
+> **Mais pistas entre os arranjos que não pioram nenhum limite.** Empate em pistas, vence o de
+> menor metragem.
+
+Os limites são os mesmos das regras de aviso (`GE_MIN`, `PASS_MIN`, `FOLGA_MIN`) mais um: o apoio
+da peça larga em dois trilhos não pode cair abaixo do que a fábrica já tem hoje (`APOIO_HOJE`,
+1.200 mm). Cada arranjo descartado aparece com o motivo. Com os valores atuais:
+
+| Arranjo | Pistas | Metragem | Apoio | Situação |
+|---|---:|---:|---:|---|
+| Versão 1 · par 200 · vão 500 | 90 | 416 m | 1.200 mm | **recomendado** |
+| Versão 2 · par encostado · vão 500 | 102 | 472 m | 1.000 mm | fora: apoio abaixo do de hoje |
+| Versão 3 · sem par · vão 500 | 77 | 356 m | 1.500 mm | apto, mas 13 pistas a menos |
+| Passo do DWG · par 200 · vão 400 | 96 | 444 m | 1.200 mm | fora: vão de 400 mm e passagem de 740 mm |
+
+**O `APOIO_HOJE` é o ponto fraco do critério.** A largura da peça mais larga apoiada em dois
+trilhos nunca foi levantada; 1.200 mm é só o que o arranjo atual entrega. A Versão 2 dá 12 pistas
+a mais e está fora só por isso. Quando a peça for medida, essa linha da recomendação muda ou se
+confirma — a tela diz isso na cara, em vez de esconder atrás do número.
+
+## Folha de conferência em campo
+
+O botão "Conferir em campo" imprime a planta e, na página seguinte, uma tabela com cada medida,
+o valor que a tela usa, a origem (campo, Produção, DWG, hipótese ou derivado) e uma coluna em
+branco para anotar o que a trena disser. As linhas destacadas são as que ainda mudam alguma
+decisão. A folha sai do estado atual da tela, então reflete o que estiver digitado na hora.
 
 ## Regras de aviso
 
@@ -50,7 +84,7 @@ como constantes nomeadas no início do script e valem para todos os cenários.
 | Folga da prancha no trilho (`FOLGA_MIN`) | 30 mm | Sem guia lateral, a prancha desalinha e trava. |
 | Apoio da peça larga hoje (`APOIO_HOJE`) | 1.200 mm | Referência do arranjo atual para comparar a base da peça apoiada em dois trilhos. |
 | Trilho de abastecimento no vão (`GAP_COL`) | 2.100 mm | A faixa do carrinho não cabe entre C2 e C3. |
-| Conjunto dentro do barracão | sobra ≥ 0 nos dois sentidos | O conjunto ultrapassa a parede; o aviso diz quantos mm faltam. |
+| Conjunto dentro do barracão | sobra ≥ 0 no comprimento e afastamento do lado da C1 ≥ 0 | O conjunto ultrapassa a parede; o aviso diz quantos mm faltam. |
 
 Os campos da tela têm mínimo e máximo declarados no HTML (`min`/`max`). Valores
 fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a ela.
@@ -62,6 +96,11 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 - No DWG a coluna C1 aparece com trilhos de 7.000 mm e a C3 com 3.000 mm, divergindo
   da informação de campo (6.000 e 4.000 mm).
 - A largura da peça mais larga apoiada nos dois trilhos ainda não foi levantada.
+- A largura do barracão (24.900 mm) e o afastamento do lado da C1 continuam sem medição. Como o
+  afastamento do lado da esteira 2 (1.450 mm) veio de campo, é o lado da C1 que absorve o erro da
+  largura: com 24.900 mm ele dá 3.550 mm, contra os 700 mm que a hipótese da linha de pilares
+  indicava. Ou a largura não é 24.900 mm, ou a hipótese dos 700 mm estava errada — medir a largura
+  interna resolve os dois.
 - Barracão: o DWG cota 55.210 mm no sentido das esteiras, a partir de 6.470 mm antes do início
   da esteira 1, e a parede do lado da esteira 2 está a 1.380 mm dela. A cota de 23.570 mm do
   DWG não fecha com o trilho de abastecimento acima da C1 (rails a 10,3 m da esteira 1), então
