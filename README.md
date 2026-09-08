@@ -13,6 +13,7 @@ dentro do alcance das duas esteiras.
 
 - Calcula quantas pistas cabem em cada esteira conforme o arranjo dos trilhos.
 - Recomenda explicitamente um dos arranjos e diz por que descartou os outros.
+- Recebe outras máquinas e áreas demarcadas do barracão, desenha na planta e avisa quando invadem o conjunto.
 - Imprime uma folha de conferência em campo com o que ainda precisa de trena.
 - Desenha a planta em escala das três colunas (C1, C2 e C3) e das duas esteiras.
 - Desenha o trilho de abastecimento com carrinho: uma faixa acima da C1, outra no vão entre C2 e C3 e uma lateral, à esquerda do início da esteira 1, no sentido dos trilhos.
@@ -74,6 +75,23 @@ no comparativo para a decisão ser tomada com ele à vista.
 
 Quando o arranjo com mais pistas cai por um único limite, a tela diz qual é e quanto custa
 mantê-lo. Hoje é a Versão 2: 4 pistas a mais, fora só pelo par de 0 mm.
+
+## Áreas e máquinas
+
+Aba ao lado das cotas. Cadastra outras máquinas e espaços demarcados do barracão com nome,
+posição e tamanho; eles aparecem na planta e a simulação avisa quando algum invade o conjunto,
+dizendo a sobreposição em milímetros nos dois sentidos.
+
+Sistema de coordenadas, o mesmo da planta: **X** no sentido das esteiras, zero no início da
+esteira 1; **Y** no sentido dos trilhos, zero no trilho de abastecimento acima da C1. Valores
+negativos ficam à esquerda e acima.
+
+As áreas viajam no link junto com o resto (`areas=nome~x~y~w~h|...`) e entram na folha de
+conferência com uma coluna para validar em campo.
+
+**Não saem do DWG.** O arquivo é AC1032 (AutoCAD 2018) com as seções comprimidas, não há conversor
+disponível e o que se extrai dele são fragmentos de XREFs de outro projeto — nenhuma máquina, nenhuma
+coordenada. Enquanto o desenho não for exportado em DXF, as áreas são digitadas na mão.
 
 ## Folha de conferência em campo
 
