@@ -633,7 +633,7 @@ function pintaAbastecimento(g, x0, x1, yy, h, txt){
 }
 
 /** Contorno do barracão com cotas. A origem do desenho é o início da esteira 1 / topo do trilho de abastecimento. */
-function pintaBarracao(g, p, H, xL){
+function pintaBarracao(g, p, H, xL, xR){
   const x = xL - p.BX, yy = -p.BY, e = 60;   // traço desenhado por fora da face interna da parede
   g.appendChild(el("rect", { x:x - e, y:yy - e, width:p.BC + 2*e, height:p.BL + 2*e, fill:"none", stroke:COR.barracao,
     "stroke-width":90, "stroke-dasharray":"900 450" }));
@@ -642,7 +642,7 @@ function pintaBarracao(g, p, H, xL){
   cotaH(g, x, x + p.BC, yy - 2700, `${fmt(p.BC)} mm`, COR.barracao, true);
   cotaV(g, x + p.BC + 1300, yy, p.BL, `${fmt(p.BL)} mm`, COR.barracao);
   if (p.BX > 0) cotaH(g, x, xL, H + 1800, fmt(p.BX), COR.barracao, false);   // na base, alinhada à cota da esteira 2
-  if (p.BY > 0) cotaV(g, -1000 - p.AX - p.AL, yy, p.BY, fmt(p.BY), COR.barracao);
+  if (p.BY > 0) cotaV(g, xR + 1200, yy, p.BY, fmt(p.BY), COR.barracao);   // à direita do conjunto, longe das cotas da esquerda
 }
 
 function pintaEsteiras(g, y){
@@ -723,7 +723,7 @@ function desenha(r){
   pat.appendChild(el("rect", { width:160, height:400, fill:COR.esteira2 }));
   defs.appendChild(pat);
   g.appendChild(defs);
-  if (temBarracao) pintaBarracao(g, p, H, xL);
+  if (temBarracao) pintaBarracao(g, p, H, xL, larg);
   pintaPassagens(g, r1, [[y.c1, p.L1], [y.c2, p.L2]]);   // passagens por baixo dos trilhos
   pintaPassagens(g, r2, [[y.c3, p.L3]]);
   pintaTrilhos(g, p, r1, r2, y, H);
