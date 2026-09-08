@@ -9,6 +9,7 @@ dentro do alcance das duas esteiras.
 - Desenha a planta em escala das três colunas (C1, C2 e C3) e das duas esteiras.
 - Desenha o trilho de abastecimento com carrinho: uma faixa acima da C1 e outra no vão entre C2 e C3.
 - Destaca o aumento de 5 m da esteira 2 na planta e mostra quantas pistas ele acrescenta.
+- Desenha o contorno do barracão com cotas e avisa quando o conjunto não cabe nele.
 - Compara os cenários pela metragem linear de trilho.
 - Gera as cotas acumuladas em CSV e a planta em SVG.
 - Imprime em A4 paisagem com cabeçalho de parâmetros.
@@ -26,6 +27,7 @@ dentro do alcance das duas esteiras.
 | Esteira 2 | 850 × 28.975 mm, defasada 8.170 mm | DWG: 23.975 mm; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
 | Vão entre as colunas C2 e C3 | 2.000 mm | ajustado para 2.000 mm (DWG: 1.590) · fixo no código, não ajustável na tela |
 | Trilho de abastecimento (carrinho) | 1.000 mm de largura | faixa acima da C1 e centrada no vão C2–C3 · largura a confirmar com a Produção |
+| Barracão | não informado (0) | comprimento × largura e afastamento da esteira 1 às paredes esquerda e superior · contorno só é desenhado quando preenchido |
 
 ## Regras de aviso
 
@@ -39,6 +41,7 @@ como constantes nomeadas no início do script e valem para todos os cenários.
 | Folga da prancha no trilho (`FOLGA_MIN`) | 30 mm | Sem guia lateral, a prancha desalinha e trava. |
 | Apoio da peça larga hoje (`APOIO_HOJE`) | 1.200 mm | Referência do arranjo atual para comparar a base da peça apoiada em dois trilhos. |
 | Trilho de abastecimento no vão (`GAP_COL`) | 2.000 mm | A faixa do carrinho não cabe entre C2 e C3. |
+| Conjunto dentro do barracão | sobra ≥ 0 nos dois sentidos | O conjunto ultrapassa a parede; o aviso diz quantos mm faltam. |
 
 Os campos da tela têm mínimo e máximo declarados no HTML (`min`/`max`). Valores
 fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a ela.
@@ -50,6 +53,8 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 - No DWG a coluna C1 aparece com trilhos de 7.000 mm e a C3 com 3.000 mm, divergindo
   da informação de campo (6.000 e 4.000 mm).
 - A largura da peça mais larga apoiada nos dois trilhos ainda não foi levantada.
+- As medidas do barracão não estão no DWG nem em nenhum arquivo disponível. Ficam em 0 até
+  serem informadas; os quatro campos aceitam o valor de campo e entram no link compartilhado.
 - O aumento de 5 m da esteira 2 foi desenhado no final da esteira (lado oposto ao início),
   mantendo a defasagem de 8.170 mm do DWG. Se o acréscimo for no início, a defasagem muda e
   o código precisa ser ajustado (`E2.ini`).
