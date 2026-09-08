@@ -25,9 +25,9 @@ dentro do alcance das duas esteiras.
 | Comprimento C1 / C2 / C3 | 6.000 / 4.000 / 4.000 mm | informado pela Produção |
 | Esteira 1 | 850 × 23.940 mm | largura ajustada para 850 mm (DWG: 840); comprimento medido no DWG |
 | Esteira 2 | 850 × 28.975 mm, defasada 8.170 mm | DWG: 23.975 mm; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
-| Vão entre as colunas C2 e C3 | 2.000 mm | ajustado para 2.000 mm (DWG: 1.590) · fixo no código, não ajustável na tela |
-| Trilho de abastecimento (carrinho) | 1.000 mm de largura | faixa acima da C1 e centrada no vão C2–C3 · largura a confirmar com a Produção |
-| Barracão | não informado (0) | comprimento × largura e afastamento da esteira 1 às paredes esquerda e superior · contorno só é desenhado quando preenchido |
+| Vão entre as colunas C2 e C3 | 2.000 mm | definido em 2.000 mm (medido no DWG: 2.100) · fixo no código, não ajustável na tela |
+| Trilho de abastecimento (carrinho) | 1.570 mm de largura | faixa acima da C1 e centrada no vão C2–C3 · no DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1 |
+| Barracão | 55.210 × 24.900 mm · esteira 1 a 6.470 mm da parede esquerda e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento e afastamento esquerdo cotados no DWG; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1) |
 
 ## Regras de aviso
 
@@ -53,16 +53,20 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 - No DWG a coluna C1 aparece com trilhos de 7.000 mm e a C3 com 3.000 mm, divergindo
   da informação de campo (6.000 e 4.000 mm).
 - A largura da peça mais larga apoiada nos dois trilhos ainda não foi levantada.
-- As medidas do barracão não estão no DWG nem em nenhum arquivo disponível. Ficam em 0 até
-  serem informadas; os quatro campos aceitam o valor de campo e entram no link compartilhado.
+- Barracão: o DWG cota 55.210 mm no sentido das esteiras, a partir de 6.470 mm antes do início
+  da esteira 1, e a parede do lado da esteira 2 está a 1.380 mm dela. A cota de 23.570 mm do
+  DWG não fecha com o trilho de abastecimento acima da C1 (rails a 10,3 m da esteira 1), então
+  a largura de 24.900 mm e o afastamento de 700 mm foram tomados na linha de pilares a 11,0 m
+  da esteira 1 e precisam ser confirmados. No eixo da esteira 1, a esteira 2 começa 7.850 mm
+  depois (8.170 mm é a diferença bruta de coordenadas, com o conjunto girado 1,5°).
 - O aumento de 5 m da esteira 2 foi desenhado no final da esteira (lado oposto ao início),
   mantendo a defasagem de 8.170 mm do DWG. Se o acréscimo for no início, a defasagem muda e
   o código precisa ser ajustado (`E2.ini`).
-- A largura da faixa do trilho de abastecimento (carrinho) está em 1.000 mm por hipótese, editável na
-  tela. Só o desenho usa esse valor; ele não entra na contagem de pistas nem na metragem. A simulação
-  avisa se a largura passar do vão de 2.000 mm entre C2 e C3.
-- O vão entre C2 e C3 (2.000 mm) e a largura da esteira 1 (850 mm) foram ajustados em
-  relação ao DWG (1.590 e 840 mm) e não são editáveis na tela. Ambos afetam só o desenho
+- A largura da faixa do trilho de abastecimento (carrinho) está em 1.570 mm, medida no DWG entre os
+  rails do vão C2–C3, editável na tela. Só o desenho usa esse valor; ele não entra na contagem de pistas
+  nem na metragem. A simulação avisa se a largura passar do vão de 2.000 mm entre C2 e C3.
+- O vão entre C2 e C3 (2.000 mm) e a largura da esteira 1 (850 mm) foram definidos em
+  relação ao DWG (2.100 e 840 mm) e não são editáveis na tela. Ambos afetam só o desenho
   e as cotas verticais, não a contagem de pistas nem a metragem.
 
 ## Stack

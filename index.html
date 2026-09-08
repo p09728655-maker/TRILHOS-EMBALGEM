@@ -297,24 +297,24 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         </div>
         <div class="campo">
           <label for="pAB">Trilho de abastecimento — largura</label>
-          <input id="pAB" type="number" min="200" max="3000" step="50" value="1000">
-          <div class="nota">Faixa do trilho com carrinho que abastece as pistas: acima da C1 e no vão entre C2 e C3 (2.000 mm). Largura a confirmar com a Produção.</div>
+          <input id="pAB" type="number" min="200" max="3000" step="10" value="1570">
+          <div class="nota">Faixa do trilho com carrinho que abastece as pistas: acima da C1 e no vão entre C2 e C3. No DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1.</div>
         </div>
         <div class="campo">
           <label>Barracão — comprimento × largura</label>
           <div class="dupla">
-            <input id="pBC" type="number" min="0" max="200000" step="100" value="0" aria-label="Comprimento do barracão, no sentido das esteiras">
-            <input id="pBL" type="number" min="0" max="200000" step="100" value="0" aria-label="Largura do barracão, no sentido dos trilhos">
+            <input id="pBC" type="number" min="0" max="200000" step="10" value="55210" aria-label="Comprimento do barracão, no sentido das esteiras">
+            <input id="pBL" type="number" min="0" max="200000" step="10" value="24900" aria-label="Largura do barracão, no sentido dos trilhos">
           </div>
-          <div class="nota">Comprimento no sentido das esteiras, largura no sentido dos trilhos. Com 0, o contorno não é desenhado.</div>
+          <div class="nota">Comprimento cotado no DWG (55.210). Largura é hipótese: parede do lado da C1 na linha de pilares. Com 0, o contorno não é desenhado.</div>
         </div>
         <div class="campo">
           <label>Barracão — afastamento da esteira 1 até as paredes</label>
           <div class="dupla">
-            <input id="pBX" type="number" min="0" max="100000" step="100" value="0" aria-label="Distância da parede esquerda ao início da esteira 1">
-            <input id="pBY" type="number" min="0" max="100000" step="100" value="0" aria-label="Distância da parede superior ao trilho de abastecimento da C1">
+            <input id="pBX" type="number" min="0" max="100000" step="10" value="6470" aria-label="Distância da parede esquerda ao início da esteira 1">
+            <input id="pBY" type="number" min="0" max="100000" step="10" value="700" aria-label="Distância da parede superior ao trilho de abastecimento da C1">
           </div>
-          <div class="nota">Esquerda: da parede ao início da esteira 1. Cima: da parede ao trilho de abastecimento da C1.</div>
+          <div class="nota">Esquerda: da parede ao início da esteira 1 (cotado no DWG). Cima: da parede ao trilho de abastecimento da C1 (hipótese).</div>
         </div>
       </details>
     </div>
@@ -357,7 +357,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
   <p class="rodape">
     Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b> · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
-    Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 8.170&nbsp;mm (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm) · Vão C2–C3: 2.000&nbsp;mm · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
+    Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 8.170&nbsp;mm (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm) · Vão C2–C3: 2.000&nbsp;mm (DWG: 2.100) · Barracão: 55.210&nbsp;mm cotado no DWG × 24.900&nbsp;mm (largura a confirmar) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
     Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> todos os cenários de referência vêm do desenho. O passo executado no chão de fábrica ainda não foi medido e pode divergir do DWG.
   </p>
 </div>
@@ -374,7 +374,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 const E1 = { ini:0,    len:23940, larg:850 };   // esteira 1 (DWG: 840; ajustado para 850 mm)
 const E2_AUMENTO = 5000;                        // acréscimo de 5 m na esteira 2 (decisão em estudo)
 const E2 = { ini:8170, len:23975 + E2_AUMENTO, larg:850, lenDwg:23975 };   // esteira 2, defasada 8.170 mm; aumento no final
-const GAP_COL = 2000;                           // vão entre a coluna C2 e a coluna C3 (DWG: 1.590; ajustado para 2.000 mm)
+const GAP_COL = 2000;                           // vão entre a coluna C2 e a coluna C3 (medido no DWG: 2.100; definido em 2.000 mm)
 
 /* ---------------- regras de aceitação ---------------- */
 const GE_MIN     = 500;    // circulação mínima entre pares
@@ -391,8 +391,11 @@ const PRESETS = [
   { id:"at", nome:"Passo do DWG", sub:"par 200 · vão 400",   W:500, modo:"par",   GI:200, GE:400 }
 ];
 
-const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:1000,
-                 BC:0, BL:0, BX:0, BY:0 };   // barracão: 0 = medidas não informadas
+const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:1570,
+                 BC:55210, BL:24900, BX:6470, BY:700 };
+// Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota).
+// Largura 24.900 e afastamento 700 são HIPÓTESE: parede do lado da C1 tomada na linha de pilares a 11,0 m da esteira 1;
+// a cota de 23.570 do DWG não fecha com o trilho de abastecimento (rails a 10,3 m da esteira 1).
 
 /* id do campo no formulário -> chave do parâmetro */
 const CAMPOS = { pW:"W", pP:"P", pModo:"modo", pGI:"GI", pGE:"GE", pPass:"pass", pL1:"L1", pL2:"L2", pL3:"L3", pAB:"AB",
@@ -614,9 +617,9 @@ function pintaBarracao(g, p){
   const x = -p.BX, yy = -p.BY;
   g.appendChild(el("rect", { x, y:yy, width:p.BC, height:p.BL, fill:"none", stroke:COR.barracao,
     "stroke-width":90, "stroke-dasharray":"900 450" }));
-  g.appendChild(el("text", { x:x + 500, y:yy + 700, "font-size":480, "font-weight":"700", fill:COR.barracao,
+  g.appendChild(el("text", { x:x + 500, y:yy + p.BL - 400, "font-size":480, "font-weight":"700", fill:COR.barracao,
     "letter-spacing":60 }, `BARRACÃO · ${fmt(p.BC)} × ${fmt(p.BL)} mm`));
-  cotaH(g, x, x + p.BC, yy - 1300, `${fmt(p.BC)} mm`, COR.barracao, true);
+  cotaH(g, x, x + p.BC, yy - 2700, `${fmt(p.BC)} mm`, COR.barracao, true);
   cotaV(g, x + p.BC + 1300, yy, p.BL, `${fmt(p.BL)} mm`, COR.barracao);
   if (p.BX > 0) cotaH(g, x, 0, -700, fmt(p.BX), COR.barracao, true);
   if (p.BY > 0) cotaV(g, -1000, yy, p.BY, fmt(p.BY), COR.barracao);
@@ -682,7 +685,7 @@ function desenha(r){
   let vx0 = -M.esq, vy0 = -M.topo, vx1 = larg + M.dir, vy1 = H + M.base;
   if (temBarracao){
     vx0 = Math.min(vx0, -p.BX - 900);
-    vy0 = Math.min(vy0, -p.BY - 2400);
+    vy0 = Math.min(vy0, -p.BY - 3600);
     vx1 = Math.max(vx1, -p.BX + p.BC + 2600);
     vy1 = Math.max(vy1, -p.BY + p.BL + 900);
   }
