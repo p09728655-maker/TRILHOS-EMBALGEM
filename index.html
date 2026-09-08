@@ -319,10 +319,10 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         <div class="campo">
           <label>Barracão — afastamento da esteira 1 até as paredes</label>
           <div class="dupla">
-            <input id="pBX" type="number" min="0" max="100000" step="10" value="6470" aria-label="Distância da parede esquerda ao início da esteira 1">
+            <input id="pBX" type="number" min="0" max="100000" step="10" value="3670" aria-label="Distância da parede esquerda à borda externa do trilho de abastecimento lateral">
             <input id="pBY" type="number" min="0" max="100000" step="10" value="700" aria-label="Distância da parede superior ao trilho de abastecimento da C1">
           </div>
-          <div class="nota">Esquerda: da parede ao início da esteira 1 (cotado no DWG). Cima: da parede ao trilho de abastecimento da C1 (hipótese).</div>
+          <div class="nota">Esquerda: da parede à borda externa do trilho lateral (DWG: 6.470 até a esteira 1, menos o trilho lateral). Cima: da parede ao trilho de abastecimento da C1 (hipótese). Com 0 a parede encosta no conjunto.</div>
         </div>
       </details>
     </div>
@@ -400,8 +400,9 @@ const PRESETS = [
 ];
 
 const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:1570,
-                 BC:55210, BL:24900, BX:6470, BY:700, AX:800, AL:3200 };
-// Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota).
+                 BC:55210, BL:24900, BX:3670, BY:700, AX:800, AL:3200 };
+// Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota);
+// BX é medido da parede à borda externa do trilho lateral, por isso 6.470 − 800 − 3.200 = 3.670.
 // Largura 24.900 e afastamento 700 são HIPÓTESE: parede do lado da C1 tomada na linha de pilares a 11,0 m da esteira 1;
 // a cota de 23.570 do DWG não fecha com o trilho de abastecimento (rails a 10,3 m da esteira 1).
 
@@ -492,10 +493,8 @@ function avalia(p){
   if (!r1 || !r2) return null;
   const r2dwg = calcula({ ini:E2.ini, len:E2.lenDwg }, p);   // esteira 2 no comprimento do DWG, para medir o ganho
   const ext = extensao(p);
-  // no sentido do comprimento o trilho lateral fica antes da esteira 1, dentro do afastamento BX
   const barracao = p.BC > 0 && p.BL > 0
-    ? { sobraX: p.BC - p.BX - (ext.larg - p.AX - p.AL), sobraY: p.BL - p.BY - ext.alt,
-        lateralCabe: p.AX + p.AL <= p.BX }   // negativo = não cabe
+    ? { sobraX: p.BC - p.BX - ext.larg, sobraY: p.BL - p.BY - ext.alt }   // negativo = não cabe
     : null;
   return {
     barracao,
@@ -533,7 +532,7 @@ function lerParams(){
     L3: numCampo("pL3"),
     AB: numCampo("pAB"),  // largura do trilho de abastecimento (carrinho)
     BC: numCampo("pBC"), BL: numCampo("pBL"),   // barracão: comprimento (x) e largura (y)
-    BX: numCampo("pBX"), BY: numCampo("pBY"),   // afastamento da esteira 1 às paredes esquerda e superior
+    BX: numCampo("pBX"), BY: numCampo("pBY"),   // afastamento do conjunto às paredes esquerda (trilho lateral) e superior
     AX: numCampo("pAX"),  // distância do trilho de abastecimento lateral ao início da esteira 1
     AL: numCampo("pAL")   // largura do trilho de abastecimento lateral
   };
@@ -634,15 +633,15 @@ function pintaAbastecimento(g, x0, x1, yy, h, txt){
 }
 
 /** Contorno do barracão com cotas. A origem do desenho é o início da esteira 1 / topo do trilho de abastecimento. */
-function pintaBarracao(g, p, H){
-  const x = -p.BX, yy = -p.BY;
-  g.appendChild(el("rect", { x, y:yy, width:p.BC, height:p.BL, fill:"none", stroke:COR.barracao,
+function pintaBarracao(g, p, H, xL){
+  const x = xL - p.BX, yy = -p.BY, e = 60;   // traço desenhado por fora da face interna da parede
+  g.appendChild(el("rect", { x:x - e, y:yy - e, width:p.BC + 2*e, height:p.BL + 2*e, fill:"none", stroke:COR.barracao,
     "stroke-width":90, "stroke-dasharray":"900 450" }));
   g.appendChild(el("text", { x:x + 500, y:yy + p.BL - 400, "font-size":480, "font-weight":"700", fill:COR.barracao,
     "letter-spacing":60 }, `BARRACÃO · ${fmt(p.BC)} × ${fmt(p.BL)} mm`));
   cotaH(g, x, x + p.BC, yy - 2700, `${fmt(p.BC)} mm`, COR.barracao, true);
   cotaV(g, x + p.BC + 1300, yy, p.BL, `${fmt(p.BL)} mm`, COR.barracao);
-  if (p.BX > 0) cotaH(g, x, 0, H + 1800, fmt(p.BX), COR.barracao, false);   // na base, alinhada à cota da esteira 2
+  if (p.BX > 0) cotaH(g, x, xL, H + 1800, fmt(p.BX), COR.barracao, false);   // na base, alinhada à cota da esteira 2
   if (p.BY > 0) cotaV(g, -1000 - p.AX - p.AL, yy, p.BY, fmt(p.BY), COR.barracao);
 }
 
@@ -706,11 +705,12 @@ function desenha(r){
   const M = { esq:2600, dir:900, topo:2400, base:4100 };
   const temBarracao = !!r.barracao;
   // caixa visível: conjunto mais margens, ampliada para envolver o barracão quando informado
+  const xL = x0 - p.AX - p.AL;   // borda externa do trilho de abastecimento lateral
   let vx0 = -M.esq - p.AX - p.AL, vy0 = -M.topo, vx1 = larg + M.dir, vy1 = H + M.base;
   if (temBarracao){
-    vx0 = Math.min(vx0, -p.BX - 900);
+    vx0 = Math.min(vx0, xL - p.BX - 900);
     vy0 = Math.min(vy0, -p.BY - 3600);
-    vx1 = Math.max(vx1, -p.BX + p.BC + 2600);
+    vx1 = Math.max(vx1, xL - p.BX + p.BC + 2600);
     vy1 = Math.max(vy1, -p.BY + p.BL + 900);
   }
   $("#svg").setAttribute("viewBox", `${vx0} ${vy0} ${vx1 - vx0} ${vy1 - vy0}`);
@@ -723,7 +723,7 @@ function desenha(r){
   pat.appendChild(el("rect", { width:160, height:400, fill:COR.esteira2 }));
   defs.appendChild(pat);
   g.appendChild(defs);
-  if (temBarracao) pintaBarracao(g, p, H);
+  if (temBarracao) pintaBarracao(g, p, H, xL);
   pintaPassagens(g, r1, [[y.c1, p.L1], [y.c2, p.L2]]);   // passagens por baixo dos trilhos
   pintaPassagens(g, r2, [[y.c3, p.L3]]);
   pintaTrilhos(g, p, r1, r2, y, H);
@@ -750,8 +750,6 @@ function montaAvisos(r){
     if (r.barracao.sobraY < 0) f.push(`<b>${fmt(-r.barracao.sobraY)} mm</b> na largura`);
     t.push(`O conjunto não cabe no barracão: falta ${f.join(" e ")}.`);
   }
-  if (r.barracao && !r.barracao.lateralCabe)
-    t.push(`Trilho de abastecimento lateral (<b>${fmt(p.AX + p.AL)} mm</b> da esteira 1 até a borda externa) atravessa a parede esquerda, a ${fmt(p.BX)} mm.`);
   if (p.AB > GAP_COL)
     t.push(`Trilho de abastecimento com <b>${fmt(p.AB)} mm</b> não cabe no vão de ${fmt(GAP_COL)} mm entre C2 e C3.`);
   if (p.pass !== "none" && r1.idxPass.length && r1.larguraPass < PASS_MIN)
