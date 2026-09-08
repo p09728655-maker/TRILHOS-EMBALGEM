@@ -7,7 +7,7 @@ dentro do alcance das duas esteiras.
 
 - Calcula quantas pistas cabem em cada esteira conforme o arranjo dos trilhos.
 - Desenha a planta em escala das três colunas (C1, C2 e C3) e das duas esteiras.
-- Desenha o trilho de abastecimento com carrinho: uma faixa acima da C1 e outra no vão entre C2 e C3.
+- Desenha o trilho de abastecimento com carrinho: uma faixa acima da C1, outra no vão entre C2 e C3 e uma lateral, à esquerda do início da esteira 1, no sentido dos trilhos.
 - Destaca o aumento de 5 m da esteira 2 na planta e mostra quantas pistas ele acrescenta.
 - Desenha o contorno do barracão com cotas e avisa quando o conjunto não cabe nele.
 - Compara os cenários pela metragem linear de trilho.
@@ -27,6 +27,7 @@ dentro do alcance das duas esteiras.
 | Esteira 2 | 850 × 28.975 mm, defasada 7.850 mm | DWG: 23.975 mm; defasagem medida no eixo da esteira 1; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
 | Vão entre as colunas C2 e C3 | 2.100 mm | medido no DWG · fixo no código, não ajustável na tela |
 | Trilho de abastecimento (carrinho) | 1.570 mm de largura | faixa acima da C1 e centrada no vão C2–C3 · no DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1 |
+| Trilho de abastecimento lateral | 2.500 mm antes da esteira 1 | mesma largura dos outros; distância é hipótese, a confirmar no DWG |
 | Barracão | 55.210 × 24.900 mm · esteira 1 a 6.470 mm da parede esquerda e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento e afastamento esquerdo cotados no DWG; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1) |
 
 ## Regras de aviso
@@ -42,6 +43,7 @@ como constantes nomeadas no início do script e valem para todos os cenários.
 | Apoio da peça larga hoje (`APOIO_HOJE`) | 1.200 mm | Referência do arranjo atual para comparar a base da peça apoiada em dois trilhos. |
 | Trilho de abastecimento no vão (`GAP_COL`) | 2.100 mm | A faixa do carrinho não cabe entre C2 e C3. |
 | Conjunto dentro do barracão | sobra ≥ 0 nos dois sentidos | O conjunto ultrapassa a parede; o aviso diz quantos mm faltam. |
+| Trilho lateral dentro do afastamento | distância + largura ≤ afastamento esquerdo | O trilho lateral atravessa a parede esquerda. |
 
 Os campos da tela têm mínimo e máximo declarados no HTML (`min`/`max`). Valores
 fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a ela.
@@ -64,6 +66,8 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 - O aumento de 5 m da esteira 2 foi desenhado no final da esteira (lado oposto ao início),
   mantendo a defasagem de 7.850 mm. Se o acréscimo for no início, a defasagem muda e
   o código precisa ser ajustado (`E2.ini`).
+- A posição do trilho de abastecimento lateral (2.500 mm antes da esteira 1) é hipótese. No DWG
+  há linhas fora de esquadro nessa região e não foi possível identificar o trilho com segurança.
 - A largura da faixa do trilho de abastecimento (carrinho) está em 1.570 mm, medida no DWG entre os
   rails do vão C2–C3, editável na tela. Só o desenho usa esse valor; ele não entra na contagem de pistas
   nem na metragem. A simulação avisa se a largura passar do vão de 2.100 mm entre C2 e C3.

@@ -301,6 +301,11 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
           <div class="nota">Faixa do trilho com carrinho que abastece as pistas: acima da C1 e no vão de 2.100 mm entre C2 e C3. No DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1.</div>
         </div>
         <div class="campo">
+          <label for="pAX">Trilho de abastecimento lateral — distância até a esteira 1</label>
+          <input id="pAX" type="number" min="0" max="20000" step="10" value="2500">
+          <div class="nota">Terceiro trilho, no sentido dos trilhos, à esquerda do início da esteira 1, cobrindo da C1 à esteira 2. Distância é hipótese, a confirmar no DWG.</div>
+        </div>
+        <div class="campo">
           <label>Barracão — comprimento × largura</label>
           <div class="dupla">
             <input id="pBC" type="number" min="0" max="200000" step="10" value="55210" aria-label="Comprimento do barracão, no sentido das esteiras">
@@ -392,14 +397,14 @@ const PRESETS = [
 ];
 
 const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:1570,
-                 BC:55210, BL:24900, BX:6470, BY:700 };
+                 BC:55210, BL:24900, BX:6470, BY:700, AX:2500 };
 // Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota).
 // Largura 24.900 e afastamento 700 são HIPÓTESE: parede do lado da C1 tomada na linha de pilares a 11,0 m da esteira 1;
 // a cota de 23.570 do DWG não fecha com o trilho de abastecimento (rails a 10,3 m da esteira 1).
 
 /* id do campo no formulário -> chave do parâmetro */
 const CAMPOS = { pW:"W", pP:"P", pModo:"modo", pGI:"GI", pGE:"GE", pPass:"pass", pL1:"L1", pL2:"L2", pL3:"L3", pAB:"AB",
-                 pBC:"BC", pBL:"BL", pBX:"BX", pBY:"BY" };
+                 pBC:"BC", pBL:"BL", pBX:"BX", pBY:"BY", pAX:"AX" };
 const IDS = Object.keys(CAMPOS);
 
 const LOGO = "data:image/png;base64,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";
@@ -473,7 +478,7 @@ const metragem = (p, r1, r2) => (r1.trilhosPorLado*(p.L1 + p.L2) + r2.trilhosPor
 /** Extensão ocupada pelo conjunto: da esteira 1 ao fim da esteira 2, e do trilho de abastecimento ao fim da esteira 2. */
 function extensao(p){
   return {
-    larg: Math.max(E1.ini + E1.len, E2.ini + E2.len) - Math.min(E1.ini, E2.ini),
+    larg: Math.max(E1.ini + E1.len, E2.ini + E2.len) - Math.min(E1.ini, E2.ini) + p.AX + p.AB,
     alt:  p.AB + p.L1 + E1.larg + p.L2 + GAP_COL + p.L3 + E2.larg
   };
 }
@@ -484,8 +489,10 @@ function avalia(p){
   if (!r1 || !r2) return null;
   const r2dwg = calcula({ ini:E2.ini, len:E2.lenDwg }, p);   // esteira 2 no comprimento do DWG, para medir o ganho
   const ext = extensao(p);
+  // no sentido do comprimento o trilho lateral fica antes da esteira 1, dentro do afastamento BX
   const barracao = p.BC > 0 && p.BL > 0
-    ? { sobraX: p.BC - p.BX - ext.larg, sobraY: p.BL - p.BY - ext.alt }   // negativo = não cabe
+    ? { sobraX: p.BC - p.BX - (ext.larg - p.AX - p.AB), sobraY: p.BL - p.BY - ext.alt,
+        lateralCabe: p.AX + p.AB <= p.BX }   // negativo = não cabe
     : null;
   return {
     barracao,
@@ -523,7 +530,8 @@ function lerParams(){
     L3: numCampo("pL3"),
     AB: numCampo("pAB"),  // largura do trilho de abastecimento (carrinho)
     BC: numCampo("pBC"), BL: numCampo("pBL"),   // barracão: comprimento (x) e largura (y)
-    BX: numCampo("pBX"), BY: numCampo("pBY")    // afastamento da esteira 1 às paredes esquerda e superior
+    BX: numCampo("pBX"), BY: numCampo("pBY"),   // afastamento da esteira 1 às paredes esquerda e superior
+    AX: numCampo("pAX")   // distância do trilho de abastecimento lateral ao início da esteira 1
   };
 }
 
@@ -603,6 +611,15 @@ function pintaTrilhos(g, p, r1, r2, y, H){
 }
 
 /** Faixa do trilho de abastecimento com carrinho: retângulo, linha central (trilho) e rótulo. */
+function pintaAbastecimentoV(g, x, y0, y1, w, txt){
+  g.appendChild(el("rect", { x, y:y0, width:w, height:y1 - y0, fill:COR.abastBg, stroke:COR.abast, "stroke-width":36 }));
+  g.appendChild(el("line", { x1:x + w/2, y1:y0, x2:x + w/2, y2:y1, stroke:COR.abast, "stroke-width":60,
+    "stroke-dasharray":"600 300" }));
+  const fs = Math.min(430, w*0.42), cx = x + w/2 - fs*0.45, cy = (y0 + y1)/2;
+  g.appendChild(el("text", { x:cx, y:cy, "font-size":fs, "font-weight":"700", fill:COR.abast, "text-anchor":"middle",
+    "letter-spacing":40, transform:`rotate(-90 ${cx} ${cy})` }, txt));
+}
+
 function pintaAbastecimento(g, x0, x1, yy, h, txt){
   g.appendChild(el("rect", { x:x0, y:yy, width:x1 - x0, height:h, fill:COR.abastBg, stroke:COR.abast, "stroke-width":36 }));
   g.appendChild(el("line", { x1:x0, y1:yy + h/2, x2:x1, y2:yy + h/2, stroke:COR.abast, "stroke-width":60,
@@ -613,7 +630,7 @@ function pintaAbastecimento(g, x0, x1, yy, h, txt){
 }
 
 /** Contorno do barracão com cotas. A origem do desenho é o início da esteira 1 / topo do trilho de abastecimento. */
-function pintaBarracao(g, p){
+function pintaBarracao(g, p, H){
   const x = -p.BX, yy = -p.BY;
   g.appendChild(el("rect", { x, y:yy, width:p.BC, height:p.BL, fill:"none", stroke:COR.barracao,
     "stroke-width":90, "stroke-dasharray":"900 450" }));
@@ -621,8 +638,8 @@ function pintaBarracao(g, p){
     "letter-spacing":60 }, `BARRACÃO · ${fmt(p.BC)} × ${fmt(p.BL)} mm`));
   cotaH(g, x, x + p.BC, yy - 2700, `${fmt(p.BC)} mm`, COR.barracao, true);
   cotaV(g, x + p.BC + 1300, yy, p.BL, `${fmt(p.BL)} mm`, COR.barracao);
-  if (p.BX > 0) cotaH(g, x, 0, -700, fmt(p.BX), COR.barracao, true);
-  if (p.BY > 0) cotaV(g, -1000, yy, p.BY, fmt(p.BY), COR.barracao);
+  if (p.BX > 0) cotaH(g, x, 0, H + 1800, fmt(p.BX), COR.barracao, false);   // na base, alinhada à cota da esteira 2
+  if (p.BY > 0) cotaV(g, -1000 - p.AX - p.AB, yy, p.BY, fmt(p.BY), COR.barracao);
 }
 
 function pintaEsteiras(g, y){
@@ -643,15 +660,17 @@ function pintaEsteiras(g, y){
 }
 
 function pintaCotas(g, p, r1, r2, y, H){
-  cotaV(g, -1000, y.ab1, p.AB, `ABAST.  ${fmt(p.AB)}`, COR.abast);
-  cotaV(g, -1000, y.c1, p.L1, `C1  ${fmt(p.L1)}`, COR.ladoA);
-  cotaV(g, -1000, y.e1, E1.larg, String(E1.larg), COR.esteira1);
-  cotaV(g, -1000, y.c2, p.L2, `C2  ${fmt(p.L2)}`, COR.ladoB);
-  cotaV(g, -1000, y.c2 + p.L2, GAP_COL, fmt(GAP_COL), COR.cota);
-  cotaV(g, -1000, y.c3, p.L3, `C3  ${fmt(p.L3)}`, COR.ladoB);
-  cotaV(g, -1000, y.e2, E2.larg, String(E2.larg), COR.esteira2);
+  // cotas verticais à esquerda do trilho de abastecimento lateral
+  cotaV(g, -1000 - p.AX - p.AB, y.ab1, p.AB, `ABAST.  ${fmt(p.AB)}`, COR.abast);
+  cotaV(g, -1000 - p.AX - p.AB, y.c1, p.L1, `C1  ${fmt(p.L1)}`, COR.ladoA);
+  cotaV(g, -1000 - p.AX - p.AB, y.e1, E1.larg, String(E1.larg), COR.esteira1);
+  cotaV(g, -1000 - p.AX - p.AB, y.c2, p.L2, `C2  ${fmt(p.L2)}`, COR.ladoB);
+  cotaV(g, -1000 - p.AX - p.AB, y.c2 + p.L2, GAP_COL, fmt(GAP_COL), COR.cota);
+  cotaV(g, -1000 - p.AX - p.AB, y.c3, p.L3, `C3  ${fmt(p.L3)}`, COR.ladoB);
+  cotaV(g, -1000 - p.AX - p.AB, y.e2, E2.larg, String(E2.larg), COR.esteira2);
 
   const un = p.modo === "par" ? "vias" : "trilhos";
+  cotaH(g, -p.AX, 0, y.ab1 - 700, fmt(p.AX), COR.abast, true);
   cotaH(g, E1.ini, E1.ini + E1.len, y.ab1 - 1500,
         `${fmt(E1.len)} mm · ${r1.n} ${un} · vão ${fmt(p.GE)} mm`, COR.esteira1, true);
   cotaH(g, E2.ini, E2.ini + E2.len, H + 1800,
@@ -682,7 +701,7 @@ function desenha(r){
   const M = { esq:2600, dir:900, topo:2400, base:4100 };
   const temBarracao = !!r.barracao;
   // caixa visível: conjunto mais margens, ampliada para envolver o barracão quando informado
-  let vx0 = -M.esq, vy0 = -M.topo, vx1 = larg + M.dir, vy1 = H + M.base;
+  let vx0 = -M.esq - p.AX - p.AB, vy0 = -M.topo, vx1 = larg + M.dir, vy1 = H + M.base;
   if (temBarracao){
     vx0 = Math.min(vx0, -p.BX - 900);
     vy0 = Math.min(vy0, -p.BY - 3600);
@@ -699,13 +718,14 @@ function desenha(r){
   pat.appendChild(el("rect", { width:160, height:400, fill:COR.esteira2 }));
   defs.appendChild(pat);
   g.appendChild(defs);
-  if (temBarracao) pintaBarracao(g, p);
+  if (temBarracao) pintaBarracao(g, p, H);
   pintaPassagens(g, r1, [[y.c1, p.L1], [y.c2, p.L2]]);   // passagens por baixo dos trilhos
   pintaPassagens(g, r2, [[y.c3, p.L3]]);
   pintaTrilhos(g, p, r1, r2, y, H);
   const abTxt = `TRILHO DE ABASTECIMENTO · CARRINHO · ${fmt(p.AB)} mm`;
   pintaAbastecimento(g, E1.ini, E1.ini + E1.len, y.ab1, p.AB, abTxt);
   pintaAbastecimento(g, x0, larg, y.ab2, p.AB, abTxt);
+  pintaAbastecimentoV(g, x0 - p.AX - p.AB, y.ab1, H, p.AB, `TRILHO DE ABASTECIMENTO LATERAL · CARRINHO · ${fmt(p.AB)} mm`);
   pintaEsteiras(g, y);
   pintaCotas(g, p, r1, r2, y, H);
   trocaConteudoSvg([g]);
@@ -725,6 +745,8 @@ function montaAvisos(r){
     if (r.barracao.sobraY < 0) f.push(`<b>${fmt(-r.barracao.sobraY)} mm</b> na largura`);
     t.push(`O conjunto não cabe no barracão: falta ${f.join(" e ")}.`);
   }
+  if (r.barracao && !r.barracao.lateralCabe)
+    t.push(`Trilho de abastecimento lateral (<b>${fmt(p.AX + p.AB)} mm</b> até a esteira 1) atravessa a parede esquerda, a ${fmt(p.BX)} mm.`);
   if (p.AB > GAP_COL)
     t.push(`Trilho de abastecimento com <b>${fmt(p.AB)} mm</b> não cabe no vão de ${fmt(GAP_COL)} mm entre C2 e C3.`);
   if (p.pass !== "none" && r1.idxPass.length && r1.larguraPass < PASS_MIN)
@@ -823,7 +845,7 @@ function montaPrintHd(r){
     ["Apoio em 2 trilhos", fmt(apoio) + " mm"],
     ["Passagem", passTxt],
     ["Trilhos C1 / C2 / C3", `${fmt(p.L1)} / ${fmt(p.L2)} / ${fmt(p.L3)} mm`],
-    ["Trilho de abastecimento", `${fmt(p.AB)} mm · acima da C1 e no vão C2–C3 (${fmt(GAP_COL)} mm)`],
+    ["Trilho de abastecimento", `${fmt(p.AB)} mm · acima da C1, no vão C2–C3 (${fmt(GAP_COL)} mm) e lateral a ${fmt(p.AX)} mm da esteira 1`],
     ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre o DWG (${fmt(E2.lenDwg)} mm)`],
     ["Barracão", r.barracao
       ? `${fmt(p.BC)} × ${fmt(p.BL)} mm · sobra ${fmt(r.barracao.sobraX)} mm no comprimento e ${fmt(r.barracao.sobraY)} mm na largura`
