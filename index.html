@@ -325,10 +325,10 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         <div class="campo">
           <label>Comprimento do trilho — esteira 1</label>
           <div class="dupla">
-            <input id="pL1" type="number" min="500" max="20000" step="100" value="6000" aria-label="Lado A, coluna C1">
+            <input id="pL1" type="number" min="500" max="20000" step="100" value="7000" aria-label="Lado A, coluna C1">
             <input id="pL2" type="number" min="500" max="20000" step="100" value="4000" aria-label="Lado B, coluna C2">
           </div>
-          <div class="nota">Lado A (C1) e lado B (C2).</div>
+          <div class="nota">Lado A (C1) e lado B (C2). A C1 tem 7.000 mm, confirmado em campo e igual ao DWG.</div>
         </div>
         <div class="campo">
           <label for="pL3">Comprimento do trilho — esteira 2</label>
@@ -475,7 +475,7 @@ const PRESETS = [
   { id:"at", nome:"Passo do DWG", sub:"par 200 · vão 400",   W:500, modo:"par",   GI:200, GE:400 }
 ];
 
-const PADRAO = { W:500, P:450, modo:"par", GI:50, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:2100,
+const PADRAO = { W:500, P:450, modo:"par", GI:50, GE:500, pass:"meio", L1:7000, L2:4000, L3:4000, AB:2100,
                  BC:55210, BX:850, BY:500, BE:1450, AX:1300, AL:2100, pos:"dwg", pos2:"dwg" };
 // Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota);
 // o trilho lateral corre COLADO na parede: BX = 850 da parede à borda externa e AX = 1.300 de vão livre
@@ -1010,9 +1010,9 @@ function linhasConferencia(r){
     L("Comprimento da esteira 2, sem o aumento", E2.lenDwg, "DWG"),
     L("Largura das esteiras", E1.larg, "DWG (840), adotado 850"),
     L("Vão entre as colunas C2 e C3", GAP_COL, "DWG"),
-    L("Trilho da C1", p.L1, "Produção — no DWG são 7.000 mm", true),
+    L("Trilho da C1", p.L1, "Campo, confirma o DWG"),
     L("Trilho da C2", p.L2, "Produção"),
-    L("Trilho da C3", p.L3, "Produção — no DWG são 3.000 mm", true),
+    L("Trilho da C3", p.L3, "Produção (4.000) — no DWG são 3.000 mm; a C1 confirmou o DWG, conferir esta", true),
     L("Passo executado hoje: trilho + vão entre pares", p.W + p.GE, "NÃO MEDIDO — todo o comparativo depende dele", true),
     L("Largura da peça mais larga apoiada em dois trilhos", 0,
       "NÃO LEVANTADA — decide entre a Versão 1 e a Versão 2", true)

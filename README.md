@@ -30,7 +30,7 @@ dentro do alcance das duas esteiras.
 | Largura da prancha | 450 mm | informado pela Produção |
 | Vão dentro do par | 50 mm | limite informado pela Produção; no DWG são 200 mm |
 | Vão entre pares | 500 mm | proposta em estudo |
-| Comprimento C1 / C2 / C3 | 6.000 / 4.000 / 4.000 mm | informado pela Produção |
+| Comprimento C1 / C2 / C3 | 7.000 / 4.000 / 4.000 mm | C1 medida em campo (confirma o DWG); C2 e C3 informadas pela Produção — o DWG traz 3.000 para a C3 |
 | Esteira 1 | 850 × 23.940 mm | largura ajustada para 850 mm (DWG: 840); comprimento medido no DWG |
 | Esteira 2 | 850 × 28.975 mm, defasada 5.550 mm | comprimento do DWG: 23.975 mm; defasagem medida em campo (9.800 mm da parede até a esteira 2, menos os 4.250 mm até a esteira 1) — o DWG traz 7.850 mm, guardados em `E2.iniDwg`; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
 | Vão entre as colunas C2 e C3 | 2.100 mm | medido no DWG · fixo no código, não ajustável na tela |
@@ -40,7 +40,7 @@ dentro do alcance das duas esteiras.
 | Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
 | Barracão — comprimento | 55.210 mm | cotado no DWG, desenho desatualizado. Com 0, o contorno não é desenhado |
 | Afastamentos das paredes | 850 mm (esquerda, até o trilho lateral) · 500 mm (lado da C1, até o trilho de abastecimento) · 1.450 mm (lado da esteira 2, até a esteira 2) | os três medidos em campo |
-| Barracão — largura | **calculada: 21.850 mm** | Não é digitada: `500 + altura do conjunto (19.900) + 1.450`. A largura nunca foi medida, então é ela que sai da conta. A hipótese antiga de 24.900 mm, tirada da linha de pilares, foi abandonada |
+| Barracão — largura | **calculada: 22.850 mm** | Não é digitada: `500 + altura do conjunto (20.900) + 1.450`. A largura nunca foi medida, então é ela que sai da conta. A hipótese antiga de 24.900 mm, tirada da linha de pilares, foi abandonada |
 
 ## Recomendação de arranjo
 
@@ -56,11 +56,11 @@ Os limites são os das regras de aviso: `GE_MIN` (500 mm de circulação entre p
 
 | Arranjo | Pistas | Metragem | Apoio | Passagem | Situação |
 |---|---:|---:|---:|---:|---|
-| Versão 4 · par 50 · vão 500 | 98 | 452 m | 1.050 mm | 1.690 mm | **recomendado** |
-| Versão 1 · par 200 · vão 500 | 90 | 416 m | 1.200 mm | 1.140 mm | apto, 8 pistas a menos |
-| Versão 2 · par encostado · vão 500 | 102 | 472 m | 1.000 mm | 940 mm | fora: par de 0 mm |
-| Versão 3 · sem par · vão 500 | 77 | 356 m | 1.500 mm | 940 mm | apto, 21 pistas a menos |
-| Passo do DWG · par 200 · vão 400 | 96 | 444 m | 1.200 mm | 740 mm | fora: vão 400 e passagem 740 |
+| Versão 4 · par 50 · vão 500 | 98 | 482 m | 1.050 mm | 1.690 mm | **recomendado** |
+| Versão 1 · par 200 · vão 500 | 90 | 444 m | 1.200 mm | 1.140 mm | apto, 8 pistas a menos |
+| Versão 2 · par encostado · vão 500 | 102 | 504 m | 1.000 mm | 940 mm | fora: par de 0 mm |
+| Versão 3 · sem par · vão 500 | 77 | 380 m | 1.500 mm | 940 mm | apto, 21 pistas a menos |
+| Passo do DWG · par 200 · vão 400 | 96 | 474 m | 1.200 mm | 740 mm | fora: vão 400 e passagem 740 |
 
 **O apoio da peça larga não é limite, é comparação.** A largura da peça mais larga apoiada em dois
 trilhos nunca foi levantada, e os 1.200 mm do arranjo de hoje são só o que ele entrega — não um
@@ -99,8 +99,10 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 
 - O passo executado no chão de fábrica ainda não foi medido. Todos os cenários de
   referência vêm do desenho e podem estar desatualizados.
-- No DWG a coluna C1 aparece com trilhos de 7.000 mm e a C3 com 3.000 mm, divergindo
-  da informação de campo (6.000 e 4.000 mm).
+- A C1 tem **7.000 mm**, confirmado em campo — o DWG estava certo nessa cota e a informação
+  anterior de 6.000 mm, errada. Como o DWG traz 7.000 e 3.000 no mesmo par, e a primeira metade se
+  confirmou, a C3 de 4.000 mm passa a ser suspeita: o desenho diz 3.000. Está marcada na folha de
+  conferência.
 - A largura da peça mais larga apoiada nos dois trilhos ainda não foi levantada.
 - **A largura do barracão passou a ser resultado, não entrada.** Os três afastamentos foram medidos
   (850, 500 e 1.450 mm) e, com a altura do conjunto, fecham em 21.850 mm. A hipótese anterior de
