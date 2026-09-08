@@ -303,10 +303,10 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         <div class="campo">
           <label>Trilho de abastecimento lateral — distância até a esteira 1 × largura</label>
           <div class="dupla">
-            <input id="pAX" type="number" min="0" max="20000" step="10" value="800" aria-label="Distância da faixa lateral ao início da esteira 1">
+            <input id="pAX" type="number" min="0" max="20000" step="10" value="3520" aria-label="Distância da faixa lateral ao início da esteira 1">
             <input id="pAL" type="number" min="200" max="10000" step="10" value="2100" aria-label="Largura da faixa lateral">
           </div>
-          <div class="nota">Terceiro trilho, no sentido dos trilhos, à esquerda do início da esteira 1, cobrindo da C1 à esteira 2. Mesma largura dos outros (2.100 mm), a 800 mm da esteira 1 conforme o DWG.</div>
+          <div class="nota">Terceiro trilho, no sentido dos trilhos, à esquerda do início da esteira 1, cobrindo da C1 à esteira 2. Mesma largura dos outros (2.100 mm). Ele corre encostado na parede esquerda (850 mm), e a distância até a esteira 1 é o vão livre que sobra: 3.520 mm dentro da cota de 6.470 mm do DWG.</div>
         </div>
         <div class="campo">
           <label>Barracão — comprimento × largura</label>
@@ -336,10 +336,10 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         <div class="campo">
           <label>Barracão — afastamento da esteira 1 até as paredes</label>
           <div class="dupla">
-            <input id="pBX" type="number" min="0" max="100000" step="10" value="3570" aria-label="Distância da parede esquerda à borda externa do trilho de abastecimento lateral">
+            <input id="pBX" type="number" min="0" max="100000" step="10" value="850" aria-label="Distância da parede esquerda à borda externa do trilho de abastecimento lateral">
             <input id="pBY" type="number" min="0" max="100000" step="10" value="700" aria-label="Distância da parede superior ao trilho de abastecimento da C1">
           </div>
-          <div class="nota">Esquerda: da parede à borda externa do trilho lateral (DWG: 6.470 até a esteira 1, menos o trilho lateral). Cima: da parede ao trilho de abastecimento da C1 (hipótese). Com 0 a parede encosta no conjunto.</div>
+          <div class="nota">Esquerda: da parede à borda externa do trilho lateral — 850 mm medidos em campo. O restante da cota de 6.470 mm do DWG (850 + 2.100 do trilho + 3.520) vira vão livre até a esteira 1. Cima: da parede ao trilho de abastecimento da C1 (hipótese). Com 0 a parede encosta no conjunto.</div>
         </div>
       </details>
     </div>
@@ -418,9 +418,10 @@ const PRESETS = [
 ];
 
 const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:2100,
-                 BC:55210, BL:24900, BX:3570, BY:700, AX:800, AL:2100, pos:"dwg", pos2:"dwg" };
+                 BC:55210, BL:24900, BX:850, BY:700, AX:3520, AL:2100, pos:"dwg", pos2:"dwg" };
 // Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota);
-// BX é medido da parede à borda externa do trilho lateral, por isso 6.470 − 800 − 2.100 = 3.570.
+// o trilho lateral corre COLADO na parede: 850 da parede à borda externa (medido em campo), por isso
+// BX = 850 e o vão livre até a esteira 1 é AX = 6.470 − 850 − 2.100 = 3.520.
 // Largura 24.900 e afastamento 700 são HIPÓTESE: parede do lado da C1 tomada na linha de pilares a 11,0 m da esteira 1;
 // a cota de 23.570 do DWG não fecha com o trilho de abastecimento (rails a 10,3 m da esteira 1).
 
@@ -676,7 +677,7 @@ function pintaBarracao(g, p, e2, H, xL, xR, yT){
   // da parede esquerda até cada esteira: esteira 1 na linha superior (ao lado da cota da esteira 1), esteira 2 na base
   cotaH(g, x, E1.ini, yT - 1500, `${fmt(E1.ini - x)} · parede → esteira 1`, COR.barracao, true);
   cotaH(g, x, e2.ini, H + 3000, `${fmt(e2.ini - x)} · parede → esteira 2`, COR.barracao, false);
-  if (p.BX > 0) cotaH(g, x, xL, yT - 700, fmt(p.BX), COR.barracao, true);   // na linha das cotas 3.200 e 800
+  if (p.BX > 0) cotaH(g, x, xL, yT - 700, fmt(p.BX), COR.barracao, true);   // na mesma linha das cotas do trilho lateral
   if (p.BY > 0) cotaV(g, xR + 1200, yy, p.BY, fmt(p.BY), COR.barracao);   // à direita do conjunto, longe das cotas da esquerda
 }
 
