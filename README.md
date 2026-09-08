@@ -24,11 +24,11 @@ dentro do alcance das duas esteiras.
 | Vão entre pares | 500 mm | proposta em estudo |
 | Comprimento C1 / C2 / C3 | 6.000 / 4.000 / 4.000 mm | informado pela Produção |
 | Esteira 1 | 850 × 23.940 mm | largura ajustada para 850 mm (DWG: 840); comprimento medido no DWG |
-| Esteira 2 | 850 × 28.975 mm, defasada 7.850 mm | DWG: 23.975 mm; defasagem medida no eixo da esteira 1; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
+| Esteira 2 | 850 × 28.975 mm, defasada 5.550 mm | comprimento do DWG: 23.975 mm; defasagem medida em campo (9.800 mm da parede até a esteira 2, menos os 4.250 mm até a esteira 1) — o DWG traz 7.850 mm, guardados em `E2.iniDwg`; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
 | Vão entre as colunas C2 e C3 | 2.100 mm | medido no DWG · fixo no código, não ajustável na tela |
 | Trilho de abastecimento (carrinho) | 2.100 mm de largura | faixa acima da C1 e no vão C2–C3, informado pela Produção (no DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1) |
 | Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 1.300 mm da esteira 1 | mesma largura dos outros, informada pela Produção; as duas distâncias foram medidas em campo e somam 4.250 mm da parede à esteira 1, contra 6.470 mm no DWG; ambas editáveis |
-| Posição da esteira 2 | como no DWG (defasada 7.850 mm) | "Alinhada com a esteira 1" ou "Encostada no trilho lateral" deslocam a esteira 2 e a C3 para perto da parede esquerda; não muda a contagem de pistas |
+| Posição da esteira 2 | como está hoje (defasada 5.550 mm) | "Alinhada com a esteira 1" ou "Encostada no trilho lateral" deslocam a esteira 2 e a C3 para perto da parede esquerda; não muda a contagem de pistas |
 | Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
 | Barracão | 55.210 × 24.900 mm · parede esquerda a 850 mm da borda externa do trilho lateral (4.250 mm até a esteira 1, medido em campo) e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento cotado no DWG, afastamento esquerdo medido em campo; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1). Com afastamento 0 a parede encosta no conjunto |
 
@@ -61,11 +61,13 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
   DWG não fecha com o trilho de abastecimento acima da C1 (rails a 10,3 m da esteira 1), então
   a largura de 24.900 mm e o afastamento de 700 mm foram tomados na linha de pilares a 11,0 m
   da esteira 1 e precisam ser confirmados.
-- A defasagem da esteira 2 (7.850 mm) foi medida no eixo da esteira 1. A diferença bruta de
-  coordenadas no DWG é 8.170 mm porque o conjunto está girado 1,5° e as esteiras não são
-  exatamente paralelas entre si.
+- A defasagem da esteira 2 adotada é de **5.550 mm, medida em campo** (9.800 mm da parede até a
+  esteira 2, menos 4.250 mm da parede até a esteira 1). O DWG traz 7.850 mm no eixo da esteira 1
+  (8.170 mm na diferença bruta de coordenadas, porque o conjunto está girado 1,5° e as esteiras não
+  são exatamente paralelas). São **2.300 mm de divergência**, somados aos 2.220 mm da parede à
+  esteira 1: no DWG a esteira 2 começa 4.520 mm depois de onde está na fábrica.
 - O aumento de 5 m da esteira 2 foi desenhado no final da esteira (lado oposto ao início),
-  mantendo a defasagem de 7.850 mm. Se o acréscimo for no início, a defasagem muda e
+  mantendo a defasagem de 5.550 mm. Se o acréscimo for no início, a defasagem muda e
   o código precisa ser ajustado (`E2.ini`).
 - **Divergência aberta de 2.220 mm entre o campo e o DWG, no sentido do comprimento.** O trilho de
   abastecimento lateral corre encostado na parede esquerda. Medidas de campo: 850 mm da parede à
@@ -73,18 +75,31 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
   esteira 1 (850 + 2.100 + 1.300). O DWG cota 6.470 mm nesse mesmo trecho. A simulação adota o
   campo. Até a versão anterior a ordem estava invertida no desenho (3.570 mm da parede e 800 mm da
   esteira 1, leitura do DWG numa região fora de esquadro).
-- Consequência da divergência acima: o comprimento do barracão (55.210 mm) foi cotado no DWG a
-  partir da parede esquerda, ou seja, do mesmo ponto que o DWG coloca a 6.470 mm da esteira 1. Com a
-  parede 2.220 mm mais perto, esses 2.220 mm passam a aparecer como sobra a mais no fim da esteira 2.
-  **Essa sobra não está confirmada.** Antes de usá-la para decidir o aumento da esteira 2, é preciso
-  medir em campo a distância do fim da esteira 2 até a parede do fundo, ou confirmar o comprimento
-  interno do barracão. Se o comprimento real for 2.220 mm menor, a folga volta ao que era.
+- **A sobra no fim da esteira 2 é o número menos confiável da simulação e é justamente o que
+  justificaria o aumento de 5 m.** O comprimento do barracão (55.210 mm) foi cotado no DWG a partir
+  da parede esquerda. As duas medidas de campo aproximaram o conjunto dessa parede — 2.220 mm na
+  esteira 1 e 4.520 mm na esteira 2 — e essa diferença reaparece inteira como folga no outro
+  extremo: a sobra no comprimento saiu de 11.915 mm (só DWG) para 16.435 mm no cenário padrão.
+  **Nenhum desses 4.520 mm foi medido.** Antes de decidir o aumento da esteira 2, medir em campo a
+  distância do fim da esteira 2 até a parede do fundo, ou o comprimento interno do barracão.
 - A largura da faixa do trilho de abastecimento (carrinho) está em 2.100 mm nas três posições,
   informada pela Produção, editável na tela. Só o desenho usa esse valor; ele não entra na contagem de pistas
   nem na metragem. A simulação avisa se a largura passar do vão de 2.100 mm entre C2 e C3.
 - O vão entre C2 e C3 (2.100 mm, medido no DWG) e a largura da esteira 1 (850 mm; DWG: 840)
   não são editáveis na tela. Ambos afetam só o desenho e as cotas verticais, não a contagem
   de pistas nem a metragem.
+
+## Versão
+
+O número da versão aparece no topo da tela, no título da aba e no cabeçalho de impressão.
+Ele vem da constante `VERSAO` no `index.html` e **precisa ser alterado junto com o nome do cache
+em `sw.js`** (`trilhos-embalagem-<versão>`) a cada publicação. Serve para conferir, no tablet do
+chão de fábrica, se a tela está mostrando a versão publicada ou um cache antigo — se o número não
+bater com a última alteração, atualizar a página com Ctrl+F5.
+
+O link de compartilhamento guarda todos os parâmetros no `#` da URL e sobrescreve os padrões ao
+abrir. Um link antigo continua mostrando os valores antigos mesmo na versão nova: abrir a URL sem
+o `#` ou clicar em "Restaurar valores do DWG".
 
 ## Stack
 

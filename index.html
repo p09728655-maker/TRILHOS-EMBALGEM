@@ -29,6 +29,9 @@ body{font-family:var(--ff);background:var(--bg);color:var(--texto);font-size:15p
 .marca img{height:30px;width:auto;display:block;background:#fff;padding:5px 8px;border-radius:5px}
 .marca h1{margin:0;font-size:15.5px;font-weight:700;letter-spacing:-.1px;white-space:nowrap}
 .marca p{margin:0;font-size:11.5px;color:#9AA1A8;letter-spacing:.3px}
+.ver{flex:0 0 auto;font-size:11.5px;font-weight:700;color:#C3C8CD;background:#2C3238;border-radius:5px;
+     padding:4px 9px;letter-spacing:.3px;white-space:nowrap}
+.ver span{font-weight:400;opacity:.7}
 
 .seg{display:flex;background:#2C3238;border-radius:7px;padding:3px;gap:2px;margin-left:auto}
 .seg button{font:inherit;font-size:13px;padding:6px 13px;border:0;background:transparent;color:#C3C8CD;
@@ -219,9 +222,10 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       <img id="logo" alt="Patrimar Móveis">
       <div>
         <h1>Dimensionamento dos trilhos — Embalagem</h1>
-        <p>Ocupação dentro do alcance das duas esteiras · geometria medida no DWG</p>
+        <p>Ocupação dentro do alcance das duas esteiras · geometria do DWG com as distâncias da parede medidas em campo</p>
       </div>
     </div>
+    <div class="ver" id="ver" title="Versão do aplicativo publicada (não confundir com os cenários Versão 1, 2 e 3). Se o número não bater com a última alteração, atualize a página com Ctrl+F5."></div>
     <div class="seg" role="group" aria-label="Cenário" id="seg"></div>
     <div class="acoes-topo">
       <button class="ghost" id="btnCsv" type="button">CSV</button>
@@ -319,7 +323,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         <div class="campo">
           <label for="pPos2">Posição da esteira 2</label>
           <select id="pPos2">
-            <option value="dwg">Como no DWG — defasada 7.850 mm</option>
+            <option value="dwg">Como está hoje — defasada 5.550 mm</option>
             <option value="alinhada">Alinhada com a esteira 1</option>
             <option value="lateral">Encostada no trilho lateral — mais perto da parede</option>
           </select>
@@ -383,8 +387,8 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
   <p class="rodape">
     Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b> · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
-    Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 7.850&nbsp;mm (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 24.900&nbsp;mm (largura a confirmar) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
-    Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> todos os cenários de referência vêm do desenho. O passo executado no chão de fábrica ainda não foi medido e pode divergir do DWG.
+    Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 5.550&nbsp;mm medidos em campo (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm de comprimento e 7.850&nbsp;mm de defasagem) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 24.900&nbsp;mm (largura a confirmar) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
+    Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> as medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem do DWG em 2.220 e 4.520&nbsp;mm. A sobra no fim da esteira 2 vem do comprimento de 55.210&nbsp;mm cotado no DWG a partir dessa mesma parede e <b>ainda não foi conferida em campo</b>. O passo executado no chão de fábrica também não foi medido.
   </p>
 </div>
 
@@ -399,7 +403,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 /* ---------------- geometria fixa (DWG) ---------------- */
 const E1 = { ini:0,    len:23940, larg:850 };   // esteira 1 (DWG: 840; ajustado para 850 mm)
 const E2_AUMENTO = 5000;                        // acréscimo de 5 m na esteira 2 (decisão em estudo)
-const E2 = { ini:7850, len:23975 + E2_AUMENTO, larg:850, lenDwg:23975 };   // esteira 2, defasada 7.850 mm no eixo da esteira 1; aumento no final
+const E2 = { ini:5550, len:23975 + E2_AUMENTO, larg:850, lenDwg:23975, iniDwg:7850 };   // esteira 2: defasagem de 5.550 medida em campo (9.800 da parede − 4.250 da parede à esteira 1); DWG: 7.850; aumento no final
 const GAP_COL = 2100;                           // vão entre a coluna C2 e a coluna C3, medido no DWG
 
 /* ---------------- regras de aceitação ---------------- */
@@ -407,6 +411,11 @@ const GE_MIN     = 500;    // circulação mínima entre pares
 const PASS_MIN   = 800;    // passagem mínima para uma pessoa carregando prancha
 const FOLGA_MIN  = 30;     // folga mínima da prancha no trilho sem guia lateral
 const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
+
+/* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
+   mostrar na tela qual versão está rodando e denunciar cache velho. */
+const VERSAO = "v6";
+const VERSAO_DATA = "08/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
 
@@ -892,7 +901,7 @@ function montaPrintHd(r){
     ["Trilhos C1 / C2 / C3", `${fmt(p.L1)} / ${fmt(p.L2)} / ${fmt(p.L3)} mm`],
     ["Trilho de abastecimento", `${fmt(p.AB)} mm · C1, vão C2–C3 e lateral (${fmt(p.AL)} mm a ${fmt(p.AX)} mm da esteira 1)`],
     ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre o DWG (${fmt(E2.lenDwg)} mm) · `
-      + ({ dwg:"defasada 7.850 mm como no DWG", alinhada:"alinhada com a esteira 1", lateral:"encostada no trilho lateral" })[p.pos2]],
+      + ({ dwg:`defasada ${fmt(E2.ini)} mm, medida em campo (DWG: ${fmt(E2.iniDwg)} mm)`, alinhada:"alinhada com a esteira 1", lateral:"encostada no trilho lateral" })[p.pos2]],
     ["Barracão", r.barracao
       ? `${fmt(p.BC)} × ${fmt(p.BL)} mm · ${p.pos === "parede" ? "encostado na parede esquerda" : "posição do DWG"}`
         + ` · sobra ${fmt(r.barracao.sobraX)} × ${fmt(r.barracao.sobraY)} mm (compr. × larg.)`
@@ -907,7 +916,7 @@ function montaPrintHd(r){
         <h1>Dimensionamento dos trilhos — Embalagem</h1>
         <p class="cen"><b>${cen}</b> · prancha de ${fmt(p.P)} mm apoiada em um trilho</p>
       </div>
-      <div class="dt">Patrimar Móveis · PPCP<br>${new Date().toLocaleDateString("pt-BR")}</div>
+      <div class="dt">Patrimar Móveis · PPCP<br>${new Date().toLocaleDateString("pt-BR")}<br>app ${VERSAO} · ${VERSAO_DATA}</div>
     </div>
     <div class="pparams">${it.map(([k, v]) => `<span class="${String(v).length > 34 ? "largo" : ""}">${k}: <b>${v}</b></span>`).join("")}</div>`;
 }
@@ -1033,6 +1042,8 @@ async function copiaLink(ev){
 /* ---------------- início ---------------- */
 function inicia(){
   $("#logo").src = LOGO;
+  $("#ver").innerHTML = `app ${VERSAO} <span>· ${VERSAO_DATA}</span>`;
+  document.title = `Dimensionamento dos trilhos — Embalagem · app ${VERSAO} | Patrimar Móveis`;
   montaSeg();
   IDS.forEach(id => $("#" + id).addEventListener("input", atualiza));
   $("#btnReset").addEventListener("click", () => { aplica(PADRAO); atualiza(); });
