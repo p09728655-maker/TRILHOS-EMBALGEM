@@ -101,6 +101,13 @@ svg#svg{display:block;width:100%;height:auto;max-height:calc(100vh - 200px);marg
 .aviso .ic{flex:0 0 auto;width:17px;height:17px;border-radius:50%;background:var(--atencao);color:#fff;
            font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
 .aviso b{color:var(--atencao)}
+.aviso.link{background:#EDF3F9;border-color:#B9CFE2;color:#1B3A57}
+.aviso.link .ic{background:var(--esteira)}
+.aviso.link b{color:var(--esteira)}
+.aviso.link ul{margin:6px 0 0;padding-left:18px}
+.aviso.link button{font:inherit;font-size:12.5px;font-weight:700;margin-top:8px;padding:5px 11px;cursor:pointer;
+       border:1px solid var(--esteira);border-radius:5px;background:var(--esteira);color:#fff}
+.aviso.link button:hover{background:#24496D}
 
 /* ---------- blocos inferiores ---------- */
 .abaixo{grid-column:2 / -1;display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:2px}
@@ -276,12 +283,12 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
     </div>
 
     <div class="painel-sec">
-      <button class="ghost claro" id="btnReset" type="button">Restaurar valores do DWG</button>
+      <button class="ghost claro" id="btnReset" type="button">Restaurar medidas atuais</button>
     </div>
 
     <div class="painel-sec">
       <details class="geo">
-        <summary>Geometria do DWG</summary>
+        <summary>Geometria e medidas</summary>
         <div class="campo">
           <label for="pW">Largura do trilho</label>
           <input id="pW" type="number" min="100" max="2000" step="10" value="500">
@@ -352,6 +359,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   <main class="palco">
     <div class="print-only" id="printHd"></div>
     <div class="faixa" id="faixa"></div>
+    <div class="avisos" id="avisoLink"></div>
     <div class="avisos" id="avisos"></div>
     <div class="desenho">
       <svg id="svg" role="img" aria-labelledby="svgTit" preserveAspectRatio="xMidYMid meet">
@@ -386,9 +394,9 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   </div>
 
   <p class="rodape">
-    Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b> · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
+    Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b>, <b>desenho desatualizado</b>, com as distâncias da parede corrigidas em campo · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
     Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 5.550&nbsp;mm medidos em campo (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm de comprimento e 7.850&nbsp;mm de defasagem) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 24.900&nbsp;mm (largura a confirmar) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
-    Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> as medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem do DWG em 2.220 e 4.520&nbsp;mm. A sobra no fim da esteira 2 vem do comprimento de 55.210&nbsp;mm cotado no DWG a partir dessa mesma parede e <b>ainda não foi conferida em campo</b>. O passo executado no chão de fábrica também não foi medido.
+    Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> o DWG está desatualizado. As medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem dele em 2.220 e 4.520&nbsp;mm, e prevalecem. O comprimento de 55.210&nbsp;mm do barracão, porém, <b>continua vindo desse mesmo desenho</b> e a partir dessa mesma parede — então a sobra no fim da esteira 2 herda o erro e não deve embasar decisão de layout até ser medida em campo. O passo executado no chão de fábrica também não foi medido.
   </p>
 </div>
 
@@ -397,7 +405,9 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
 /* ============================================================
    Dimensionamento dos trilhos — Embalagem
-   Todas as medidas em milímetros. Origem: DWG do layout da fábrica.
+   Todas as medidas em milímetros. O DWG do layout está DESATUALIZADO na região da parede
+   esquerda: as distâncias da parede e a defasagem entre as esteiras vêm de medição em campo
+   e prevalecem sobre o desenho.
    ============================================================ */
 
 /* ---------------- geometria fixa (DWG) ---------------- */
@@ -414,7 +424,7 @@ const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v6";
+const VERSAO = "v7";
 const VERSAO_DATA = "08/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -966,14 +976,50 @@ function marcaCenario(){
 function gravaHash(){
   const v = new URLSearchParams();
   IDS.forEach(id => v.set(CAMPOS[id], $("#" + id).value));
+  v.set("app", VERSAO);   // carimbo da versão: um link antigo passa a ser reconhecido ao abrir
   history.replaceState(null, "", "#" + v.toString());
 }
 
+/* Campos cujo padrão é medida de campo ou do desenho. Um link salvo antes de uma
+   correção congela esses valores e a tela mostra geometria velha sem avisar.
+   W, P, GI, GE e as duas listas ficam de fora: mexer neles é o uso normal dos cenários. */
+const MEDIDAS = {
+  pL1:"Trilho da C1", pL2:"Trilho da C2", pL3:"Trilho da C3",
+  pAB:"Largura do trilho de abastecimento", pAX:"Trilho lateral até a esteira 1",
+  pAL:"Largura do trilho lateral", pBC:"Comprimento do barracão", pBL:"Largura do barracão",
+  pBX:"Parede esquerda até o trilho lateral", pBY:"Parede de cima até o abastecimento"
+};
+
+/** Aplica o link e devolve as medidas que vieram diferentes do padrão atual, quando
+    o link foi salvo em outra versão do app. Devolve [] quando não há o que avisar. */
 function leHash(){
-  if (!location.hash) return;
+  if (!location.hash) return [];
   const v = {};
   new URLSearchParams(location.hash.slice(1)).forEach((val, k) => { v[k] = val; });
   aplica(v);
+  if (v.app === VERSAO) return [];   // link desta versão: o que estiver diferente foi o usuário quem mudou
+  const difs = [];
+  Object.keys(MEDIDAS).forEach(id => {
+    const link = Number($("#" + id).value), padrao = Number(PADRAO[CAMPOS[id]]);
+    if (Number.isFinite(link) && Number.isFinite(padrao) && link !== padrao)
+      difs.push({ rot:MEDIDAS[id], link, padrao });
+  });
+  return difs;
+}
+
+/** Alerta de link antigo, num container próprio que o render não limpa. */
+function avisaLinkAntigo(difs){
+  if (!difs.length) return;
+  $("#avisoLink").innerHTML = `<div class="aviso link"><span class="ic">i</span><div>
+    Este link foi salvo em uma versão anterior do app e trouxe medidas que já foram corrigidas desde então.
+    A tela está mostrando os valores do link, não os de hoje:
+    <ul>${difs.map(c => `<li>${c.rot}: <b>${fmt(c.link)} mm</b> no link · ${fmt(c.padrao)} mm hoje</li>`).join("")}</ul>
+    <button type="button" id="btnUsaAtuais">Usar as medidas atuais</button></div></div>`;
+  $("#btnUsaAtuais").addEventListener("click", () => {
+    aplica(PADRAO);
+    $("#avisoLink").innerHTML = "";
+    atualiza();
+  });
 }
 
 /** Único ponto de entrada: recalcula, marca o cenário e grava o link. */
@@ -1051,8 +1097,9 @@ function inicia(){
   $("#btnCsv").addEventListener("click", csvCotas);
   $("#btnSvg").addEventListener("click", svgPlanta);
   $("#btnPrint").addEventListener("click", () => window.print());
-  leHash();
-  atualiza();
+  const difs = leHash();
+  atualiza();          // já recarimba a URL com a versão atual
+  avisaLinkAntigo(difs);
 }
 
 document.addEventListener("DOMContentLoaded", inicia);
