@@ -303,10 +303,10 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         <div class="campo">
           <label>Trilho de abastecimento lateral — distância até a esteira 1 × largura</label>
           <div class="dupla">
-            <input id="pAX" type="number" min="0" max="20000" step="10" value="3520" aria-label="Distância da faixa lateral ao início da esteira 1">
+            <input id="pAX" type="number" min="0" max="20000" step="10" value="1300" aria-label="Distância da faixa lateral ao início da esteira 1">
             <input id="pAL" type="number" min="200" max="10000" step="10" value="2100" aria-label="Largura da faixa lateral">
           </div>
-          <div class="nota">Terceiro trilho, no sentido dos trilhos, à esquerda do início da esteira 1, cobrindo da C1 à esteira 2. Mesma largura dos outros (2.100 mm). Ele corre encostado na parede esquerda (850 mm), e a distância até a esteira 1 é o vão livre que sobra: 3.520 mm dentro da cota de 6.470 mm do DWG.</div>
+          <div class="nota">Terceiro trilho, no sentido dos trilhos, à esquerda do início da esteira 1, cobrindo da C1 à esteira 2. Mesma largura dos outros (2.100 mm). Ele corre encostado na parede esquerda (850 mm) e o vão livre até a esteira 1 é de 1.300 mm — as duas medidas vieram de campo. Somadas ao trilho dão 4.250 mm da parede à esteira 1, contra os 6.470 mm cotados no DWG: 2.220 mm de divergência ainda em aberto.</div>
         </div>
         <div class="campo">
           <label>Barracão — comprimento × largura</label>
@@ -339,7 +339,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
             <input id="pBX" type="number" min="0" max="100000" step="10" value="850" aria-label="Distância da parede esquerda à borda externa do trilho de abastecimento lateral">
             <input id="pBY" type="number" min="0" max="100000" step="10" value="700" aria-label="Distância da parede superior ao trilho de abastecimento da C1">
           </div>
-          <div class="nota">Esquerda: da parede à borda externa do trilho lateral — 850 mm medidos em campo. O restante da cota de 6.470 mm do DWG (850 + 2.100 do trilho + 3.520) vira vão livre até a esteira 1. Cima: da parede ao trilho de abastecimento da C1 (hipótese). Com 0 a parede encosta no conjunto.</div>
+          <div class="nota">Esquerda: da parede à borda externa do trilho lateral — 850 mm medidos em campo. Com o vão de 1.300 mm até a esteira 1, a cadeia fecha em 4.250 mm (850 + 2.100 + 1.300) e não nos 6.470 mm do DWG. Os 2.220 mm de diferença viraram sobra no fim da esteira 2, que precisa ser confirmada em campo. Cima: da parede ao trilho de abastecimento da C1 (hipótese). Com 0 a parede encosta no conjunto.</div>
         </div>
       </details>
     </div>
@@ -418,10 +418,12 @@ const PRESETS = [
 ];
 
 const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:2100,
-                 BC:55210, BL:24900, BX:850, BY:700, AX:3520, AL:2100, pos:"dwg", pos2:"dwg" };
+                 BC:55210, BL:24900, BX:850, BY:700, AX:1300, AL:2100, pos:"dwg", pos2:"dwg" };
 // Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota);
-// o trilho lateral corre COLADO na parede: 850 da parede à borda externa (medido em campo), por isso
-// BX = 850 e o vão livre até a esteira 1 é AX = 6.470 − 850 − 2.100 = 3.520.
+// o trilho lateral corre COLADO na parede: BX = 850 da parede à borda externa e AX = 1.300 de vão livre
+// até a esteira 1, as duas medidas de campo. A cadeia fecha em 850 + 2.100 + 1.300 = 4.250, e NÃO nos
+// 6.470 do DWG: sobram 2.220 de divergência, que hoje aparecem como sobra a mais no fim da esteira 2.
+// Enquanto isso não for resolvido em campo, a sobra no comprimento é otimista nesses 2.220.
 // Largura 24.900 e afastamento 700 são HIPÓTESE: parede do lado da C1 tomada na linha de pilares a 11,0 m da esteira 1;
 // a cota de 23.570 do DWG não fecha com o trilho de abastecimento (rails a 10,3 m da esteira 1).
 
