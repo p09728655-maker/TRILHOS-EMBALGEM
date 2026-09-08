@@ -79,8 +79,12 @@ mantê-lo. Hoje é a Versão 2: 4 pistas a mais, fora só pelo par de 0 mm.
 ## Áreas e máquinas
 
 Aba ao lado das cotas. Cadastra outras máquinas e espaços demarcados do barracão com nome,
-posição e tamanho; eles aparecem na planta e a simulação avisa quando algum invade o conjunto,
-dizendo a sobreposição em milímetros nos dois sentidos.
+posição e tamanho; eles aparecem na planta e a simulação avisa quando algum entra na área do
+conjunto. O aviso separa dois casos, porque só um deles custa capacidade:
+
+- **Pega trilho** — diz quantos, e que ou a máquina sai ou o conjunto perde essas pistas.
+- **Está num vão** — dentro da caixa do conjunto, mas sem atrapalhar trilho nenhum; o aviso pede
+  confirmação da folga em vez de tratar como conflito.
 
 Sistema de coordenadas, o mesmo da planta: **X** no sentido das esteiras, zero no início da
 esteira 1; **Y** no sentido dos trilhos, zero no trilho de abastecimento acima da C1. Valores
@@ -89,9 +93,31 @@ negativos ficam à esquerda e acima.
 As áreas viajam no link junto com o resto (`areas=nome~x~y~w~h|...`) e entram na folha de
 conferência com uma coluna para validar em campo.
 
-**Não saem do DWG.** O arquivo é AC1032 (AutoCAD 2018) com as seções comprimidas, não há conversor
-disponível e o que se extrai dele são fragmentos de XREFs de outro projeto — nenhuma máquina, nenhuma
-coordenada. Enquanto o desenho não for exportado em DXF, as áreas são digitadas na mão.
+O botão **"Carregar do DWG"** traz cinco áreas extraídas do desenho: a Grampeadora (única com
+rótulo no arquivo), três máquinas sem nome e a área demarcada de 5,49 × 11,64 m. Elas podem ser
+editadas ou apagadas como qualquer outra.
+
+### Como o DWG foi lido
+
+O arquivo é AC1032 (AutoCAD 2018) e não abre em ferramenta comum. Foi convertido uma vez com o
+LibreDWG compilado do fonte, e o DXF resultante está versionado em `ferramentas/`:
+
+```
+git clone --depth 1 https://github.com/LibreDWG/libredwg.git
+cd libredwg && sh autogen.sh && ./configure --disable-bindings --disable-shared && make -j
+./programs/dwg2dxf -o layout-embalagem.dxf "Layout Produção Patrimar - Embalagem - Oderli.dwg"
+```
+
+`ferramentas/extrai-maquinas.py` reconstrói os retângulos ligando as LINEs que compartilham ponta,
+ancora na esteira 1 — que no desenho aparece deitada, o eixo Y do DWG é o X do app — e descarta o
+que o app já modela: trilhos, esteiras, paredes, cotas e hachuras. Duas cotas do próprio desenho
+confirmam o resultado: 55,213 m de barracão e 5,49 × 11,64 m da área demarcada.
+
+O desenho também confirma os comprimentos de trilho medidos em campo: as LINEs aparecem em grupos
+de 7,0 / 4,0 / 3,0 / 5,0 m com 0,5 m de largura.
+
+**A posição no sentido dos trilhos herda o erro do desenho**, que já se mostrou deslocado nessa
+direção. Conferir em campo antes de decidir layout.
 
 ## Folha de conferência em campo
 

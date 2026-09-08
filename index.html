@@ -465,11 +465,13 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
       <div id="pnAreas" role="tabpanel" aria-labelledby="abaAreas" hidden>
         <div class="area-nota">
-          Outras máquinas e espaços demarcados do barracão. <b>O DWG não pôde ser lido</b> — o arquivo é
-          AC1032 com as seções comprimidas —, então as áreas são digitadas aqui. Origem das coordenadas:
-          <b>X</b> no sentido das esteiras, zero no início da esteira 1; <b>Y</b> no sentido dos trilhos,
-          zero no trilho de abastecimento acima da C1. Valores negativos ficam à esquerda e acima.
-          Elas aparecem na planta e a simulação avisa quando alguma invade o conjunto.
+          Outras máquinas e espaços demarcados do barracão. As cinco do botão <b>vieram do DWG</b>,
+          extraídas da geometria do desenho; as sem nome estão sem rótulo no arquivo. Origem das
+          coordenadas: <b>X</b> no sentido das esteiras, zero no início da esteira 1; <b>Y</b> no
+          sentido dos trilhos, zero no trilho de abastecimento acima da C1. Valores negativos ficam
+          à esquerda e acima. Elas aparecem na planta e a simulação avisa quando alguma invade o
+          conjunto. <b>A posição no sentido dos trilhos herda o erro do desenho</b>, que já se
+          mostrou deslocado nessa direção — conferir em campo antes de decidir layout.
         </div>
         <div class="rolagem">
           <table id="tabAreas">
@@ -478,6 +480,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
           </table>
         </div>
         <div class="area-acoes">
+          <button type="button" class="ghost claro" id="btnAreaDwg">Carregar do DWG</button>
           <button type="button" class="ghost claro" id="btnAreaAdd">Adicionar área</button>
           <button type="button" class="ghost claro" id="btnAreaLimpa">Limpar todas</button>
         </div>
@@ -520,7 +523,7 @@ const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v14";
+const VERSAO = "v15";
 const VERSAO_DATA = "08/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -548,6 +551,19 @@ const PADRAO = { W:500, P:450, modo:"par", GI:50, GE:500, pass:"meio", L1:7000, 
    esteira 1, Y no sentido dos trilhos com zero no trilho de abastecimento acima da C1.
    Não saem do DWG: o arquivo é AC1032 com as seções comprimidas e não foi possível lê-lo. */
 let AREAS = [];
+
+/* Extraídas do DWG. O arquivo é AC1032 e não abre em nenhuma ferramenta comum: foi convertido
+   para DXF com o LibreDWG compilado do fonte, e a geometria reconstruída ligando as LINEs por
+   ponta compartilhada. A âncora é a esteira 1, que no desenho aparece deitada — o eixo Y do DWG
+   é o X daqui. Só entram as caixas da camada "0"; o resto é parede, cota e hachura.
+   As duas cotas do desenho batem: 55,213 m de barracão e 5,49 × 11,64 m da área demarcada. */
+const AREAS_DWG = [
+  { nome:"Grampeadora",     x:22039, y:878,   w:1300,  h:7250 },
+  { nome:"Máquina 1",       x:26026, y:8159,  w:1718,  h:2076 },
+  { nome:"Máquina 2",       x:27762, y:7253,  w:7290,  h:3416 },
+  { nome:"Máquina 3",       x:34196, y:19000, w:1698,  h:2094 },
+  { nome:"Área demarcada",  x:35892, y:5218,  w:11700, h:6072 }
+];
 
 const areaLimpa = t => String(t == null ? "" : t).replace(/[|~]/g, " ").trim().slice(0, 40);
 
@@ -664,6 +680,28 @@ function invasao(a, c){
     x: Math.min(a.x + a.w, c.x1) - Math.max(a.x, c.x0),
     y: Math.min(a.y + a.h, c.y1) - Math.max(a.y, c.y0)
   };
+}
+
+/** Faixas Y ocupadas por trilho, na ordem em que a planta as desenha. */
+function faixasY(p){
+  const c1 = p.AB, e1 = c1 + p.L1, c2 = e1 + E1.larg, c3 = c2 + p.L2 + GAP_COL;
+  return { c1:[c1, c1 + p.L1], c2:[c2, c2 + p.L2], c3:[c3, c3 + p.L3] };
+}
+
+/** Quantos trilhos a área realmente pega. Uma máquina parada num vão entre trilhos
+    fica dentro da caixa do conjunto sem atrapalhar nenhum, e isso precisa aparecer. */
+function trilhosAtingidos(a, p, r1, r2){
+  const f = faixasY(p);
+  const cruzaY = ([y0, y1]) => Math.min(a.y + a.h, y1) > Math.max(a.y, y0);
+  const conta = (r, faixas) => {
+    if (!faixas.some(cruzaY)) return 0;
+    let n = 0;
+    r.grupos.forEach(g => g.trilhos.forEach(x => {
+      if (Math.min(a.x + a.w, x + p.W) > Math.max(a.x, x)) n++;
+    }));
+    return n;
+  };
+  return conta(r1, [f.c1, f.c2]) + conta(r2, [f.c3]);
 }
 
 /** Extensão ocupada pelo conjunto: do trilho lateral ao fim mais distante das esteiras, e do trilho acima da C1 à esteira 2. */
@@ -986,9 +1024,13 @@ function montaAvisos(r){
   const cx = caixaConjunto(p, r.e2);
   AREAS.forEach(a => {
     const s = invasao(a, cx);
-    if (s.x > 0 && s.y > 0)
-      t.push(`<b>${a.nome || "Área sem nome"}</b> invade o conjunto: sobrepõe `
-        + `<b>${fmt(s.x)} mm</b> no sentido das esteiras e <b>${fmt(s.y)} mm</b> no sentido dos trilhos.`);
+    if (s.x <= 0 || s.y <= 0) return;
+    const n = trilhosAtingidos(a, p, r1, r.r2);
+    t.push(n
+      ? `<b>${a.nome || "Área sem nome"}</b> pega <b>${n} ${n === 1 ? "trilho" : "trilhos"}</b> do arranjo. `
+        + `Ou a máquina sai, ou esses trilhos não existem — e o conjunto perde ${n === 1 ? "essa pista" : "essas pistas"}.`
+      : `<b>${a.nome || "Área sem nome"}</b> está dentro da área do conjunto, mas <b>num vão</b>, `
+        + `sem pegar trilho. Confirme a folga: sobrepõe ${fmt(s.x)} × ${fmt(s.y)} mm da caixa.`);
   });
 
   // O que o usuário acrescenta num trilho tem que sair de algum lugar: as duas esteiras são
@@ -1239,6 +1281,10 @@ function ligaAreas(){
   tb.addEventListener("click", ev => {
     if (!ev.target.closest(".rm")) return;
     AREAS.splice(+ev.target.closest("tr").dataset.i, 1);
+    montaAreas(); atualiza();
+  });
+  $("#btnAreaDwg").addEventListener("click", () => {
+    AREAS = AREAS_DWG.map(a => ({ ...a }));
     montaAreas(); atualiza();
   });
   $("#btnAreaAdd").addEventListener("click", () => {
