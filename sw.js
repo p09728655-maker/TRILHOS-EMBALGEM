@@ -1,4 +1,4 @@
-const CACHE = "trilhos-embalagem-v11";   // manter igual ao VERSAO do index.html
+const CACHE = "trilhos-embalagem-v12";   // manter igual ao VERSAO do index.html
 const ARQ = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARQ)).then(() => self.skipWaiting()));
