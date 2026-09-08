@@ -34,8 +34,13 @@ body{font-family:var(--ff);background:var(--bg);color:var(--texto);font-size:15p
 .ver span{font-weight:400;opacity:.7}
 
 .seg{display:flex;background:#2C3238;border-radius:7px;padding:3px;gap:2px;margin-left:auto}
-.seg button{font:inherit;font-size:13px;padding:6px 13px;border:0;background:transparent;color:#C3C8CD;
-            border-radius:5px;cursor:pointer;white-space:nowrap;line-height:1.15}
+.seg button{position:relative;font:inherit;font-size:13px;padding:6px 13px;border:0;background:transparent;
+            color:#C3C8CD;border-radius:5px;cursor:pointer;white-space:nowrap;line-height:1.15}
+/* ponto verde no arranjo recomendado: a barra segue a sequência das versões, então
+   sem marca não dá para saber qual delas o critério escolheu */
+.seg button[data-rec]::after{content:"";position:absolute;top:5px;right:6px;width:6px;height:6px;
+            border-radius:50%;background:var(--aumento)}
+.seg button[data-rec][aria-pressed="true"]::after{background:#fff}
 .seg button:hover{color:#fff}
 .seg button:focus-visible{outline:2px solid #7FA8CC;outline-offset:1px}
 .seg button[aria-pressed="true"]{background:var(--vermelho);color:#fff;font-weight:700}
@@ -462,16 +467,16 @@ const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v11";
+const VERSAO = "v12";
 const VERSAO_DATA = "08/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
 
 const PRESETS = [
-  { id:"v4", nome:"Versão 4", sub:"par 50 · vão 500",        W:500, modo:"par",   GI:50,  GE:500 },
   { id:"v1", nome:"Versão 1", sub:"par 200 · vão 500",       W:500, modo:"par",   GI:200, GE:500 },
   { id:"v2", nome:"Versão 2", sub:"par encostado · vão 500", W:500, modo:"par",   GI:0,   GE:500 },
   { id:"v3", nome:"Versão 3", sub:"sem par · vão 500",       W:500, modo:"solto", GI:0,   GE:500 },
+  { id:"v4", nome:"Versão 4", sub:"par 50 · vão 500",        W:500, modo:"par",   GI:50,  GE:500 },
   { id:"at", nome:"Passo do DWG", sub:"par 200 · vão 400",   W:500, modo:"par",   GI:200, GE:400 }
 ];
 
@@ -1177,7 +1182,7 @@ function reprovaCenario(p, r){
   return f;
 }
 
-/** Avalia os quatro arranjos com os comprimentos e a passagem da tela e escolhe um:
+/** Avalia os arranjos com os comprimentos e a passagem da tela e escolhe um:
     mais pistas entre os que não reprovam; empatou em pistas, vence o de menor metragem. */
 function recomenda(pa){
   const av = [];
@@ -1192,11 +1197,21 @@ function recomenda(pa){
   return { av, escolha:aptos[0] || null, maisPistas };
 }
 
+/** Ponto verde no botão do arranjo recomendado, na barra de cenários. */
+function marcaRecomendado(id){
+  document.querySelectorAll("#seg button[data-id]").forEach(b => {
+    const rec = b.dataset.id === id;
+    if (rec){ b.setAttribute("data-rec", ""); b.title = "Arranjo recomendado pelo critério do comparativo"; }
+    else { b.removeAttribute("data-rec"); b.removeAttribute("title"); }
+  });
+}
+
 function montaRecomendacao(pa){
   const { av, escolha, maisPistas } = recomenda(pa);
   if (!escolha){
+    marcaRecomendado(null);
     $("#rec").innerHTML = `<div class="crit">Nenhum dos arranjos passa em todos os limites com os
-      valores atuais. O comparativo abaixo mostra os quatro assim mesmo.</div>`;
+      valores atuais. O comparativo abaixo mostra todos assim mesmo.</div>`;
     return;
   }
   const e = escolha.r;
@@ -1213,6 +1228,7 @@ function montaRecomendacao(pa){
       ${maisPistas.reprova[0]}. Se esse limite mudar, a recomendação passa a ser a ${maisPistas.pr.nome}.</p>`;
   }
 
+  marcaRecomendado(escolha.pr.id);
   $("#rec").innerHTML = `
     <div><span class="tag">RECOMENDADO</span><span class="nome">${escolha.pr.nome}</span></div>
     <p class="num"><b>${escolha.pistas} pistas</b> · ${fmt(e.metros)} m de trilho ·

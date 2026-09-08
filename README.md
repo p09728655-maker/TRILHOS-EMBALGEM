@@ -44,7 +44,8 @@ dentro do alcance das duas esteiras.
 
 ## Recomendação de arranjo
 
-A tela nomeia um dos quatro arranjos como recomendado, acima do comparativo. O critério é
+A tela nomeia um dos arranjos como recomendado, acima do comparativo, e marca o botão dele com
+um ponto verde na barra de cenários. O critério é
 explícito e está impresso junto com a resposta:
 
 > **Mais pistas entre os arranjos que respeitam os limites declarados.** Empate em pistas, vence o
@@ -56,11 +57,14 @@ Os limites são os das regras de aviso: `GE_MIN` (500 mm de circulação entre p
 
 | Arranjo | Pistas | Metragem | Apoio | Passagem | Situação |
 |---|---:|---:|---:|---:|---|
-| Versão 4 · par 50 · vão 500 | 98 | 444 m | 1.050 mm | 1.690 mm | **recomendado** |
 | Versão 1 · par 200 · vão 500 | 90 | 410 m | 1.200 mm | 1.140 mm | apto, 8 pistas a menos |
 | Versão 2 · par encostado · vão 500 | 102 | 466 m | 1.000 mm | 940 mm | fora: par de 0 mm |
 | Versão 3 · sem par · vão 500 | 77 | 351 m | 1.500 mm | 940 mm | apto, 21 pistas a menos |
+| Versão 4 · par 50 · vão 500 | 98 | 444 m | 1.050 mm | 1.690 mm | **recomendado** |
 | Passo do DWG · par 200 · vão 400 | 96 | 438 m | 1.200 mm | 740 mm | fora: vão 400 e passagem 740 |
+
+Os botões seguem a sequência das versões, não o ranking — a Versão 4 é a quarta na barra mesmo
+sendo a recomendada.
 
 **O apoio da peça larga não é limite, é comparação.** A largura da peça mais larga apoiada em dois
 trilhos nunca foi levantada, e os 1.200 mm do arranjo de hoje são só o que ele entrega — não um
