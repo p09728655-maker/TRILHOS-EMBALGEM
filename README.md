@@ -28,7 +28,8 @@ dentro do alcance das duas esteiras.
 | Vão entre as colunas C2 e C3 | 2.100 mm | medido no DWG · fixo no código, não ajustável na tela |
 | Trilho de abastecimento (carrinho) | 1.570 mm de largura | faixa acima da C1 e centrada no vão C2–C3 · no DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1 |
 | Trilho de abastecimento lateral | 3.200 mm de largura, a 800 mm da esteira 1 | lido do DWG (faixa entre 0,8 m e 4,0 m antes da esteira 1), precisão de uns 300 mm; ambos editáveis |
-| Barracão | 55.210 × 24.900 mm · parede esquerda a 3.670 mm da borda externa do trilho lateral (6.470 mm até a esteira 1, cotado no DWG) e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento e afastamento esquerdo cotados no DWG; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1). Com afastamento 0 a parede encosta no conjunto |
+| Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
+| Barracão | 55.210 × 24.900 mm · parede esquerda a 2.470 mm da borda externa do trilho lateral (6.470 mm até a esteira 1, cotado no DWG) e trilho de abastecimento a 700 mm da parede do lado da C1 | comprimento e afastamento esquerdo cotados no DWG; largura e afastamento superior são hipótese (linha de pilares a 11,0 m da esteira 1). Com afastamento 0 a parede encosta no conjunto |
 
 ## Regras de aviso
 

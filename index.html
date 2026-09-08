@@ -317,9 +317,17 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
           <div class="nota">Comprimento cotado no DWG (55.210). Largura é hipótese: parede do lado da C1 na linha de pilares. Com 0, o contorno não é desenhado.</div>
         </div>
         <div class="campo">
+          <label for="pPos">Posição do conjunto no barracão</label>
+          <select id="pPos">
+            <option value="dwg">Como no DWG — afastamento informado abaixo</option>
+            <option value="parede">Encostado na parede esquerda</option>
+          </select>
+          <div class="nota">Encostado: o trilho lateral cola na parede e todo o afastamento vira sobra no fim da esteira 2.</div>
+        </div>
+        <div class="campo">
           <label>Barracão — afastamento da esteira 1 até as paredes</label>
           <div class="dupla">
-            <input id="pBX" type="number" min="0" max="100000" step="10" value="3670" aria-label="Distância da parede esquerda à borda externa do trilho de abastecimento lateral">
+            <input id="pBX" type="number" min="0" max="100000" step="10" value="2470" aria-label="Distância da parede esquerda à borda externa do trilho de abastecimento lateral">
             <input id="pBY" type="number" min="0" max="100000" step="10" value="700" aria-label="Distância da parede superior ao trilho de abastecimento da C1">
           </div>
           <div class="nota">Esquerda: da parede à borda externa do trilho lateral (DWG: 6.470 até a esteira 1, menos o trilho lateral). Cima: da parede ao trilho de abastecimento da C1 (hipótese). Com 0 a parede encosta no conjunto.</div>
@@ -400,15 +408,15 @@ const PRESETS = [
 ];
 
 const PADRAO = { W:500, P:450, modo:"par", GI:200, GE:500, pass:"meio", L1:6000, L2:4000, L3:4000, AB:1570,
-                 BC:55210, BL:24900, BX:3670, BY:700, AX:800, AL:3200 };
+                 BC:55210, BL:24900, BX:2470, BY:700, AX:800, AL:3200, pos:"dwg" };
 // Barracão medido no DWG: comprimento 55.210 (cota do desenho) e esteira 1 a 6.470 da parede esquerda (mesma cota);
-// BX é medido da parede à borda externa do trilho lateral, por isso 6.470 − 800 − 3.200 = 3.670.
+// BX é medido da parede à borda externa do trilho lateral, por isso 6.470 − 800 − 3.200 = 2.470.
 // Largura 24.900 e afastamento 700 são HIPÓTESE: parede do lado da C1 tomada na linha de pilares a 11,0 m da esteira 1;
 // a cota de 23.570 do DWG não fecha com o trilho de abastecimento (rails a 10,3 m da esteira 1).
 
 /* id do campo no formulário -> chave do parâmetro */
 const CAMPOS = { pW:"W", pP:"P", pModo:"modo", pGI:"GI", pGE:"GE", pPass:"pass", pL1:"L1", pL2:"L2", pL3:"L3", pAB:"AB",
-                 pBC:"BC", pBL:"BL", pBX:"BX", pBY:"BY", pAX:"AX", pAL:"AL" };
+                 pBC:"BC", pBL:"BL", pBX:"BX", pBY:"BY", pAX:"AX", pAL:"AL", pPos:"pos" };
 const IDS = Object.keys(CAMPOS);
 
 const LOGO = "data:image/png;base64,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";
@@ -520,6 +528,7 @@ function numCampo(id){
 
 function lerParams(){
   const modo = $("#pModo").value || PADRAO.modo;
+  const pos = $("#pPos").value || PADRAO.pos;
   return {
     W:  numCampo("pW"),
     P:  numCampo("pP"),
@@ -532,7 +541,9 @@ function lerParams(){
     L3: numCampo("pL3"),
     AB: numCampo("pAB"),  // largura do trilho de abastecimento (carrinho)
     BC: numCampo("pBC"), BL: numCampo("pBL"),   // barracão: comprimento (x) e largura (y)
-    BX: numCampo("pBX"), BY: numCampo("pBY"),   // afastamento do conjunto às paredes esquerda (trilho lateral) e superior
+    pos,
+    BX: pos === "parede" ? 0 : numCampo("pBX"),  // encostado na parede: afastamento esquerdo zero
+    BY: numCampo("pBY"),                          // afastamento do conjunto à parede superior
     AX: numCampo("pAX"),  // distância do trilho de abastecimento lateral ao início da esteira 1
     AL: numCampo("pAL")   // largura do trilho de abastecimento lateral
   };
@@ -641,7 +652,10 @@ function pintaBarracao(g, p, H, xL, xR){
     "letter-spacing":60 }, `BARRACÃO · ${fmt(p.BC)} × ${fmt(p.BL)} mm`));
   cotaH(g, x, x + p.BC, yy - 2700, `${fmt(p.BC)} mm`, COR.barracao, true);
   cotaV(g, x + p.BC + 1300, yy, p.BL, `${fmt(p.BL)} mm`, COR.barracao);
-  if (p.BX > 0) cotaH(g, x, xL, H + 1800, fmt(p.BX), COR.barracao, false);   // na base, alinhada à cota da esteira 2
+  // cotas na base: da parede esquerda até cada esteira e até o trilho lateral
+  cotaH(g, x, E1.ini, H + 1800, `${fmt(E1.ini - x)} · parede → esteira 1`, COR.barracao, false);
+  cotaH(g, x, E2.ini, H + 3000, `${fmt(E2.ini - x)} · parede → esteira 2`, COR.barracao, false);
+  if (p.BX > 0) cotaH(g, x, xL, -700, fmt(p.BX), COR.barracao, true);   // na linha das cotas 3.200 e 800
   if (p.BY > 0) cotaV(g, xR + 1200, yy, p.BY, fmt(p.BY), COR.barracao);   // à direita do conjunto, longe das cotas da esquerda
 }
 
@@ -851,7 +865,8 @@ function montaPrintHd(r){
     ["Trilho de abastecimento", `${fmt(p.AB)} mm · acima da C1 e no vão C2–C3 (${fmt(GAP_COL)} mm) · lateral de ${fmt(p.AL)} mm a ${fmt(p.AX)} mm da esteira 1`],
     ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre o DWG (${fmt(E2.lenDwg)} mm)`],
     ["Barracão", r.barracao
-      ? `${fmt(p.BC)} × ${fmt(p.BL)} mm · sobra ${fmt(r.barracao.sobraX)} mm no comprimento e ${fmt(r.barracao.sobraY)} mm na largura`
+      ? `${fmt(p.BC)} × ${fmt(p.BL)} mm · ${p.pos === "parede" ? "conjunto encostado na parede esquerda" : "posição do DWG"}`
+        + ` · sobra ${fmt(r.barracao.sobraX)} mm no comprimento e ${fmt(r.barracao.sobraY)} mm na largura`
       : "medidas não informadas"],
     ["Pistas por lado", `${r1.trilhosPorLado} na esteira 1 · ${r2.trilhosPorLado} na esteira 2 (+${r.ganhoE2} com o aumento)`],
     ["Conjunto", `${trilhos} trilhos · ${fmt(metros)} m`]
@@ -882,6 +897,7 @@ function limpaPalco(){
 function render(){
   const p = lerParams();
   $("#fGI").style.display = p.modo === "par" ? "" : "none";
+  $("#pBX").disabled = p.pos === "parede";
 
   const r = avalia(p);
   if (!r){
