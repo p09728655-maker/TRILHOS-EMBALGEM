@@ -38,8 +38,9 @@ dentro do alcance das duas esteiras.
 | Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 1.300 mm da esteira 1 | mesma largura dos outros, informada pela Produção; as duas distâncias foram medidas em campo e somam 4.250 mm da parede à esteira 1, contra 6.470 mm no DWG — **o DWG está desatualizado nessa região e o campo prevalece**; ambas editáveis |
 | Posição da esteira 2 | como está hoje (defasada 5.550 mm) | "Alinhada com a esteira 1" ou "Encostada no trilho lateral" deslocam a esteira 2 e a C3 para perto da parede esquerda; não muda a contagem de pistas |
 | Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
-| Barracão | 55.210 × 24.900 mm · parede esquerda a 850 mm da borda externa do trilho lateral (4.250 mm até a esteira 1) e parede do lado da esteira 2 a 1.450 mm dela | comprimento cotado no DWG; os dois afastamentos digitados foram medidos em campo; a largura é hipótese (linha de pilares). Com afastamento 0 a parede esquerda encosta no conjunto |
-| Afastamento da parede do lado da C1 | derivado | Não é digitado: é `largura do barracão − altura do conjunto − afastamento do lado da esteira 2`. Sai negativo quando o conjunto não cabe na largura, e é assim que o erro aparece do lado que ninguém mediu, em vez de sumir |
+| Barracão — comprimento | 55.210 mm | cotado no DWG, desenho desatualizado. Com 0, o contorno não é desenhado |
+| Afastamentos das paredes | 850 mm (esquerda, até o trilho lateral) · 500 mm (lado da C1, até o trilho de abastecimento) · 1.450 mm (lado da esteira 2, até a esteira 2) | os três medidos em campo |
+| Barracão — largura | **calculada: 21.850 mm** | Não é digitada: `500 + altura do conjunto (19.900) + 1.450`. A largura nunca foi medida, então é ela que sai da conta. A hipótese antiga de 24.900 mm, tirada da linha de pilares, foi abandonada |
 
 ## Recomendação de arranjo
 
@@ -89,7 +90,7 @@ como constantes nomeadas no início do script e valem para todos os cenários.
 | Folga da prancha no trilho (`FOLGA_MIN`) | 30 mm | Sem guia lateral, a prancha desalinha e trava. |
 | Apoio da peça larga hoje (`APOIO_HOJE`) | 1.200 mm | Referência do arranjo atual para comparar a base da peça apoiada em dois trilhos. Não reprova arranjo: é comparação, não limite. |
 | Trilho de abastecimento no vão (`GAP_COL`) | 2.100 mm | A faixa do carrinho não cabe entre C2 e C3. |
-| Conjunto dentro do barracão | sobra ≥ 0 no comprimento e afastamento do lado da C1 ≥ 0 | O conjunto ultrapassa a parede; o aviso diz quantos mm faltam. |
+| Conjunto dentro do barracão | sobra ≥ 0 no comprimento | O conjunto ultrapassa a parede do fundo; o aviso diz quantos mm faltam. Na largura não há aviso: ela é calculada e fecha sempre. |
 
 Os campos da tela têm mínimo e máximo declarados no HTML (`min`/`max`). Valores
 fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a ela.
@@ -101,11 +102,18 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
 - No DWG a coluna C1 aparece com trilhos de 7.000 mm e a C3 com 3.000 mm, divergindo
   da informação de campo (6.000 e 4.000 mm).
 - A largura da peça mais larga apoiada nos dois trilhos ainda não foi levantada.
-- A largura do barracão (24.900 mm) e o afastamento do lado da C1 continuam sem medição. Como o
-  afastamento do lado da esteira 2 (1.450 mm) veio de campo, é o lado da C1 que absorve o erro da
-  largura: com 24.900 mm ele dá 3.550 mm, contra os 700 mm que a hipótese da linha de pilares
-  indicava. Ou a largura não é 24.900 mm, ou a hipótese dos 700 mm estava errada — medir a largura
-  interna resolve os dois.
+- **A largura do barracão passou a ser resultado, não entrada.** Os três afastamentos foram medidos
+  (850, 500 e 1.450 mm) e, com a altura do conjunto, fecham em 21.850 mm. A hipótese anterior de
+  24.900 mm, tirada da linha de pilares do DWG, sobrava 3.050 mm sem explicação e foi abandonada.
+  Falta conferir com trena se o barracão tem mesmo essa largura: se tiver menos, o conjunto não
+  cabe e algum trilho precisa encurtar; se tiver mais, sobra espaço que a simulação não mostra.
+- Alongar um trilho aumenta a largura necessária, e não reduz um dos afastamentos. É o
+  comportamento correto: os afastamentos foram medidos contra equipamento e parede que não saem do
+  lugar. Mas isso esconde uma restrição que a simulação ainda não trava: `trilho da C2 + 2.100 do
+  corredor + trilho da C3` é exatamente a distância entre a esteira 1 e a esteira 2 — hoje
+  10.100 mm. As duas esteiras são equipamento existente, então essa distância é fixa. Aumentar o
+  trilho da C3 sem encurtar o da C2 equivale a simular um layout em que as esteiras foram movidas.
+  Medir a distância real entre elas fecharia a questão.
 - Barracão: o DWG cota 55.210 mm no sentido das esteiras, a partir de 6.470 mm antes do início
   da esteira 1, e a parede do lado da esteira 2 está a 1.380 mm dela. A cota de 23.570 mm do
   DWG não fecha com o trilho de abastecimento acima da C1 (rails a 10,3 m da esteira 1), então
