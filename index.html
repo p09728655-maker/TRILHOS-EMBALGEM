@@ -298,7 +298,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
         <div class="campo">
           <label for="pAB">Trilho de abastecimento — largura</label>
           <input id="pAB" type="number" min="200" max="3000" step="10" value="1570">
-          <div class="nota">Faixa do trilho com carrinho que abastece as pistas: acima da C1 e no vão entre C2 e C3. No DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1.</div>
+          <div class="nota">Faixa do trilho com carrinho que abastece as pistas: acima da C1 e no vão de 2.100 mm entre C2 e C3. No DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1.</div>
         </div>
         <div class="campo">
           <label>Barracão — comprimento × largura</label>
@@ -357,7 +357,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
   <p class="rodape">
     Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b> · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
-    Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 8.170&nbsp;mm (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm) · Vão C2–C3: 2.000&nbsp;mm (DWG: 2.100) · Barracão: 55.210&nbsp;mm cotado no DWG × 24.900&nbsp;mm (largura a confirmar) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
+    Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 7.850&nbsp;mm (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 24.900&nbsp;mm (largura a confirmar) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
     Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> todos os cenários de referência vêm do desenho. O passo executado no chão de fábrica ainda não foi medido e pode divergir do DWG.
   </p>
 </div>
@@ -373,8 +373,8 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 /* ---------------- geometria fixa (DWG) ---------------- */
 const E1 = { ini:0,    len:23940, larg:850 };   // esteira 1 (DWG: 840; ajustado para 850 mm)
 const E2_AUMENTO = 5000;                        // acréscimo de 5 m na esteira 2 (decisão em estudo)
-const E2 = { ini:8170, len:23975 + E2_AUMENTO, larg:850, lenDwg:23975 };   // esteira 2, defasada 8.170 mm; aumento no final
-const GAP_COL = 2000;                           // vão entre a coluna C2 e a coluna C3 (medido no DWG: 2.100; definido em 2.000 mm)
+const E2 = { ini:7850, len:23975 + E2_AUMENTO, larg:850, lenDwg:23975 };   // esteira 2, defasada 7.850 mm no eixo da esteira 1; aumento no final
+const GAP_COL = 2100;                           // vão entre a coluna C2 e a coluna C3, medido no DWG
 
 /* ---------------- regras de aceitação ---------------- */
 const GE_MIN     = 500;    // circulação mínima entre pares
