@@ -156,20 +156,23 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   .app{display:block;max-width:none;padding:0;gap:0}
 
   .phd{display:flex;align-items:flex-start;gap:12px;border-bottom:2px solid var(--grafite);
-       padding-bottom:6px;margin-bottom:8px}
-  .phd img{height:26px;width:auto}
+       padding-bottom:4px;margin-bottom:5px}
+  .phd img{height:22px;width:auto}
   .phd .tt{flex:1}
   .phd h1{margin:0;font-size:15px;font-weight:700}
   .phd .cen{margin:2px 0 0;font-size:10.5px;color:#444}
   .phd .dt{font-size:9.5px;color:#666;text-align:right;white-space:nowrap;padding-top:2px}
 
-  .pparams{display:flex;flex-wrap:wrap;gap:0 18px;font-size:9.5px;color:#333;margin-bottom:8px}
+  .pparams{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px 12px;font-size:8.5px;color:#333;margin-bottom:6px;line-height:1.3}
+  .pparams span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pparams span.largo{grid-column:span 2}
   .pparams b{color:#000}
 
-  .palco{border:0;overflow:visible}
-  .faixa{border:1px solid #C8CCD0;border-radius:5px;margin-bottom:7px;break-inside:avoid}
-  .met{padding:7px 11px;border-right:1px solid #E2E5E8}
-  .met .v{font-size:17px}
+  /* página 1: coluna de altura fixa; o desenho ocupa o que sobra entre cabeçalho, faixa, avisos e legenda */
+  .palco{border:0;border-radius:0;height:193mm;display:flex;flex-direction:column;overflow:hidden;break-after:page}
+  .faixa{border:1px solid #C8CCD0;border-radius:5px;margin-bottom:5px;break-inside:avoid}
+  .met{padding:5px 11px;border-right:1px solid #E2E5E8}
+  .met .v{font-size:15px}
   .met .v .u{font-size:9.5px}
   .met .l{font-size:8.5px;margin-top:1px}
 
@@ -177,12 +180,11 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   .aviso{font-size:9.5px;padding:5px 8px;margin-bottom:5px;break-inside:avoid}
   .aviso .ic{width:13px;height:13px;font-size:9px}
 
-  .desenho{padding:0}
-  svg#svg{max-height:96mm}
-  .leg{padding:5px 0 0;font-size:9px;gap:14px}
+  .desenho{padding:0;flex:1 1 auto;min-height:0;display:flex;justify-content:center;align-items:center}
+  svg#svg{width:auto;height:100%;max-width:100%;max-height:100%}
+  .leg{padding:4px 0 0;font-size:9px;gap:14px;justify-content:center}
 
-  .abaixo{display:grid;grid-template-columns:1.15fr 1fr;gap:7mm;margin:0;
-          page-break-before:always;break-before:page}
+  .abaixo{display:grid;grid-template-columns:1.15fr 1fr;gap:7mm;margin:0}
   .bloco{border:1px solid #C8CCD0;break-inside:avoid}
   .bloco-hd{padding:7px 11px}
   .bloco-hd h2{font-size:9.5px}
@@ -202,7 +204,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
   .rodape{font-size:8.5px;margin-top:6px;padding:5px 0 0;border-top:1px solid #C8CCD0}
 
-  @page{size:A4 landscape;margin:9mm}
+  @page{size:A4 landscape;margin:8mm}
 }
 </style>
   <link rel="manifest" href="manifest.webmanifest">
@@ -231,8 +233,6 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 </div>
 
 <div class="app">
-
-  <div class="print-only" id="printHd" style="grid-column:1 / -1"></div>
 
 
   <aside class="painel">
@@ -346,6 +346,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   </aside>
 
   <main class="palco">
+    <div class="print-only" id="printHd"></div>
     <div class="faixa" id="faixa"></div>
     <div class="avisos" id="avisos"></div>
     <div class="desenho">
@@ -886,12 +887,12 @@ function montaPrintHd(r){
     ["Apoio em 2 trilhos", fmt(apoio) + " mm"],
     ["Passagem", passTxt],
     ["Trilhos C1 / C2 / C3", `${fmt(p.L1)} / ${fmt(p.L2)} / ${fmt(p.L3)} mm`],
-    ["Trilho de abastecimento", `${fmt(p.AB)} mm · acima da C1 e no vão C2–C3 (${fmt(GAP_COL)} mm) · lateral de ${fmt(p.AL)} mm a ${fmt(p.AX)} mm da esteira 1`],
+    ["Trilho de abastecimento", `${fmt(p.AB)} mm · C1, vão C2–C3 e lateral (${fmt(p.AL)} mm a ${fmt(p.AX)} mm da esteira 1)`],
     ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre o DWG (${fmt(E2.lenDwg)} mm) · `
       + ({ dwg:"defasada 7.850 mm como no DWG", alinhada:"alinhada com a esteira 1", lateral:"encostada no trilho lateral" })[p.pos2]],
     ["Barracão", r.barracao
-      ? `${fmt(p.BC)} × ${fmt(p.BL)} mm · ${p.pos === "parede" ? "conjunto encostado na parede esquerda" : "posição do DWG"}`
-        + ` · sobra ${fmt(r.barracao.sobraX)} mm no comprimento e ${fmt(r.barracao.sobraY)} mm na largura`
+      ? `${fmt(p.BC)} × ${fmt(p.BL)} mm · ${p.pos === "parede" ? "encostado na parede esquerda" : "posição do DWG"}`
+        + ` · sobra ${fmt(r.barracao.sobraX)} × ${fmt(r.barracao.sobraY)} mm (compr. × larg.)`
       : "medidas não informadas"],
     ["Pistas por lado", `${r1.trilhosPorLado} na esteira 1 · ${r2.trilhosPorLado} na esteira 2 (+${r.ganhoE2} com o aumento)`],
     ["Conjunto", `${trilhos} trilhos · ${fmt(metros)} m`]
@@ -905,7 +906,7 @@ function montaPrintHd(r){
       </div>
       <div class="dt">Patrimar Móveis · PPCP<br>${new Date().toLocaleDateString("pt-BR")}</div>
     </div>
-    <div class="pparams">${it.map(([k, v]) => `${k}: <b>${v}</b>`).join("")}</div>`;
+    <div class="pparams">${it.map(([k, v]) => `<span class="${String(v).length > 34 ? "largo" : ""}">${k}: <b>${v}</b></span>`).join("")}</div>`;
 }
 
 /* ---------------- ciclo de atualização ---------------- */
