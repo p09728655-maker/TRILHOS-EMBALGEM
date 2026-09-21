@@ -358,15 +358,30 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   .rec details.mais{margin:6px -11px 0}
 
   /* impressão focada no desenho ("Imprimir só a planta"): a planta sozinha na folha.
-     Saem de cena a faixa de indicadores, o comparativo, as cotas e os parâmetros que o
-     desenho não mostra; o cabeçalho fica, senão não dá para saber de que arranjo é a
-     planta, e a ressalva do DWG viaja junto com ela. */
+     Saem de cena a faixa de indicadores, os avisos de regra, o comparativo, as cotas e os
+     parâmetros que o desenho não mostra; o cabeçalho fica, senão não dá para saber de que
+     arranjo é a planta, e a ressalva do DWG viaja junto com ela. O alerta de link antigo
+     (#avisoLink) continua saindo: ele diz que a geometria na tela está desatualizada, e uma
+     planta impressa sem esse aviso vale como certa sendo errada.
+
+     Tamanho: a planta tem cerca de 2,1:1 e a folha 1,45:1, então quem limita o desenho é a
+     LARGURA do papel, não a altura — o desenho já sai com a largura inteira e sobra altura
+     que a proporção não consegue usar. Esconder os avisos deixa a folha limpa, não aumenta
+     o desenho. O ganho de verdade vem do papel: a @page nomeada abaixo fixa só a orientação,
+     sem travar o tamanho, então escolher A3 no diálogo de impressão rende ~46% de desenho.
+     Por isso a altura do palco acompanha a folha (100vh) em vez de ser fixa em mm: numa
+     folha maior a altura precisa crescer junto, senão o desenho volta a ser limitado por ela. */
+  body.planta{page:planta}
   body.planta .faixa,
+  body.planta #avisos,
   body.planta .abaixo,
   body.planta .rodape-in,
   body.planta .pparams span.sec{display:none}
-  body.planta .palco{height:180mm;break-after:auto}
+  body.planta .palco{height:calc(100vh - 13mm);break-after:auto}
   body.planta .rodape{margin-top:4px;font-size:8.5px;break-inside:avoid}
+  /* margem igual à das outras folhas: fechar para 5 mm renderia 2,3% e arrisca corte de
+     borda em impressora com margem física maior — o desenho vai de ponta a ponta. */
+  @page planta{size:landscape;margin:8mm}
 
   @page{size:A4 landscape;margin:8mm}
 }
@@ -394,7 +409,8 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       <details class="menu" id="menuAcoes">
         <summary class="ghost" role="button" aria-label="Mais ações">Mais ▾</summary>
         <div class="menu-in">
-          <button class="ghost" id="btnPlanta" type="button">Imprimir só a planta</button>
+          <button class="ghost" id="btnPlanta" type="button"
+            title="A planta sozinha na folha, na largura inteira. O tamanho do papel não fica travado: escolher A3 no diálogo de impressão rende um desenho 46% maior.">Imprimir só a planta</button>
           <button class="ghost" id="btnConf" type="button">Conferir em campo</button>
           <button class="ghost" id="btnCsv" type="button">Cotas em CSV</button>
           <button class="ghost" id="btnSvg" type="button">Planta em SVG</button>
@@ -638,7 +654,7 @@ const GI_DWG     = 200;    // vão dentro do par no passo que o DWG desenha — 
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v17";
+const VERSAO = "v18";
 const VERSAO_DATA = "21/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
