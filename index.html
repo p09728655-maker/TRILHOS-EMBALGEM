@@ -440,7 +440,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       <div class="campo" id="fGI">
         <label for="pGI">Vão dentro do par</label>
         <input id="pGI" type="number" min="0" max="1000" step="10" value="50">
-        <div class="nota">Não muda o apoio da prancha (um trilho), mas define a base da peça larga apoiada nos dois. A Produção aceita fechar o par até 50 mm; abaixo disso a simulação avisa.</div>
+        <div class="nota">Não muda o apoio da prancha, que entra num trilho só. É o que decide quantas pistas cabem no banco: cada milímetro fechado aqui vira trilho no conjunto. A Produção aceita fechar o par até 50 mm; abaixo disso a simulação avisa.</div>
       </div>
       <div class="campo">
         <label for="pP">Largura da prancha</label>
@@ -649,12 +649,11 @@ const GE_MIN     = 500;    // circulação mínima entre pares
 const GI_MIN     = 50;     // o par pode fechar até 50 mm — informado pela Produção
 const PASS_MIN   = 800;    // passagem mínima para uma pessoa carregando prancha
 const FOLGA_MIN  = 30;     // folga mínima da prancha no trilho sem guia lateral
-const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
 const GI_DWG     = 200;    // vão dentro do par no passo que o DWG desenha — referência do ganho
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v18";
+const VERSAO = "v19";
 const VERSAO_DATA = "21/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -1147,7 +1146,7 @@ function desenha(r){
 const caixaAviso = txt => `<div class="aviso"><span class="ic">!</span><div>${txt}</div></div>`;
 
 function montaAvisos(r){
-  const { p, r1, folga, apoio } = r;
+  const { p, r1, folga } = r;
   const t = [];
   if (p.GE < GE_MIN)
     t.push(`Vão entre pares em <b>${fmt(p.GE)} mm</b>, abaixo dos ${fmt(GE_MIN)} mm adotados como mínimo de circulação.`);
@@ -1198,15 +1197,13 @@ function montaAvisos(r){
       ? ` Em troca, rende <b>${sinalN(r.metros - dwg.metros)} m</b> de trilho e `
         + `${sinalPistas(r.trilhos - dwg.pistas)} sobre o passo de ${fmt(GI_DWG)} mm do DWG.`
       : "";
-    t.push(`Vão de <b>${fmt(p.GI)} mm</b> dentro do par, abaixo dos ${fmt(GI_MIN)} mm que a Produção aceita. A base da peça larga cai para ${fmt(apoio)} mm, contra ${fmt(APOIO_HOJE)} mm do arranjo de hoje.${ganho}`);
+    t.push(`Vão de <b>${fmt(p.GI)} mm</b> dentro do par, abaixo dos ${fmt(GI_MIN)} mm que a Produção aceita.${ganho}`);
   }
-  if (p.modo === "solto")
-    t.push(`Sem par, a peça larga teria que vencer um vão de <b>${fmt(p.GE)} mm</b> entre os dois trilhos de apoio.`);
   $("#avisos").innerHTML = t.map(caixaAviso).join("");
 }
 
 function montaFaixa(r){
-  const { r1, r2, folga, apoio, metros, trilhos, ganhoE2 } = r;
+  const { r1, r2, folga, metros, trilhos, ganhoE2 } = r;
   const sinal = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v));
   const met = (valor, unid, rotulo, pri) =>
     `<div class="met${pri ? " pri" : ""}"><div class="v tnum">${valor}`
@@ -1216,7 +1213,6 @@ function montaFaixa(r){
     met(r1.trilhosPorLado, "pistas", `por lado da esteira 1 · ${r2.trilhosPorLado} na esteira 2 `
         + `(<b>+${ganhoE2}</b> com o aumento de ${fmt(E2_AUMENTO/1000)} m)`, true),
     met(folga >= 0 ? fmt(folga) : "−" + fmt(-folga), "mm", "folga da prancha no trilho"),
-    met(fmt(apoio), "mm", "apoio da peça larga em 2 trilhos"),
     met(trilhos, "", `trilhos · ${sinal(trilhos - REF.trilhos)} vs. DWG`),
     met(fmt(metros), "m", `metragem · ${sinal(metros - REF.metros)} m vs. DWG`, true),
     r1.idxPass.length ? met(fmt(r1.larguraPass), "mm", `passagem · ${r1.idxPass.length} no banco`)
@@ -1253,7 +1249,7 @@ function montaCotas(r){
 /** Reavalia o arranjo da tela trocando só o que vier em `mod`. */
 function arranjoCom(p, mod){
   const r = avalia({ ...p, ...mod });
-  return r ? { metros:r.metros, pistas:r.trilhos, apoio:r.apoio } : null;
+  return r ? { metros:r.metros, pistas:r.trilhos } : null;
 }
 
 /** Arranjo atual, trilhos soltos, passo do DWG e par fechado no limite da Produção. */
@@ -1262,7 +1258,7 @@ function ganhoDoPar(p, r){
   const dwg    = arranjoCom(p, { modo:"par",   GI:GI_DWG });
   const limite = arranjoCom(p, { modo:"par",   GI:GI_MIN });
   if (!solto || !dwg || !limite) return null;
-  return { solto, dwg, limite, atual:{ metros:r.metros, pistas:r.trilhos, apoio:r.apoio } };
+  return { solto, dwg, limite, atual:{ metros:r.metros, pistas:r.trilhos } };
 }
 
 const sinalN = v => (v >= 0 ? "+" : "\u2212") + fmt(Math.abs(v));
@@ -1275,17 +1271,11 @@ function montaGanho(p, r){
   if (!g){ box.innerHTML = ""; box.hidden = true; return; }
   box.hidden = false;
 
-  // O que se paga pelo ganho: trilhos mais juntos deixam a peça larga com menos base.
-  // O texto muda com o arranjo da tela para não repetir o mesmo número duas vezes.
-  const ressalva = ` Metro de trilho a mais é capacidade a mais — e também trilho a instalar.`;
-  const contra = [];
-  if (p.GI !== GI_DWG) contra.push(`${fmt(g.dwg.apoio)} mm no passo do DWG`);
-  contra.push(`${fmt(g.solto.apoio)} mm com os trilhos soltos`);
-  const custo = p.modo !== "par"
-    ? `<span class="custo">Em troca, o apoio da peça larga cairia de <b>${fmt(g.solto.apoio)} mm</b> `
-      + `para ${fmt(g.limite.apoio)} mm.${ressalva}</span>`
-    : `<span class="custo">Em troca, o apoio da peça larga fica em <b>${fmt(g.atual.apoio)} mm</b>, `
-      + `contra ${contra.join(" e ")}.${ressalva}</span>`;
+  // A base da peça larga apoiada em dois trilhos saiu daqui: o campo informa que
+  // praticamente toda peça entra num trilho só de 500 mm, então ela não é o preço do
+  // ganho. O que sobra de preço é real e continua dito: trilho a mais é trilho a instalar.
+  const custo = `<span class="custo">Metro de trilho a mais é capacidade a mais — `
+    + `e também trilho a instalar.</span>`;
 
   let num, txt;
   if (p.modo !== "par"){
@@ -1327,7 +1317,7 @@ function montaComparativo(pa){
     if (!r) return;
     itens.push({
       nome: pr.nome,
-      sub: `${pr.sub} · ${r.r1.trilhosPorLado} pistas por lado · apoio duplo ${fmt(r.apoio)} mm`,
+      sub: `${pr.sub} · ${r.r1.trilhosPorLado} pistas por lado`,
       metros: r.metros,
       trilhos: r.trilhos,
       cor: pr.id === "at" ? COR.numero : (pr.id === "v3" ? COR.neutra : COR.ladoA),
@@ -1425,7 +1415,8 @@ function linhasConferencia(r){
     L("Trilho da C3", p.L3, "Campo, confirma o DWG"),
     L("Passo executado hoje: trilho + vão entre pares", p.W + p.GE, "NÃO MEDIDO — todo o comparativo depende dele", true),
     L("Largura da peça mais larga apoiada em dois trilhos", 0,
-      "NÃO LEVANTADA — decide entre a Versão 1 e a Versão 2", true)
+      "Não levantada. O campo informa que praticamente toda peça entra num trilho só — "
+      + "confirmar antes de fechar o par", false)
   ];
 }
 
@@ -1457,8 +1448,10 @@ function montaConferencia(r){
          O DWG está desatualizado na região da parede esquerda: as distâncias já corrigidas em campo
          divergem dele em 2.220 mm na esteira 1 e 4.520 mm na esteira 2. O comprimento do barracão
          continua vindo desse mesmo desenho, então a sobra no fim da esteira 2 herda o erro — é ela
-         que diz se o aumento de 5 m cabe. O passo executado hoje e a largura da peça mais larga
-         nunca foram levantados, e são eles que sustentam a comparação entre os arranjos.</p>
+         que diz se o aumento de 5 m cabe. O passo executado hoje nunca foi levantado, e é ele que
+         sustenta a comparação entre os arranjos. A largura da peça mais larga também não foi
+         medida, mas deixou de pesar na escolha: o campo informa que praticamente toda peça entra
+         num trilho só.</p>
       ${areas}
       <p class="pe">Conferido por: ______________________________
          &nbsp;&nbsp;&nbsp; Data: ______ / ______ / __________</p>
@@ -1745,7 +1738,7 @@ function montaRecomendacao(pa){
   $("#rec").innerHTML = `
     <div><span class="tag">RECOMENDADO</span><span class="nome">${escolha.pr.nome}</span></div>
     <p class="num"><b>${escolha.pistas} pistas</b> · ${fmt(e.metros)} m de trilho ·
-       apoio de ${fmt(e.apoio)} mm · passagem de ${fmt(e.r1.larguraPass)} mm · ${escolha.pr.sub}</p>
+       passagem de ${fmt(e.r1.larguraPass)} mm · ${escolha.pr.sub}</p>
     ${chave}
     <details class="mais">
       <summary>Critério${fora ? " e arranjos descartados" : ""}</summary>
@@ -1753,8 +1746,9 @@ function montaRecomendacao(pa){
         <p class="crit">Mais pistas entre os arranjos que respeitam os limites declarados —
            circulação de ${fmt(GE_MIN)} mm entre pares, ${fmt(GI_MIN)} mm dentro do par,
            passagem de ${fmt(PASS_MIN)} mm e folga de ${fmt(FOLGA_MIN)} mm da prancha no trilho.
-           Empate em pistas: vence o de menor metragem. O apoio da peça larga entra como comparação,
-           não como limite: a largura da peça mais larga nunca foi levantada.</p>
+           Empate em pistas: vence o de menor metragem. A base da peça larga apoiada em dois trilhos
+           não entra: o campo informa que praticamente toda peça entra num trilho só de ${fmt(pa.W)} mm,
+           e a largura da peça mais larga nunca foi levantada.</p>
         ${fora ? `<ul class="fora">${fora}</ul>` : ""}
       </div>
     </details>`;
