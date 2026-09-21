@@ -145,6 +145,38 @@ capacidade a mais, mas também trilho a instalar — não é economia, é invest
 A base da peça larga já esteve aqui como o outro lado da troca e saiu: com praticamente toda peça
 entrando num trilho só, ela não é preço de nada.
 
+## Quanto esta versão rende sobre o passo de hoje
+
+Sair do arranjo de hoje para uma versão é a decisão que o papel precisa embasar, e a conta que
+responde a ela é uma subtração — 466 m da Versão 2 menos 438 m do **Passo do DWG**. Ela agora sai
+pronta em três lugares, com as duas referências sempre **nomeadas e com o valor ao lado**, porque
+elas não se somam e confundi-las troca +28 m por +68 m:
+
+| Referência | O que é | Versão 2 contra ela |
+|---|---|---|
+| **Passo do DWG** (par 200 · vão 400) | 438 m e 96 trilhos — o passo do desenho aplicado do começo ao fim, o arranjo de partida | **+28 m**, +6 trilhos, +2 pistas por lado da esteira 1 |
+| **Contado no DWG** | 398 m e 86 trilhos — o que está desenhado dentro do alcance das esteiras, sem passo regular | **+68 m**, +16 trilhos |
+
+- **Cabeçalho da impressão** — faixa no alto da folha, antes dos parâmetros: o ganho em metros,
+  as duas metragens lado a lado e as pistas. Sai também na **impressão só da planta**: quem recebe
+  o desenho na reunião de layout recebe junto o número que ele rende. Quando a tela **é** o passo
+  do DWG, a faixa diz isso em vez de mostrar ganho zero.
+- **Comparativo** — cada linha traz a diferença contra o passo do DWG, que ganha o rótulo
+  *passo de hoje*. Ganho em verde, perda em bordô.
+- **Faixa de indicadores** — `+68 m vs. os 398 m do DWG` no lugar de `+68 m vs. DWG`: o valor da
+  referência no rótulo é o que impede ler esse número como se fosse contra os 438 m.
+
+O comparativo, a recomendação e o ganho passam a avaliar os presets pela mesma função
+(`arranjoPreset`), com **toda** a geometria da tela — inclusive a posição da esteira 2. Antes o
+comparativo montava um parâmetro só com os comprimentos de trilho, e com a esteira 2 fora da
+posição do DWG comparava arranjos sobre geometrias diferentes.
+
+**"Passo do DWG" é o cenário inteiro** (par de 200 mm *e* vão de 400 mm entre pares, 438 m). O
+ganho de juntar os trilhos, da seção anterior, mexe **só no vão dentro do par** e mantém o vão
+entre pares da tela — por isso compara com 410 m, não com 438 m. Os textos passaram a dizer
+"o par de 200 mm que o DWG desenha, mantido o vão entre pares da tela": dois números com o mesmo
+nome na mesma tela era o que fazia a leitura tropeçar.
+
 ## Áreas e máquinas
 
 Seção da barra lateral, ao lado da planta — é entrada, e entrada fica onde estão os outros
@@ -200,6 +232,7 @@ largura inteira da folha — **20% maior em escala** (43% em área) que na impre
 O que fica, porque planta sem isso não se confere:
 
 - o cabeçalho com o arranjo, a data e a versão do app;
+- a **faixa de ganho** sobre o passo do DWG — é o número que a planta está ali para defender;
 - os parâmetros que o desenho mostra (trilho, vãos, passagem, comprimentos de C1/C2/C3,
   abastecimento, esteira 2, barracão e pistas por lado). Os que a planta não desenha — prancha,
   folga, apoio em dois trilhos e distância entre as esteiras — só saem na impressão completa;

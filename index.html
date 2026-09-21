@@ -217,6 +217,11 @@ details.mais>summary:focus-visible{outline:2px solid var(--esteira);outline-offs
 .lc-num{text-align:right}
 .lc-num .m{font-size:19px;font-weight:700;line-height:1;letter-spacing:-.3px}
 .lc-num .t{font-size:11.5px;color:var(--muted);margin-top:3px}
+/* diferença de metragem contra o passo do DWG: a subtração que o leitor fazia de cabeça */
+.lc-num .d{font-size:12px;font-weight:700;margin-top:4px;color:var(--muted)}
+.lc-num .d.up{color:var(--aumento)}
+.lc-num .d.down{color:var(--bordeaux)}
+.lc-num .d.base{font-weight:400;font-size:11px;color:var(--muted2)}
 
 /* ganho de juntar os trilhos: o número que o comparativo obrigava a calcular na cabeça */
 .ganho{display:flex;gap:15px;align-items:center;padding:11px 18px;
@@ -286,6 +291,15 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   .phd .cen{margin:2px 0 0;font-size:10.5px;color:#444}
   .phd .dt{font-size:9.5px;color:#666;text-align:right;white-space:nowrap;padding-top:2px}
 
+  /* o ganho abre a folha: quem recebe o papel quer saber quanto esta versão rende sobre o
+     arranjo de hoje, e essa subtração não pode ficar por conta de quem lê. Fica fora dos
+     parâmetros marcados com .sec porque também vale na impressão só da planta. */
+  .pgan{display:flex;align-items:baseline;gap:9px;border:1px solid #C8CCD0;border-left:3px solid #1F8A4C;
+        border-radius:4px;padding:4px 9px;margin-bottom:5px;font-size:9px;line-height:1.35;break-inside:avoid}
+  .pgan>b{font-size:15px;white-space:nowrap;color:#000;font-variant-numeric:tabular-nums}
+  .pgan .pg-rot{font-size:8px;letter-spacing:.8px;color:#666;text-transform:uppercase;white-space:nowrap}
+  .pgan em{font-style:normal;font-variant-numeric:tabular-nums}
+
   .pparams{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px 12px;font-size:8.5px;color:#333;margin-bottom:6px;line-height:1.3}
   .pparams span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .pparams span.largo{grid-column:span 2}
@@ -324,6 +338,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   .linha-comp{padding:6px 11px;grid-template-columns:1fr 92px;gap:9px;break-inside:avoid}
   .lc-nome{font-size:10.5px}.lc-sub{font-size:9px}
   .lc-num .m{font-size:13px}.lc-num .t{font-size:8.5px}
+  .lc-num .d{font-size:9px;margin-top:2px}.lc-num .d.base{font-size:8.5px}
   .lc-bar{height:5px}
 
   .rolagem{max-height:none;overflow:visible}
@@ -594,7 +609,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
 
   <div class="abaixo">
     <section class="bloco">
-      <div class="bloco-hd"><h2>Comparativo</h2><p>metragem linear de trilho no conjunto</p></div>
+      <div class="bloco-hd"><h2>Comparativo</h2><p>metragem linear de trilho no conjunto · diferença contra o passo do DWG</p></div>
       <div class="rec" id="rec"></div>
       <div class="ganho" id="ganho" hidden></div>
       <div class="comp" id="comp"></div>
@@ -653,7 +668,7 @@ const GI_DWG     = 200;    // vão dentro do par no passo que o DWG desenha — 
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v23";
+const VERSAO = "v24";
 const VERSAO_DATA = "21/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -1195,7 +1210,8 @@ function montaAvisos(r){
     const dwg = arranjoCom(p, { modo:"par", GI:GI_DWG });
     const ganho = dwg
       ? ` Em troca, rende <b>${sinalN(r.metros - dwg.metros)} m</b> de trilho e `
-        + `${sinalPistas(r.trilhos - dwg.pistas)} sobre o passo de ${fmt(GI_DWG)} mm do DWG.`
+        + `${sinalPistas(r.trilhos - dwg.pistas)} sobre o par de ${fmt(GI_DWG)} mm do DWG, `
+        + `mantido o vão entre pares da tela.`
       : "";
     t.push(`Vão de <b>${fmt(p.GI)} mm</b> dentro do par, abaixo dos ${fmt(GI_MIN)} mm que a Produção aceita.${ganho}`);
   }
@@ -1204,7 +1220,6 @@ function montaAvisos(r){
 
 function montaFaixa(r){
   const { r1, r2, folga, metros, trilhos, ganhoE2 } = r;
-  const sinal = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v));
   const met = (valor, unid, rotulo, pri) =>
     `<div class="met${pri ? " pri" : ""}"><div class="v tnum">${valor}`
     + `${unid ? ` <span class="u">${unid}</span>` : ""}</div><div class="l">${rotulo}</div></div>`;
@@ -1213,8 +1228,8 @@ function montaFaixa(r){
     met(r1.trilhosPorLado, "pistas", `por lado da esteira 1 · ${r2.trilhosPorLado} na esteira 2 `
         + `(<b>+${ganhoE2}</b> com o aumento de ${fmt(E2_AUMENTO/1000)} m)`, true),
     met(folga >= 0 ? fmt(folga) : "−" + fmt(-folga), "mm", "folga da prancha no trilho"),
-    met(trilhos, "", `trilhos · ${sinal(trilhos - REF.trilhos)} vs. DWG`),
-    met(fmt(metros), "m", `metragem · ${sinal(metros - REF.metros)} m vs. DWG`, true),
+    met(trilhos, "", `trilhos · ${sinalN(trilhos - REF.trilhos)} vs. os ${REF.trilhos} do DWG`),
+    met(fmt(metros), "m", `metragem · ${sinalN(metros - REF.metros)} m vs. os ${fmt(REF.metros)} m do DWG`, true),
     r1.idxPass.length ? met(fmt(r1.larguraPass), "mm", `passagem · ${r1.idxPass.length} no banco`)
                       : met("—", "", "sem passagem")
   ].join("");
@@ -1252,6 +1267,36 @@ function arranjoCom(p, mod){
   return r ? { metros:r.metros, pistas:r.trilhos } : null;
 }
 
+/** Um preset avaliado com o resto da tela: comprimentos de trilho, passagem e posição das esteiras.
+    Comparativo, recomendação e ganho passam por aqui, senão cada um compara contra uma geometria. */
+const arranjoPreset = (pr, p) =>
+  avalia({ ...p, W:pr.W, GI:pr.modo === "par" ? pr.GI : 0, GE:pr.GE, modo:pr.modo });
+
+/* ---------------- ganho sobre o arranjo de hoje ----------------
+   O passo que o DWG desenha é o ponto de partida: é dele que se sai ao trocar de versão, e a
+   pergunta que o papel precisa responder é quanto essa troca rende. A faixa já media contra os
+   trilhos contados no desenho, que é outra conta — o que está montado hoje não segue
+   passo regular. As duas são úteis e agora aparecem com o valor da referência ao lado, para
+   ninguém somar uma na outra. */
+const ID_ATUAL = "at";   // "Passo do DWG" — par de 200 mm e vão de 400 mm, o arranjo de partida
+
+/** Quanto o arranjo da tela rende sobre o passo do DWG e sobre os trilhos contados no desenho. */
+function ganhoSobreAtual(p, r){
+  const pr = PRESETS.find(x => x.id === ID_ATUAL);
+  const base = pr && arranjoPreset(pr, p);
+  if (!base) return null;
+  return {
+    nome: pr.nome, sub: pr.sub, igual: mesmoArranjo(pr, p),
+    base: { metros:base.metros, trilhos:base.trilhos, pistas:base.r1.trilhosPorLado },
+    dM: r.metros - base.metros,
+    dT: r.trilhos - base.trilhos,
+    dP: r.r1.trilhosPorLado - base.r1.trilhosPorLado,
+    dP2: r.r2.trilhosPorLado - base.r2.trilhosPorLado,
+    refM: r.metros - REF.metros,
+    refT: r.trilhos - REF.trilhos
+  };
+}
+
 /** Arranjo atual, trilhos soltos, passo do DWG e par fechado no limite da Produção. */
 function ganhoDoPar(p, r){
   const solto  = arranjoCom(p, { modo:"solto", GI:0 });
@@ -1261,7 +1306,7 @@ function ganhoDoPar(p, r){
   return { solto, dwg, limite, atual:{ metros:r.metros, pistas:r.trilhos } };
 }
 
-const sinalN = v => (v >= 0 ? "+" : "\u2212") + fmt(Math.abs(v));
+const sinalN = v => (v > 0 ? "+" : v < 0 ? "\u2212" : "\u00b1") + fmt(Math.abs(v));
 const sinalPistas = v => `${sinalN(v)} pista${Math.abs(Math.round(v)) === 1 ? "" : "s"}`;
 
 /** Uma linha só, sempre visível: quantos metros e quantas pistas o par rende, e o que custa. */
@@ -1288,7 +1333,7 @@ function montaGanho(p, r){
   } else if (p.GI === GI_DWG){
     // O arranjo da tela é o próprio passo do DWG: a referência passa a ser não juntar.
     num = [g.atual.metros - g.solto.metros, g.atual.pistas - g.solto.pistas];
-    txt = `É o que o <b>par de ${fmt(GI_DWG)} mm</b> — o passo que o DWG desenha — rende sobre os mesmos
+    txt = `É o que o <b>par de ${fmt(GI_DWG)} mm</b> — o vão que o DWG desenha dentro do par — rende sobre os mesmos
       trilhos soltos: <b>${fmt(g.atual.metros)} m</b> e ${g.atual.pistas} pistas, no lugar de
       ${fmt(g.solto.metros)} m e ${g.solto.pistas} pistas. Fechar o par até os ${fmt(GI_MIN)} mm da Produção
       acrescenta mais <b>${sinalN(g.limite.metros - g.atual.metros)} m</b> e
@@ -1298,7 +1343,7 @@ function montaGanho(p, r){
     const fecha = p.GI < GI_DWG;
     num = [g.atual.metros - g.dwg.metros, g.atual.pistas - g.dwg.pistas];
     txt = `É o que <b>${fecha ? "fechar" : "abrir"} o par de ${fmt(GI_DWG)} para ${fmt(p.GI)} mm</b>
-      ${fecha ? "rende sobre" : "custa contra"} o passo que o DWG desenha:
+      ${fecha ? "rende sobre" : "custa contra"} o par que o DWG desenha, mantido o vão entre pares da tela:
       <b>${fmt(g.atual.metros)} m</b> e ${g.atual.pistas} pistas, no lugar de ${fmt(g.dwg.metros)} m
       e ${g.dwg.pistas} pistas, dentro do mesmo alcance das esteiras. Contra os trilhos soltos, juntar em par
       rende <b>${sinalN(g.atual.metros - g.solto.metros)} m</b> e
@@ -1313,28 +1358,67 @@ function montaGanho(p, r){
 function montaComparativo(pa){
   const itens = [{ nome:REF.nome, sub:REF.sub, metros:REF.metros, trilhos:REF.trilhos, cor:COR.cota, ref:true }];
   PRESETS.forEach(pr => {
-    const r = avalia({ W:pr.W, GI:pr.GI, GE:pr.GE, modo:pr.modo, pass:pa.pass, L1:pa.L1, L2:pa.L2, L3:pa.L3 });
+    const r = arranjoPreset(pr, pa);
     if (!r) return;
     itens.push({
+      id: pr.id,
       nome: pr.nome,
       sub: `${pr.sub} · ${r.r1.trilhosPorLado} pistas por lado`,
       metros: r.metros,
       trilhos: r.trilhos,
-      cor: pr.id === "at" ? COR.numero : (pr.id === "v3" ? COR.neutra : COR.ladoA),
+      cor: pr.id === ID_ATUAL ? COR.numero : (pr.id === "v3" ? COR.neutra : COR.ladoA),
       sel: mesmoArranjo(pr, pa)
     });
   });
 
+  // A linha do passo do DWG é a régua: trocar de versão é sair dela. A diferença sai pronta em
+  // cada linha — ler duas metragens e subtrair era justamente o trabalho que sobrava para quem lê.
+  const base = itens.find(i => i.id === ID_ATUAL);
   const max = Math.max(...itens.map(i => i.metros)) || 1;
-  $("#comp").innerHTML = itens.map(i => `
+  $("#comp").innerHTML = itens.map(i => {
+    const d = base ? i.metros - base.metros : 0;
+    const dif = !base ? ""
+      : i.id === ID_ATUAL ? `<div class="d base">passo de hoje</div>`
+      : `<div class="d tnum ${d > 0 ? "up" : d < 0 ? "down" : ""}">${sinalN(d)} m</div>`;
+    return `
     <div class="linha-comp ${i.sel ? "sel" : ""} ${i.ref ? "ref" : ""}">
       <div>
         <div class="lc-nome">${i.nome}</div>
         <div class="lc-sub">${i.sub}</div>
         <div class="lc-bar"><i style="width:${(i.metros/max*100).toFixed(1)}%;background:${i.cor}"></i></div>
       </div>
-      <div class="lc-num"><div class="m tnum">${fmt(i.metros)} m</div><div class="t tnum">${i.trilhos} trilhos</div></div>
-    </div>`).join("");
+      <div class="lc-num"><div class="m tnum">${fmt(i.metros)} m</div><div class="t tnum">${i.trilhos} trilhos</div>${dif}</div>
+    </div>`;
+  }).join("");
+}
+
+/** Faixa de ganho do papel: quanto esta versão rende sobre o passo do DWG, com as duas
+    referências nomeadas e os valores de cada uma — a diferença sai somada, não subentendida. */
+function faixaGanhoImpressa(p, r){
+  const g = ganhoSobreAtual(p, r);
+  if (!g) return "";
+  const contado = `Sobre os ${REF.trilhos} trilhos contados no DWG (${fmt(REF.metros)} m): `
+    + `<em>${sinalN(g.refM)} m</em> e <em>${sinalN(g.refT)}</em> trilhos.`;
+  if (g.igual)
+    return `<div class="pgan"><span class="pg-rot">Referência</span>
+      <b>${fmt(r.metros)} m</b>
+      <span>é o <b>${g.nome}</b> (${g.sub}), o arranjo de partida: ${r.trilhos} trilhos,
+      ${r.r1.trilhosPorLado} pistas por lado da esteira 1. ${contado}</span></div>`;
+  // Arranjo que rende menos que o passo de hoje existe (vão maior, trilho solto) e não pode
+  // sair com o rótulo de ganho: o número é o mesmo, o que muda é de que lado ele está.
+  const rot = g.dM > 0 ? "Ganho" : g.dM < 0 ? "Custo" : "Empate";
+  const rel = g.dM > 0 ? "a mais que o" : g.dM < 0 ? "a menos que o" : "— a mesma metragem do";
+  // De onde vem a diferença: a esteira 1 puxa C1 e C2, a esteira 2 puxa só a C3. Dizer "±0 pistas"
+  // quando o ganho veio todo da outra esteira é pior que não dizer nada.
+  const onde = [];
+  if (g.dP)  onde.push(`${sinalPistas(g.dP)} por lado da esteira 1`);
+  if (g.dP2) onde.push(onde.length ? `${sinalN(g.dP2)} na esteira 2`
+                                   : `${sinalPistas(g.dP2)} na esteira 2`);
+  return `<div class="pgan"><span class="pg-rot">${rot}</span>
+    <b>${sinalN(g.dM)} m</b>
+    <span>de trilho ${rel} <b>${g.nome}</b> (${g.sub}): <em>${fmt(r.metros)} m</em> e
+    <em>${r.trilhos}</em> trilhos no lugar de <em>${fmt(g.base.metros)} m</em> e
+    <em>${g.base.trilhos}</em> trilhos${onde.length ? " — " + onde.join(" e ") : ""}. ${contado}</span></div>`;
 }
 
 function montaPrintHd(r){
@@ -1380,6 +1464,7 @@ function montaPrintHd(r){
       </div>
       <div class="dt">Patrimar Móveis · PPCP<br>${new Date().toLocaleDateString("pt-BR")}<br>app ${VERSAO} · ${VERSAO_DATA}</div>
     </div>
+    ${faixaGanhoImpressa(p, r)}
     <div class="pparams">${it.map(([k, v, sec]) =>
       `<span class="${String(v).length > 34 ? "largo" : ""}${sec ? " sec" : ""}">${k}: <b>${v}</b></span>`).join("")}</div>`;
 }
