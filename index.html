@@ -653,7 +653,7 @@ const GI_DWG     = 200;    // vão dentro do par no passo que o DWG desenha — 
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v22";
+const VERSAO = "v23";
 const VERSAO_DATA = "21/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -1406,8 +1406,15 @@ function linhasConferencia(r){
     L("Fim da esteira 2 → parede do fundo", barracao ? barracao.sobraX : 0,
       "Derivado de medidas de campo, do começo ao fim — decide se o aumento de 5 m cabe"),
     L("Defasagem entre a esteira 1 e a esteira 2", e2.ini, "Campo"),
+    // Sem dizer de onde até onde, quem estiver com a trena mede de centro a centro e
+    // reporta 850 mm a mais, e a C2 leva a culpa. O vão livre ainda é o único dos três
+    // que não depende da largura da esteira, que vem do DWG.
     L("Distância entre a esteira 1 e a esteira 2, no sentido dos trilhos",
-      p.L2 + GAP_COL + p.L3, "Derivado de C2 + corredor + C3 — as esteiras são fixas, conferir", true),
+      p.L2 + GAP_COL + p.L3,
+      "Derivado de C2 + corredor + C3 — as esteiras são fixas, conferir. Medir o VÃO LIVRE: "
+      + `da borda da esteira 1 do lado da C2 até a borda da esteira 2 do lado da C3. De centro `
+      + `a centro daria ${fmt(p.L2 + GAP_COL + p.L3 + E1.larg)} e de borda externa a borda `
+      + `externa, ${fmt(p.L2 + GAP_COL + p.L3 + 2*E1.larg)}. Confere a C2 de quebra`, true),
     L("Comprimento da esteira 1", E1.len,
       `Campo, CONFERIDO — o DWG cotava ${fmt(E1.lenDwg)}`),
     L("Comprimento da esteira 2, sem o aumento", E2.lenBase,
