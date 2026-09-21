@@ -7,7 +7,8 @@ dentro do alcance das duas esteiras.
 > parede esquerda. Onde há medição de campo, ela prevalece sobre o desenho: distâncias da parede ao
 > trilho lateral e à esteira 1, e a defasagem entre as esteiras. O que ainda vem só do DWG —
 > comprimento do barracão, comprimentos das esteiras, passo dos trilhos — continua sujeito ao mesmo
-> erro e está listado em Pendências.
+> erro e está listado em Pendências. **O comprimento do barracão saiu dessa lista: foi conferido em
+> campo e confirma o desenho.** Restam os comprimentos das esteiras.
 
 > **Isto é projeto, não levantamento.** Os trilhos montados hoje na Embalagem **não seguem passo
 > regular e não têm medida definida** — não estão encostados nem espaçados por uma regra. Não existe,
@@ -68,7 +69,7 @@ voltam a fechar depois.
 | Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 1.300 mm da esteira 1 | **cadeia conferida em campo: 850 + 2.100 + 1.300 = 4.250 mm da parede à esteira 1**, contra 6.470 mm no DWG — o desenho está errado nessa região e o campo prevalece. A largura de 2.100 mm, antes informada pela Produção, foi conferida dentro dessa cadeia; as três medidas seguem editáveis |
 | Posição da esteira 2 | como está hoje (defasada 5.550 mm) | "Alinhada com a esteira 1" ou "Encostada no trilho lateral" deslocam a esteira 2 e a C3 para perto da parede esquerda; não muda a contagem de pistas |
 | Posição do conjunto | como no DWG | "Encostado na parede esquerda" zera o afastamento esquerdo e joga a folga para o fim da esteira 2 |
-| Barracão — comprimento | 55.210 mm | cotado no DWG, desenho desatualizado. Com 0, o contorno não é desenhado |
+| Barracão — comprimento | 55.210 mm | **conferido em campo, confirma a cota do DWG**. Com 0, o contorno não é desenhado |
 | Barracão — largura | 21.850 mm | deduzida das três medidas de campo com os comprimentos de trilho atuais (500 + 19.900 + 1.450) e tratada como parede fixa. A hipótese antiga de 24.900 mm, tirada da linha de pilares, foi abandonada |
 | Afastamentos das paredes | 850 mm (esquerda, até o trilho lateral) · 500 mm (lado da C1, até o trilho de abastecimento) | medidos em campo. O conjunto está ancorado no lado da C1: é de lá que ele cresce |
 | Parede do lado da esteira 2 → esteira 2 | **calculado: 1.450 mm** | Não é digitado: `largura − afastamento da C1 − altura do conjunto`. Alongar um trilho reduz este número, que é o espaço sendo consumido. Negativo = não cabe |
@@ -301,13 +302,20 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
   **O que isso não resolve:** o comprimento do barracão (55.210 mm) continua saindo do mesmo DWG e
   contado a partir dessa mesma parede, então a sobra no fim da esteira 2 segue herdando o erro — ver
   o item abaixo. Confirmar a cadeia da parede não confirma a outra ponta.
-- **A sobra no fim da esteira 2 é o número menos confiável da simulação e é justamente o que
-  justificaria o aumento de 5 m.** O comprimento do barracão (55.210 mm) foi cotado no DWG a partir
-  da parede esquerda. As duas medidas de campo aproximaram o conjunto dessa parede — 2.220 mm na
-  esteira 1 e 4.520 mm na esteira 2 — e essa diferença reaparece inteira como folga no outro
-  extremo: a sobra no comprimento saiu de 11.915 mm (só DWG) para 16.435 mm no cenário padrão.
-  **Nenhum desses 4.520 mm foi medido.** Antes de decidir o aumento da esteira 2, medir em campo a
-  distância do fim da esteira 2 até a parede do fundo, ou o comprimento interno do barracão.
+- ~~A sobra no fim da esteira 2 é o número menos confiável da simulação.~~ **Resolvida.** Era o
+  número mais frágil porque as medidas de campo aproximaram o conjunto da parede esquerda e essa
+  diferença reaparecia inteira como folga no outro extremo, com o comprimento do barracão vindo do
+  mesmo desenho que errava a primeira ponta. **As duas pontas foram conferidas em campo:** a cadeia
+  da parede esquerda (850 + 2.100 + 1.300 = 4.250 mm) e o comprimento interno do barracão
+  (55.210 mm, que confirma a cota do DWG). A sobra de **16.435 mm** no cenário padrão passa a ser
+  número derivado de medida, não de hipótese, e o aviso de "não cabe no comprimento" passa a ser
+  confiável.
+  **O que ela ainda herda do desenho:** o comprimento da esteira 2. É esse termo que governa a
+  conta — `5.550 de defasagem + 28.975 de esteira` chega mais longe que a esteira 1 —, então medir a
+  esteira 2 fecha o último furo da sobra. Está destacado na folha de conferência.
+- **Os comprimentos das esteiras são a última medida de peso que vem só do DWG.** A esteira 1
+  (23.940 mm) define quantas pistas cabem nela; a esteira 2 (23.975 mm antes do aumento) define as
+  dela e ainda governa a sobra do fundo. As duas passaram a sair destacadas na folha de conferência.
 - A largura da faixa do trilho de abastecimento (carrinho) está em 2.100 mm nas três posições,
   informada pela Produção, editável na tela. Só o desenho usa esse valor; ele não entra na contagem de pistas
   nem na metragem. A simulação avisa se a largura passar do vão de 2.100 mm entre C2 e C3.
