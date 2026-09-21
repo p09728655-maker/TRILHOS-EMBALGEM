@@ -22,7 +22,8 @@ dentro do alcance das duas esteiras.
 - Compara os cenários pela metragem linear de trilho.
 - Diz, em números, quantos metros e quantas pistas juntar os trilhos em par rende — e o que custa.
 - Gera as cotas acumuladas em CSV e a planta em SVG.
-- Imprime em A4 paisagem com cabeçalho de parâmetros, com uma impressão focada só no desenho.
+- Imprime em A4 paisagem com cabeçalho de parâmetros, e tem uma impressão focada só no desenho,
+  que aceita papel maior (A3 rende ~44% de desenho).
 
 ## Densidade da tela
 
@@ -175,9 +176,9 @@ direção. Conferir em campo antes de decidir layout.
 ## Impressão focada no desenho
 
 O botão **"Imprimir só a planta"**, no menu **Mais**, manda a planta sozinha para o papel: saem de
-cena a faixa de indicadores, o comparativo e as cotas, e o desenho ocupa a folha inteira — com os
-valores padrão, sai **20% maior em escala** (43% em área) que na impressão completa. É a folha de
-levar ao chão de fábrica ou à reunião de layout.
+cena a faixa de indicadores, os avisos de regra, o comparativo e as cotas, e o desenho ocupa a
+largura inteira da folha — **20% maior em escala** (43% em área) que na impressão completa em A4.
+É a folha de levar ao chão de fábrica ou à reunião de layout.
 
 O que fica, porque planta sem isso não se confere:
 
@@ -185,12 +186,29 @@ O que fica, porque planta sem isso não se confere:
 - os parâmetros que o desenho mostra (trilho, vãos, passagem, comprimentos de C1/C2/C3,
   abastecimento, esteira 2, barracão e pistas por lado). Os que a planta não desenha — prancha,
   folga, apoio em dois trilhos e distância entre as esteiras — só saem na impressão completa;
-- os avisos, que dizem quando o conjunto não cabe;
+- o **alerta de link antigo**, quando aparece. Os avisos de regra saem, mas esse fica: ele diz que
+  a geometria na tela está desatualizada, e uma planta impressa sem ele vale como certa sendo
+  errada;
 - a legenda das cores;
 - a ressalva do DWG, em uma linha no pé.
 
-A impressão completa (botão **Imprimir**) não mudou: planta na primeira página, comparativo e
-cotas depois.
+### O tamanho é limitado pela largura do papel, não pela altura
+
+A planta tem cerca de **2,1:1** e a folha A4 paisagem, **1,45:1**. Quem limita o desenho é a
+**largura**: ele já sai de ponta a ponta e sobra altura que a proporção não consegue usar. Esconder
+os avisos deixa a folha limpa — **não aumenta o desenho**, e o mesmo vale para encolher o cabeçalho.
+Girar para retrato também não adianta: o lado maior do A4 é o mesmo nas duas orientações.
+
+Por isso a `@page` desta impressão fixa **só a orientação**, sem travar o tamanho do papel. Escolher
+**A3** no diálogo rende um desenho **~44% maior em escala** (mais que o dobro em área), medido no PDF
+gerado. A altura do palco acompanha a folha (`100vh`) em vez de ser fixa em milímetros — numa folha
+maior ela precisa crescer junto, senão o desenho volta a ser limitado pela altura e o A3 não paga.
+
+A margem continua em 8 mm, igual à das outras folhas: fechar para 5 mm renderia 2,3% e arrisca corte
+de borda em impressora com margem física maior, já que o desenho vai de ponta a ponta.
+
+A impressão completa (botão **Imprimir**) não mudou: A4 paisagem, planta na primeira página,
+comparativo e cotas depois.
 
 ## Folha de conferência em campo
 
