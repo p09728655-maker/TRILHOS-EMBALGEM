@@ -6,9 +6,12 @@ dentro do alcance das duas esteiras.
 > **Origem das medidas.** O DWG foi a referência inicial, mas **está desatualizado** na região da
 > parede esquerda. Onde há medição de campo, ela prevalece sobre o desenho: distâncias da parede ao
 > trilho lateral e à esteira 1, e a defasagem entre as esteiras. O que ainda vem só do DWG —
-> comprimento do barracão, comprimentos das esteiras, passo dos trilhos — continua sujeito ao mesmo
-> erro e está listado em Pendências. **O comprimento do barracão saiu dessa lista: foi conferido em
-> campo e confirma o desenho.** Restam os comprimentos das esteiras.
+> comprimento do barracão, comprimentos das esteiras, passo dos trilhos — continuava sujeito ao mesmo
+> erro. **Essa lista acabou:** o comprimento do barracão foi conferido e confirma o desenho, as duas
+> esteiras foram medidas em campo (24.150 mm cada, contra 23.940 e 23.975 do DWG) e não existe passo
+> de trilhos a medir. Do desenho sobram só o vão entre C2 e C3 e a largura das esteiras, que mexem
+> no desenho e nas cotas, não na contagem de pistas. **O que ainda não foi medido** é o trilho da C2
+> (4.000 mm, informado pela Produção) e a largura interna do barracão, que segue deduzida.
 
 > **Isto é projeto, não levantamento.** Os trilhos montados hoje na Embalagem **não seguem passo
 > regular e não têm medida definida** — não estão encostados nem espaçados por uma regra. Não existe,
@@ -62,8 +65,8 @@ voltam a fechar depois.
 | Vão dentro do par | 50 mm | limite informado pela Produção; no DWG são 200 mm |
 | Vão entre pares | 500 mm | proposta em estudo |
 | Comprimento C1 / C2 / C3 | 7.000 / 4.000 / 3.000 mm | C1 e C3 medidas em campo, ambas confirmando o DWG; C2 ainda vem da Produção, a fonte que errou as outras duas |
-| Esteira 1 | 850 × 23.940 mm | largura ajustada para 850 mm (DWG: 840); comprimento medido no DWG |
-| Esteira 2 | 850 × 28.975 mm, defasada 5.550 mm | comprimento do DWG: 23.975 mm; defasagem medida em campo (9.800 mm da parede até a esteira 2, menos os 4.250 mm até a esteira 1) — o DWG traz 7.850 mm, guardados em `E2.iniDwg`; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
+| Esteira 1 | 850 × 24.150 mm | **comprimento medido em campo** (DWG: 23.940, guardado em `E1.lenDwg`); largura ajustada para 850 mm (DWG: 840) |
+| Esteira 2 | 850 × 29.150 mm, defasada 5.550 mm | **comprimento medido em campo: 24.150 mm** (`E2.lenBase`), igual ao da esteira 1 — o DWG cotava 23.975, guardado em `E2.lenDwg`; defasagem medida em campo (9.800 mm da parede até a esteira 2, menos os 4.250 mm até a esteira 1) — o DWG traz 7.850 mm, em `E2.iniDwg`; aumento de +5.000 mm no final (`E2_AUMENTO`), desenhado hachurado |
 | Vão entre as colunas C2 e C3 | 2.100 mm | medido no DWG · fixo no código, não ajustável na tela |
 | Trilho de abastecimento (carrinho) | 2.100 mm de largura | faixa acima da C1 e no vão C2–C3, informado pela Produção (no DWG os rails ocupam 1.570 mm no vão e 2.100 mm acima da C1) |
 | Trilho de abastecimento lateral | 2.100 mm de largura, encostado na parede (850 mm) e a 1.300 mm da esteira 1 | **cadeia conferida em campo: 850 + 2.100 + 1.300 = 4.250 mm da parede à esteira 1**, contra 6.470 mm no DWG — o desenho está errado nessa região e o campo prevalece. A largura de 2.100 mm, antes informada pela Produção, foi conferida dentro dessa cadeia; as três medidas seguem editáveis |
@@ -310,12 +313,15 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
   (55.210 mm, que confirma a cota do DWG). A sobra de **16.435 mm** no cenário padrão passa a ser
   número derivado de medida, não de hipótese, e o aviso de "não cabe no comprimento" passa a ser
   confiável.
-  **O que ela ainda herda do desenho:** o comprimento da esteira 2. É esse termo que governa a
-  conta — `5.550 de defasagem + 28.975 de esteira` chega mais longe que a esteira 1 —, então medir a
-  esteira 2 fecha o último furo da sobra. Está destacado na folha de conferência.
-- **Os comprimentos das esteiras são a última medida de peso que vem só do DWG.** A esteira 1
-  (23.940 mm) define quantas pistas cabem nela; a esteira 2 (23.975 mm antes do aumento) define as
-  dela e ainda governa a sobra do fundo. As duas passaram a sair destacadas na folha de conferência.
+  **Fechada por inteiro:** com as esteiras medidas, a sobra de **16.260 mm** sai de medida de campo
+  do começo ao fim — parede, conjunto e barracão. Deixou de sair destacada na folha de conferência.
+- ~~Os comprimentos das esteiras são a última medida de peso que vem só do DWG.~~ **Medidos em
+  campo: 24.150 mm cada**, contra 23.940 e 23.975 do desenho. As duas medem igual — a diferença de
+  35 mm entre elas no DWG era imprecisão de desenho. **Nada mudou na contagem de pistas:** os
+  175–210 mm a mais não cruzam nenhum limiar em nenhum dos cinco arranjos (Versão 4 segue 98 pistas
+  e 444 m, Versão 2 segue 102 e 466). O único efeito é a sobra do fundo, que caiu de 16.435 para
+  **16.260 mm**. Que a simulação não se mexa com um erro de 200 mm na entrada é a melhor evidência
+  de robustez que o app produziu até agora.
 - A largura da faixa do trilho de abastecimento (carrinho) está em 2.100 mm nas três posições,
   informada pela Produção, editável na tela. Só o desenho usa esse valor; ele não entra na contagem de pistas
   nem na metragem. A simulação avisa se a largura passar do vão de 2.100 mm entre C2 e C3.
