@@ -533,7 +533,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
             <input id="pBC" type="number" min="0" max="200000" step="10" value="55210" aria-label="Comprimento do barracão, no sentido das esteiras">
             <input id="pBL" type="number" min="0" max="200000" step="10" value="21850" aria-label="Largura do barracão, no sentido dos trilhos">
           </div>
-          <div class="nota">Comprimento cotado no DWG (55.210); com 0, o contorno não é desenhado. A largura de 21.850 mm veio das três medidas de campo com o arranjo de hoje (500 + 19.900 + 1.450) e agora é tratada como a parede que ela é: <b>fixa</b>. Alongar um trilho passa a comer o espaço até a esteira 2.</div>
+          <div class="nota">Comprimento cotado no DWG (55.210); com 0, o contorno não é desenhado. A largura de 21.850 mm veio das três medidas de campo com os comprimentos de trilho atuais (500 + 19.900 + 1.450) e agora é tratada como a parede que ela é: <b>fixa</b>. Alongar um trilho passa a comer o espaço até a esteira 2.</div>
         </div>
         <div class="campo">
           <label for="pPos2">Posição da esteira 2</label>
@@ -620,7 +620,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
     <div class="rodape-in">
       Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b>, <b>desenho desatualizado</b>, com as distâncias da parede corrigidas em campo · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
       Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 5.550&nbsp;mm medidos em campo (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm de comprimento e 7.850&nbsp;mm de defasagem) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 21.850&nbsp;mm de largura, deduzidos das três medidas de campo (500 + 19.900 + 1.450) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
-      Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> as medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem do desenho em 2.220 e 4.520&nbsp;mm, e prevalecem. O comprimento de 55.210&nbsp;mm do barracão, porém, <b>continua vindo desse mesmo desenho</b> e a partir dessa mesma parede — então a sobra no fim da esteira 2 herda o erro e não deve embasar decisão de layout até ser medida em campo. O passo executado no chão de fábrica também não foi medido.
+      Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> as medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem do desenho em 2.220 e 4.520&nbsp;mm, e prevalecem. O comprimento de 55.210&nbsp;mm do barracão, porém, <b>continua vindo desse mesmo desenho</b> e a partir dessa mesma parede — então a sobra no fim da esteira 2 herda o erro e não deve embasar decisão de layout até ser medida em campo. Os trilhos montados hoje <b>não seguem passo regular</b>: esta planta é o layout a executar, não um retrato do que está montado, e os arranjos são comparados entre si e contra o DWG.
     </div>
   </details>
 
@@ -653,7 +653,7 @@ const GI_DWG     = 200;    // vão dentro do par no passo que o DWG desenha — 
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v19";
+const VERSAO = "v20";
 const VERSAO_DATA = "21/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -1392,15 +1392,17 @@ function linhasConferencia(r){
   const { p, e2, barracao } = r;
   const L = (medida, valor, origem, chk) => ({ medida, valor, origem, chk });
   return [
-    L("Parede esquerda → borda externa do trilho lateral", p.BX, "Campo"),
-    L("Trilho lateral → início da esteira 1", p.AX, "Campo"),
-    L("Largura do trilho de abastecimento lateral", p.AL, "Informado pela Produção"),
+    L("Parede esquerda → início da esteira 1 (cadeia)", p.BX + p.AL + p.AX,
+      "Campo, CONFERIDO — 850 + 2.100 + 1.300; o DWG cota 6.470 nesse trecho e está errado"),
+    L("Parede esquerda → borda externa do trilho lateral", p.BX, "Campo, conferido"),
+    L("Largura do trilho de abastecimento lateral", p.AL, "Campo, conferido na cadeia dos 4.250"),
+    L("Trilho lateral → início da esteira 1", p.AX, "Campo, conferido"),
     L("Parede do lado da esteira 2 → esteira 2", p.BE,
-      "CALCULADO — com o arranjo de hoje tem que dar os 1.450 mm medidos"),
+      "CALCULADO — com os comprimentos de trilho atuais tem que dar os 1.450 mm medidos"),
     L("Parede do lado da C1 → trilho de abastecimento", p.BY, "Campo"),
     L("Comprimento interno do barracão", p.BC, "DWG, desenho desatualizado", true),
     L("Largura interna do barracão", p.BL,
-      "Deduzida das três medidas de campo com o arranjo de hoje — conferir com trena", true),
+      "Deduzida das três medidas de campo com os comprimentos de trilho atuais — conferir com trena", true),
     L("Fim da esteira 2 → parede do fundo", barracao ? barracao.sobraX : 0,
       "Derivado — decide se o aumento de 5 m cabe", true),
     L("Defasagem entre a esteira 1 e a esteira 2", e2.ini, "Campo"),
@@ -1413,7 +1415,6 @@ function linhasConferencia(r){
     L("Trilho da C1", p.L1, "Campo, confirma o DWG"),
     L("Trilho da C2", p.L2, "Produção — única cota de trilho ainda não medida; a fonte errou C1 e C3", true),
     L("Trilho da C3", p.L3, "Campo, confirma o DWG"),
-    L("Passo executado hoje: trilho + vão entre pares", p.W + p.GE, "NÃO MEDIDO — todo o comparativo depende dele", true),
     L("Largura da peça mais larga apoiada em dois trilhos", 0,
       "Não levantada. O campo informa que praticamente toda peça entra num trilho só — "
       + "confirmar antes de fechar o par", false)
@@ -1448,10 +1449,11 @@ function montaConferencia(r){
          O DWG está desatualizado na região da parede esquerda: as distâncias já corrigidas em campo
          divergem dele em 2.220 mm na esteira 1 e 4.520 mm na esteira 2. O comprimento do barracão
          continua vindo desse mesmo desenho, então a sobra no fim da esteira 2 herda o erro — é ela
-         que diz se o aumento de 5 m cabe. O passo executado hoje nunca foi levantado, e é ele que
-         sustenta a comparação entre os arranjos. A largura da peça mais larga também não foi
-         medida, mas deixou de pesar na escolha: o campo informa que praticamente toda peça entra
-         num trilho só.</p>
+         que diz se o aumento de 5 m cabe. <b>Os trilhos montados hoje não seguem passo regular</b>,
+         então não há passo de campo a conferir nesta folha: a comparação entre os arranjos é entre
+         projetos, e a referência é o DWG. O que esta planta mostra é o layout a executar, não um
+         retrato do que está montado. A largura da peça mais larga não foi medida, mas deixou de
+         pesar na escolha: o campo informa que praticamente toda peça entra num trilho só.</p>
       ${areas}
       <p class="pe">Conferido por: ______________________________
          &nbsp;&nbsp;&nbsp; Data: ______ / ______ / __________</p>
@@ -1668,9 +1670,9 @@ function atualiza(){
 /* ---------------- recomendação ---------------- */
 
 /* Motivos que tiram um arranjo da disputa: os limites de aceitação declarados como
-   constantes. O apoio da peça larga NÃO entra aqui — ele é informação comparativa,
-   porque a largura da peça mais larga nunca foi levantada e o valor de hoje é só o
-   que o arranjo atual entrega, não um requisito. O que a Produção declarou é o vão
+   constantes. A base da peça larga apoiada em dois trilhos NÃO entra aqui e nem aparece
+   mais na tela: o campo informa que praticamente toda peça entra num trilho só, e a
+   largura da peça mais larga nunca foi levantada. O que a Produção declarou é o vão
    mínimo dentro do par: 50 mm. */
 function reprovaCenario(p, r){
   const f = [];
