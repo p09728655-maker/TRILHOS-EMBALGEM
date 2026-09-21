@@ -218,6 +218,19 @@ details.mais>summary:focus-visible{outline:2px solid var(--esteira);outline-offs
 .lc-num .m{font-size:19px;font-weight:700;line-height:1;letter-spacing:-.3px}
 .lc-num .t{font-size:11.5px;color:var(--muted);margin-top:3px}
 
+/* ganho de juntar os trilhos: o número que o comparativo obrigava a calcular na cabeça */
+.ganho{display:flex;gap:15px;align-items:center;padding:11px 18px;
+       border-bottom:1px solid var(--linha);background:#F1F5F9}
+.ganho[hidden]{display:none}
+.ganho .g-num{flex:0 0 auto;min-width:98px;text-align:center;line-height:1.15}
+.ganho .g-num b{display:block;font-size:23px;font-weight:700;letter-spacing:-.5px;
+       color:var(--esteira);font-variant-numeric:tabular-nums}
+.ganho .g-num span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px;
+       font-variant-numeric:tabular-nums}
+.ganho .g-txt{font-size:12.5px;color:var(--texto);line-height:1.5}
+.ganho .g-txt b{font-variant-numeric:tabular-nums}
+.ganho .custo{display:block;margin-top:3px;font-size:11.5px;color:var(--muted)}
+
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th,td{text-align:left;padding:7px 18px;border-bottom:1px solid var(--linha2)}
 th{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted2);font-weight:700;
@@ -301,6 +314,13 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   .bloco-hd h2{font-size:9.5px}
   .bloco-hd p{font-size:9px}
 
+  .ganho{padding:6px 11px;gap:10px;break-inside:avoid;border-bottom:1px solid #C8CCD0}
+  .ganho .g-num{min-width:72px}
+  .ganho .g-num b{font-size:15px}
+  .ganho .g-num span{font-size:8.5px}
+  .ganho .g-txt{font-size:9px}
+  .ganho .custo{font-size:8.5px}
+
   .linha-comp{padding:6px 11px;grid-template-columns:1fr 92px;gap:9px;break-inside:avoid}
   .lc-nome{font-size:10.5px}.lc-sub{font-size:9px}
   .lc-num .m{font-size:13px}.lc-num .t{font-size:8.5px}
@@ -337,6 +357,17 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
   .mais-in{padding:0 11px 7px;font-size:9px}
   .rec details.mais{margin:6px -11px 0}
 
+  /* impressão focada no desenho ("Imprimir só a planta"): a planta sozinha na folha.
+     Saem de cena a faixa de indicadores, o comparativo, as cotas e os parâmetros que o
+     desenho não mostra; o cabeçalho fica, senão não dá para saber de que arranjo é a
+     planta, e a ressalva do DWG viaja junto com ela. */
+  body.planta .faixa,
+  body.planta .abaixo,
+  body.planta .rodape-in,
+  body.planta .pparams span.sec{display:none}
+  body.planta .palco{height:180mm;break-after:auto}
+  body.planta .rodape{margin-top:4px;font-size:8.5px;break-inside:avoid}
+
   @page{size:A4 landscape;margin:8mm}
 }
 </style>
@@ -363,6 +394,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       <details class="menu" id="menuAcoes">
         <summary class="ghost" role="button" aria-label="Mais ações">Mais ▾</summary>
         <div class="menu-in">
+          <button class="ghost" id="btnPlanta" type="button">Imprimir só a planta</button>
           <button class="ghost" id="btnConf" type="button">Conferir em campo</button>
           <button class="ghost" id="btnCsv" type="button">Cotas em CSV</button>
           <button class="ghost" id="btnSvg" type="button">Planta em SVG</button>
@@ -548,6 +580,7 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
     <section class="bloco">
       <div class="bloco-hd"><h2>Comparativo</h2><p>metragem linear de trilho no conjunto</p></div>
       <div class="rec" id="rec"></div>
+      <div class="ganho" id="ganho" hidden></div>
       <div class="comp" id="comp"></div>
     </section>
 
@@ -601,11 +634,12 @@ const GI_MIN     = 50;     // o par pode fechar até 50 mm — informado pela Pr
 const PASS_MIN   = 800;    // passagem mínima para uma pessoa carregando prancha
 const FOLGA_MIN  = 30;     // folga mínima da prancha no trilho sem guia lateral
 const APOIO_HOJE = 1200;   // base da peça larga no arranjo executado hoje
+const GI_DWG     = 200;    // vão dentro do par no passo que o DWG desenha — referência do ganho
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v16";
-const VERSAO_DATA = "08/09/2026";
+const VERSAO = "v17";
+const VERSAO_DATA = "21/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
 
@@ -1140,8 +1174,16 @@ function montaAvisos(r){
     t.push(`A prancha tem <b>${fmt(p.P)} mm</b> e o trilho <b>${fmt(p.W)} mm</b>. A prancha não apoia.`);
   else if (folga < FOLGA_MIN)
     t.push(`Folga de <b>${fmt(folga)} mm</b> (${fmt(folga/2)} mm por lado). Sem guia lateral, a prancha desalinha e trava.`);
-  if (p.modo === "par" && p.GI < GI_MIN)
-    t.push(`Vão de <b>${fmt(p.GI)} mm</b> dentro do par, abaixo dos ${fmt(GI_MIN)} mm que a Produção aceita. A base da peça larga cai para ${fmt(apoio)} mm, contra ${fmt(APOIO_HOJE)} mm do arranjo de hoje.`);
+  if (p.modo === "par" && p.GI < GI_MIN){
+    // O aviso dizia só o que se perde. O que se ganha está do outro lado da mesma
+    // decisão e precisa aparecer junto, senão a troca fica pela metade.
+    const dwg = arranjoCom(p, { modo:"par", GI:GI_DWG });
+    const ganho = dwg
+      ? ` Em troca, rende <b>${sinalN(r.metros - dwg.metros)} m</b> de trilho e `
+        + `${sinalPistas(r.trilhos - dwg.pistas)} sobre o passo de ${fmt(GI_DWG)} mm do DWG.`
+      : "";
+    t.push(`Vão de <b>${fmt(p.GI)} mm</b> dentro do par, abaixo dos ${fmt(GI_MIN)} mm que a Produção aceita. A base da peça larga cai para ${fmt(apoio)} mm, contra ${fmt(APOIO_HOJE)} mm do arranjo de hoje.${ganho}`);
+  }
   if (p.modo === "solto")
     t.push(`Sem par, a peça larga teria que vencer um vão de <b>${fmt(p.GE)} mm</b> entre os dois trilhos de apoio.`);
   $("#avisos").innerHTML = t.map(caixaAviso).join("");
@@ -1184,6 +1226,84 @@ function montaCotas(r){
   $("#cotasSub").textContent = `${r1.trilhosPorLado} pistas por lado · fecha em ${fmt(r1.fim)} mm`;
 }
 
+/* ---------------- ganho de juntar os trilhos ----------------
+   Juntar os trilhos é fechar o vão dentro do par: dois trilhos encostados ocupam menos
+   banco que dois soltos, e a esteira que sobra vira mais uma via. O comparativo já trazia
+   a metragem de cada arranjo, mas a subtração ficava por conta de quem lia — e era ela
+   que respondia à pergunta. Aqui o ganho sai pronto, contra as duas referências que
+   decidem: não juntar (trilhos soltos) e o par de 200 mm que o DWG desenha.
+   Só o vão dentro do par muda; o resto vem da tela, senão a conta mistura dois efeitos. */
+
+/** Reavalia o arranjo da tela trocando só o que vier em `mod`. */
+function arranjoCom(p, mod){
+  const r = avalia({ ...p, ...mod });
+  return r ? { metros:r.metros, pistas:r.trilhos, apoio:r.apoio } : null;
+}
+
+/** Arranjo atual, trilhos soltos, passo do DWG e par fechado no limite da Produção. */
+function ganhoDoPar(p, r){
+  const solto  = arranjoCom(p, { modo:"solto", GI:0 });
+  const dwg    = arranjoCom(p, { modo:"par",   GI:GI_DWG });
+  const limite = arranjoCom(p, { modo:"par",   GI:GI_MIN });
+  if (!solto || !dwg || !limite) return null;
+  return { solto, dwg, limite, atual:{ metros:r.metros, pistas:r.trilhos, apoio:r.apoio } };
+}
+
+const sinalN = v => (v >= 0 ? "+" : "\u2212") + fmt(Math.abs(v));
+const sinalPistas = v => `${sinalN(v)} pista${Math.abs(Math.round(v)) === 1 ? "" : "s"}`;
+
+/** Uma linha só, sempre visível: quantos metros e quantas pistas o par rende, e o que custa. */
+function montaGanho(p, r){
+  const box = $("#ganho");
+  const g = ganhoDoPar(p, r);
+  if (!g){ box.innerHTML = ""; box.hidden = true; return; }
+  box.hidden = false;
+
+  // O que se paga pelo ganho: trilhos mais juntos deixam a peça larga com menos base.
+  // O texto muda com o arranjo da tela para não repetir o mesmo número duas vezes.
+  const ressalva = ` Metro de trilho a mais é capacidade a mais — e também trilho a instalar.`;
+  const contra = [];
+  if (p.GI !== GI_DWG) contra.push(`${fmt(g.dwg.apoio)} mm no passo do DWG`);
+  contra.push(`${fmt(g.solto.apoio)} mm com os trilhos soltos`);
+  const custo = p.modo !== "par"
+    ? `<span class="custo">Em troca, o apoio da peça larga cairia de <b>${fmt(g.solto.apoio)} mm</b> `
+      + `para ${fmt(g.limite.apoio)} mm.${ressalva}</span>`
+    : `<span class="custo">Em troca, o apoio da peça larga fica em <b>${fmt(g.atual.apoio)} mm</b>, `
+      + `contra ${contra.join(" e ")}.${ressalva}</span>`;
+
+  let num, txt;
+  if (p.modo !== "par"){
+    // Sem par não há o que fechar: o ganho que interessa é o de passar a juntar,
+    // medido no par de 50 mm, que é até onde a Produção aceita.
+    num = [g.limite.metros - g.solto.metros, g.limite.pistas - g.solto.pistas];
+    txt = `É o que <b>juntar os trilhos em par de ${fmt(GI_MIN)} mm</b> — o limite da Produção —
+      renderia sobre os trilhos soltos da tela: <b>${fmt(g.limite.metros)} m</b> e ${g.limite.pistas} pistas,
+      no lugar de ${fmt(g.solto.metros)} m e ${g.solto.pistas} pistas, dentro do mesmo alcance das esteiras.`;
+  } else if (p.GI === GI_DWG){
+    // O arranjo da tela é o próprio passo do DWG: a referência passa a ser não juntar.
+    num = [g.atual.metros - g.solto.metros, g.atual.pistas - g.solto.pistas];
+    txt = `É o que o <b>par de ${fmt(GI_DWG)} mm</b> — o passo que o DWG desenha — rende sobre os mesmos
+      trilhos soltos: <b>${fmt(g.atual.metros)} m</b> e ${g.atual.pistas} pistas, no lugar de
+      ${fmt(g.solto.metros)} m e ${g.solto.pistas} pistas. Fechar o par até os ${fmt(GI_MIN)} mm da Produção
+      acrescenta mais <b>${sinalN(g.limite.metros - g.atual.metros)} m</b> e
+      ${sinalPistas(g.limite.pistas - g.atual.pistas)} (${fmt(g.limite.metros)} m).`;
+  } else {
+    // Vão maior que o do DWG afasta os trilhos em vez de juntá-los, e aí o número é custo.
+    const fecha = p.GI < GI_DWG;
+    num = [g.atual.metros - g.dwg.metros, g.atual.pistas - g.dwg.pistas];
+    txt = `É o que <b>${fecha ? "fechar" : "abrir"} o par de ${fmt(GI_DWG)} para ${fmt(p.GI)} mm</b>
+      ${fecha ? "rende sobre" : "custa contra"} o passo que o DWG desenha:
+      <b>${fmt(g.atual.metros)} m</b> e ${g.atual.pistas} pistas, no lugar de ${fmt(g.dwg.metros)} m
+      e ${g.dwg.pistas} pistas, dentro do mesmo alcance das esteiras. Contra os trilhos soltos, juntar em par
+      rende <b>${sinalN(g.atual.metros - g.solto.metros)} m</b> e
+      ${sinalPistas(g.atual.pistas - g.solto.pistas)}.`;
+  }
+
+  box.innerHTML = `
+    <div class="g-num"><b>${sinalN(num[0])} m</b><span>${sinalPistas(num[1])}</span></div>
+    <div class="g-txt">${txt}${custo}</div>`;
+}
+
 function montaComparativo(pa){
   const itens = [{ nome:REF.nome, sub:REF.sub, metros:REF.metros, trilhos:REF.trilhos, cor:COR.cota, ref:true }];
   PRESETS.forEach(pr => {
@@ -1218,14 +1338,16 @@ function montaPrintHd(r){
   const q = r1.idxPass.length;
   const passTxt = q === 0 ? "sem passagem"
                 : `${q} ${q > 1 ? "passagens" : "passagem"} de ${fmt(r1.larguraPass)} mm`;
+  // O 3º item marca o parâmetro que a planta não desenha: ele some na impressão
+  // focada ("Imprimir só a planta"), onde a folha inteira é do desenho.
   const it = [
     ["Trilho", fmt(p.W) + " mm"],
-    ["Prancha", fmt(p.P) + " mm"],
-    ["Folga", fmt(r.folga) + " mm"],
+    ["Prancha", fmt(p.P) + " mm", true],
+    ["Folga", fmt(r.folga) + " mm", true],
     ["Arranjo", p.modo === "par" ? "em par" : "independentes"],
     ["Vão no par", p.modo === "par" ? fmt(p.GI) + " mm" : "—"],
     ["Vão entre pares", fmt(p.GE) + " mm"],
-    ["Apoio em 2 trilhos", fmt(apoio) + " mm"],
+    ["Apoio em 2 trilhos", fmt(apoio) + " mm", true],
     ["Passagem", passTxt],
     ["Trilhos C1 / C2 / C3", `${fmt(p.L1)} / ${fmt(p.L2)} / ${fmt(p.L3)} mm`],
     ["Trilho de abastecimento", `${fmt(p.AB)} mm · C1, vão C2–C3 e lateral (${fmt(p.AL)} mm a ${fmt(p.AX)} mm da esteira 1)`],
@@ -1239,7 +1361,7 @@ function montaPrintHd(r){
       ? `${fmt(p.BL)} mm = ${fmt(r.barracao.topo)} (parede C1, medido) + ${fmt(alturaConjunto(p))} (conjunto)`
         + ` + ${fmt(r.barracao.base)} (até a esteira 2, calculado)`
       : "—"],
-    ["Entre as esteiras", `${fmt(p.L2 + GAP_COL + p.L3)} mm = C2 + corredor + C3 · hoje são ${fmt(DIST_E1E2)} mm`],
+    ["Entre as esteiras", `${fmt(p.L2 + GAP_COL + p.L3)} mm = C2 + corredor + C3 · hoje são ${fmt(DIST_E1E2)} mm`, true],
     ["Pistas por lado", `${r1.trilhosPorLado} na esteira 1 · ${r2.trilhosPorLado} na esteira 2 (+${r.ganhoE2} com o aumento)`],
     ["Conjunto", `${trilhos} trilhos · ${fmt(metros)} m`]
   ];
@@ -1252,7 +1374,8 @@ function montaPrintHd(r){
       </div>
       <div class="dt">Patrimar Móveis · PPCP<br>${new Date().toLocaleDateString("pt-BR")}<br>app ${VERSAO} · ${VERSAO_DATA}</div>
     </div>
-    <div class="pparams">${it.map(([k, v]) => `<span class="${String(v).length > 34 ? "largo" : ""}">${k}: <b>${v}</b></span>`).join("")}</div>`;
+    <div class="pparams">${it.map(([k, v, sec]) =>
+      `<span class="${String(v).length > 34 ? "largo" : ""}${sec ? " sec" : ""}">${k}: <b>${v}</b></span>`).join("")}</div>`;
 }
 
 /* ---------------- folha de conferência em campo ---------------- */
@@ -1324,6 +1447,16 @@ function montaConferencia(r){
       <p class="pe">Conferido por: ______________________________
          &nbsp;&nbsp;&nbsp; Data: ______ / ______ / __________</p>
     </div>`;
+}
+
+/** Impressão focada no desenho: a planta sozinha na folha, sem faixa, comparativo nem
+    cotas. Serve para levar o layout ao chão de fábrica ou à reunião. O cabeçalho continua
+    saindo — planta sem o arranjo que a gerou não se confere — e a ressalva do DWG vai no pé. */
+function imprimePlanta(){
+  if (!atual) return;
+  document.body.classList.add("planta");
+  window.print();
+  setTimeout(() => document.body.classList.remove("planta"), 500);
 }
 
 function imprimeConferencia(){
@@ -1441,6 +1574,7 @@ function render(){
     $("#avisos").innerHTML = caixaAviso(
       "Com esses valores nenhum trilho cabe no alcance da esteira. Revise a largura do trilho e os vãos.");
     montaComparativo(p);
+    $("#ganho").hidden = true;
     marcaAreasQueBatem(null);
     return;
   }
@@ -1451,6 +1585,7 @@ function render(){
   desenha(r);
   montaCotas(r);
   montaComparativo(p);
+  montaGanho(p, r);
   montaRecomendacao(p);
   marcaAreasQueBatem(r);
 }
@@ -1583,7 +1718,8 @@ function montaRecomendacao(pa){
   if (maisPistas && maisPistas.pr.id !== escolha.pr.id && maisPistas.pistas > escolha.pistas
       && maisPistas.reprova.length === 1){
     chave = `<p class="chave">A <b>${maisPistas.pr.nome}</b> daria
-      <b>${maisPistas.pistas - escolha.pistas} pistas a mais</b> e está fora por um único limite:
+      <b>${maisPistas.pistas - escolha.pistas} pistas a mais</b> e
+      <b>${sinalN(maisPistas.r.metros - e.metros)} m</b> de trilho, mas está fora por um único limite:
       ${maisPistas.reprova[0]}. Se esse limite mudar, a recomendação passa a ser a ${maisPistas.pr.nome}.</p>`;
   }
 
@@ -1735,6 +1871,7 @@ function inicia(){
   $("#btnCsv").addEventListener("click", csvCotas);
   $("#btnSvg").addEventListener("click", svgPlanta);
   $("#btnPrint").addEventListener("click", () => window.print());
+  $("#btnPlanta").addEventListener("click", imprimePlanta);
   $("#btnConf").addEventListener("click", imprimeConferencia);
   ligaAreas();
   ligaNotas();

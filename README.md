@@ -20,8 +20,9 @@ dentro do alcance das duas esteiras.
 - Destaca o aumento de 5 m da esteira 2 na planta e mostra quantas pistas ele acrescenta.
 - Desenha o contorno do barracão com cotas e avisa quando o conjunto não cabe nele.
 - Compara os cenários pela metragem linear de trilho.
+- Diz, em números, quantos metros e quantas pistas juntar os trilhos em par rende — e o que custa.
 - Gera as cotas acumuladas em CSV e a planta em SVG.
-- Imprime em A4 paisagem com cabeçalho de parâmetros.
+- Imprime em A4 paisagem com cabeçalho de parâmetros, com uma impressão focada só no desenho.
 
 ## Densidade da tela
 
@@ -38,7 +39,7 @@ O que só aparece quando pedido:
 | Procedência das áreas | barra lateral | detalhe "De onde vêm estas áreas" |
 | Geometria e medidas | barra lateral | detalhe "Geometria e medidas" |
 | Origem das medidas e ressalvas do DWG | rodapé | rodapé recolhido, com a ressalva que importa na linha visível |
-| Cotas em CSV, planta em SVG e folha de conferência | topo | menu **Mais** |
+| Cotas em CSV, planta em SVG, impressão só da planta e folha de conferência | topo | menu **Mais** |
 
 **Na impressão nada fica escondido**: as camadas recolhidas abrem sozinhas antes de imprimir e
 voltam a fechar depois.
@@ -94,7 +95,37 @@ requisito. Usá-lo como corte reprovaria arranjos por um número que ninguém co
 no comparativo para a decisão ser tomada com ele à vista.
 
 Quando o arranjo com mais pistas cai por um único limite, a tela diz qual é e quanto custa
-mantê-lo. Hoje é a Versão 2: 4 pistas a mais, fora só pelo par de 0 mm.
+mantê-lo, **em pistas e em metros**. Hoje é a Versão 2: 4 pistas e 22 m a mais, fora só pelo
+par de 0 mm.
+
+## Quanto juntar os trilhos rende
+
+Juntar os trilhos é fechar o vão **dentro do par**: dois trilhos encostados ocupam menos banco que
+dois soltos, e a esteira que sobra vira mais uma via. O comparativo sempre trouxe a metragem de
+cada arranjo, mas a subtração ficava por conta de quem lia — e era ela que respondia à pergunta.
+Agora o ganho sai pronto, numa linha fixa dentro do bloco Comparativo, logo abaixo da recomendação.
+
+Só o vão dentro do par muda: largura do trilho, vão entre pares, passagem e os comprimentos de C1,
+C2 e C3 vêm da tela. Misturar dois efeitos na mesma conta invalidaria o número.
+
+A referência muda com o arranjo que estiver na tela, e o texto sempre a nomeia:
+
+| Arranjo na tela | Número grande | Contra o quê |
+|---|---|---|
+| Par fechado ou aberto (vão ≠ 200 mm) | o que fechar o par rende sobre o passo do DWG | par de 200 mm, o passo que o DWG desenha |
+| Par de 200 mm | o que o par rende sobre os trilhos soltos | mesmos trilhos, sem par |
+| Sem par | o que juntar em par de 50 mm renderia | os trilhos soltos da própria tela |
+
+Com os valores padrão, fechar o par de 200 para 0 mm rende **+56 m e +12 pistas** (466 m no lugar
+de 410 m); contra trilhos soltos, o par rende **+115 m e +25 pistas**. Até os 50 mm que a Produção
+aceita são **+34 m e +8 pistas**.
+
+**O ganho vem com conta a pagar, e ela aparece na mesma linha.** Trilhos mais juntos deixam a peça
+larga com menos base: 1.500 mm soltos, 1.200 mm no par de 200, 1.050 mm no par de 50 e 1.000 mm
+encostados. E metro de trilho a mais é capacidade a mais, mas também trilho a instalar — não é
+economia, é investimento em ocupação. Pela mesma razão o aviso do par abaixo de 50 mm, que antes
+só dizia o que se perde, passou a dizer também o que se ganha: a troca aparece inteira, no lugar
+onde a decisão é tomada.
 
 ## Áreas e máquinas
 
@@ -140,6 +171,26 @@ de 7,0 / 4,0 / 3,0 / 5,0 m com 0,5 m de largura.
 
 **A posição no sentido dos trilhos herda o erro do desenho**, que já se mostrou deslocado nessa
 direção. Conferir em campo antes de decidir layout.
+
+## Impressão focada no desenho
+
+O botão **"Imprimir só a planta"**, no menu **Mais**, manda a planta sozinha para o papel: saem de
+cena a faixa de indicadores, o comparativo e as cotas, e o desenho ocupa a folha inteira — com os
+valores padrão, sai **20% maior em escala** (43% em área) que na impressão completa. É a folha de
+levar ao chão de fábrica ou à reunião de layout.
+
+O que fica, porque planta sem isso não se confere:
+
+- o cabeçalho com o arranjo, a data e a versão do app;
+- os parâmetros que o desenho mostra (trilho, vãos, passagem, comprimentos de C1/C2/C3,
+  abastecimento, esteira 2, barracão e pistas por lado). Os que a planta não desenha — prancha,
+  folga, apoio em dois trilhos e distância entre as esteiras — só saem na impressão completa;
+- os avisos, que dizem quando o conjunto não cabe;
+- a legenda das cores;
+- a ressalva do DWG, em uma linha no pé.
+
+A impressão completa (botão **Imprimir**) não mudou: planta na primeira página, comparativo e
+cotas depois.
 
 ## Folha de conferência em campo
 
