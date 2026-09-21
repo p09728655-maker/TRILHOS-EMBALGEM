@@ -618,9 +618,9 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
       barracão ainda vem do desenho e não deve embasar decisão de layout.</span>
       <span class="abre">origem das medidas</span></summary>
     <div class="rodape-in">
-      Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b>, <b>desenho desatualizado</b>, com as distâncias da parede corrigidas em campo · Esteira 1: 850&nbsp;×&nbsp;23.940&nbsp;mm ·
-      Esteira 2: 850&nbsp;×&nbsp;28.975&nbsp;mm, defasada 5.550&nbsp;mm medidos em campo (<b>aumento de +5.000&nbsp;mm</b> no final; DWG: 23.975&nbsp;mm de comprimento e 7.850&nbsp;mm de defasagem) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 21.850&nbsp;mm de largura, deduzidos das três medidas de campo (500 + 19.900 + 1.450) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
-      Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> as medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem do desenho em 2.220 e 4.520&nbsp;mm, e prevalecem. O comprimento de 55.210&nbsp;mm do barracão <b>foi conferido em campo</b> e confirma o desenho: com a cadeia da parede esquerda também conferida, a sobra no fim da esteira 2 passou a ter as duas pontas medidas. O que ela ainda herda do DWG é o <b>comprimento da esteira 2</b> (23.975&nbsp;mm), o termo que governa a conta. Os trilhos montados hoje <b>não seguem passo regular</b>: esta planta é o layout a executar, não um retrato do que está montado, e os arranjos são comparados entre si e contra o DWG.
+      Geometria extraída de <b>Layout_Produção_Patrimar&nbsp;-&nbsp;Embalagem.dwg</b>, <b>desenho desatualizado</b>, com as distâncias da parede corrigidas em campo · Esteiras: 850&nbsp;×&nbsp;<b>24.150&nbsp;mm cada, medidas em campo</b> (DWG: 23.940 e 23.975) ·
+      Esteira 2 defasada 5.550&nbsp;mm medidos em campo, com <b>aumento de +5.000&nbsp;mm</b> no final, fechando 29.150&nbsp;mm (DWG: 7.850&nbsp;mm de defasagem) · Vão C2–C3: 2.100&nbsp;mm · Barracão: 55.210&nbsp;mm cotado no DWG × 21.850&nbsp;mm de largura, deduzidos das três medidas de campo (500 + 19.900 + 1.450) · Referência contada no DWG: 86 trilhos sob esteira, 398&nbsp;m ·
+      Prancha de 450&nbsp;mm apoiada sobre um trilho de 500&nbsp;mm · Cotas em milímetros · Coordenação de PPCP.<br><b>Atenção:</b> as medidas de campo da parede (4.250&nbsp;mm até a esteira 1 e 9.800&nbsp;mm até a esteira 2) divergem do desenho em 2.220 e 4.520&nbsp;mm, e prevalecem. O comprimento de 55.210&nbsp;mm do barracão <b>foi conferido em campo</b> e confirma o desenho. Com a cadeia da parede esquerda e as duas esteiras também conferidas, a sobra no fim da esteira 2 passou a sair <b>de medida de campo do começo ao fim</b>. O que ainda não foi medido é o trilho da C2 (4.000&nbsp;mm, informado pela Produção) e a largura interna do barracão, que segue deduzida. Os trilhos montados hoje <b>não seguem passo regular</b>: esta planta é o layout a executar, não um retrato do que está montado, e os arranjos são comparados entre si e contra o DWG.
     </div>
   </details>
 
@@ -638,9 +638,9 @@ tr.passagem td{background:var(--areia);font-weight:700;color:#4A3300}
    ============================================================ */
 
 /* ---------------- geometria fixa (DWG) ---------------- */
-const E1 = { ini:0,    len:23940, larg:850 };   // esteira 1 (DWG: 840; ajustado para 850 mm)
+const E1 = { ini:0,    len:24150, larg:850, lenDwg:23940 };   // comprimento medido em campo (DWG: 23.940); largura DWG 840, adotado 850
 const E2_AUMENTO = 5000;                        // acréscimo de 5 m na esteira 2 (decisão em estudo)
-const E2 = { ini:5550, len:23975 + E2_AUMENTO, larg:850, lenDwg:23975, iniDwg:7850 };   // esteira 2: defasagem de 5.550 medida em campo (9.800 da parede − 4.250 da parede à esteira 1); DWG: 7.850; aumento no final
+const E2 = { ini:5550, len:24150 + E2_AUMENTO, larg:850, lenBase:24150, lenDwg:23975, iniDwg:7850 };   // comprimento medido em campo, igual ao da esteira 1 (DWG: 23.975); defasagem de 5.550 medida em campo (9.800 da parede − 4.250 da parede à esteira 1; DWG: 7.850); aumento no final
 const GAP_COL = 2100;                           // vão entre a coluna C2 e a coluna C3, medido no DWG
 const DIST_E1E2 = 9100;                         // distância entre as esteiras hoje: C2 4.000 + corredor 2.100 + C3 3.000
 
@@ -653,7 +653,7 @@ const GI_DWG     = 200;    // vão dentro do par no passo que o DWG desenha — 
 
 /* Versão do app. Mantenha igual ao nome do cache em sw.js, para o tablet
    mostrar na tela qual versão está rodando e denunciar cache velho. */
-const VERSAO = "v21";
+const VERSAO = "v22";
 const VERSAO_DATA = "21/09/2026";
 
 const REF = { nome:"Contado no DWG", sub:"86 trilhos dentro do alcance da esteira", trilhos:86, metros:398 };
@@ -789,7 +789,7 @@ const metragem = (p, r1, r2) => (r1.trilhosPorLado*(p.L1 + p.L2) + r2.trilhosPor
 /** Esteira 2 na posição escolhida: DWG (defasada), alinhada com a esteira 1 ou encostada no trilho lateral. */
 function esteira2(p){
   const ini = p.pos2 === "alinhada" ? E1.ini : (p.pos2 === "lateral" ? E1.ini - p.AX : E2.ini);
-  return { ini, len:E2.len, larg:E2.larg, lenDwg:E2.lenDwg };
+  return { ini, len:E2.len, larg:E2.larg, lenBase:E2.lenBase };
 }
 
 /** Borda externa do trilho de abastecimento lateral, referência da parede esquerda. */
@@ -847,7 +847,7 @@ function avalia(p){
   const e2 = esteira2(p);
   const r1 = calcula(E1, p), r2 = calcula(e2, p);
   if (!r1 || !r2) return null;
-  const r2dwg = calcula({ ini:e2.ini, len:e2.lenDwg }, p);   // esteira 2 no comprimento do DWG, para medir o ganho
+  const r2base = calcula({ ini:e2.ini, len:e2.lenBase }, p);   // esteira 2 sem o aumento, para medir o que ele rende
   const ext = extensao(p, e2);
   const barracao = p.BC > 0 && p.BL > 0
     ? { sobraX: p.BC - p.BX - ext.larg,   // negativo = não cabe no comprimento
@@ -857,7 +857,7 @@ function avalia(p){
   return {
     e2, barracao,
     p, r1, r2,
-    ganhoE2: r2.trilhosPorLado - (r2dwg ? r2dwg.trilhosPorLado : 0),
+    ganhoE2: r2.trilhosPorLado - (r2base ? r2base.trilhosPorLado : 0),
     metros:  metragem(p, r1, r2),
     apoio:   apoioDuplo(p),
     folga:   p.W - p.P,
@@ -1052,7 +1052,7 @@ function pintaEsteiras(g, y, e2){
   barra(e2, y.e2, COR.esteira2, `ESTEIRA 2 · ${fmt(e2.larg)} × ${fmt(e2.len)} mm`);
 
   // trecho acrescido da esteira 2: hachura no final e rótulo próprio
-  const xa = e2.ini + e2.lenDwg;
+  const xa = e2.ini + e2.lenBase;
   g.appendChild(el("rect", { x:xa, y:y.e2, width:E2_AUMENTO, height:E2.larg, fill:"url(#hachAumento)",
     stroke:COR.aumento, "stroke-width":50 }));
   g.appendChild(el("text", { x:xa + E2_AUMENTO/2, y:y.e2 + E2.larg*0.70, "font-size":440, "font-weight":"700",
@@ -1077,8 +1077,8 @@ function pintaCotas(g, p, r1, r2, y, H, e2, xC, yT){
   const d = e2.ini - E1.ini;
   const posTxt = d > 0 ? `defasada ${fmt(d)} mm` : (d < 0 ? `${fmt(-d)} mm antes da esteira 1` : "alinhada com a esteira 1");
   cotaH(g, e2.ini, e2.ini + e2.len, H + 1800,
-        `${fmt(e2.len)} mm · ${r2.n} ${un} · ${posTxt} · era ${fmt(e2.lenDwg)} mm no DWG`, COR.esteira2, false);
-  cotaH(g, e2.ini + e2.lenDwg, e2.ini + e2.len, H + 3000, `+${fmt(E2_AUMENTO)} mm`, COR.aumento, false);
+        `${fmt(e2.len)} mm · ${r2.n} ${un} · ${posTxt} · ${fmt(e2.lenBase)} mm medidos (DWG: ${fmt(E2.lenDwg)})`, COR.esteira2, false);
+  cotaH(g, e2.ini + e2.lenBase, e2.ini + e2.len, H + 3000, `+${fmt(E2_AUMENTO)} mm`, COR.aumento, false);
 }
 
 /** Troca o conteúdo do SVG preservando o <title> usado pelo aria-labelledby.
@@ -1357,7 +1357,7 @@ function montaPrintHd(r){
     ["Passagem", passTxt],
     ["Trilhos C1 / C2 / C3", `${fmt(p.L1)} / ${fmt(p.L2)} / ${fmt(p.L3)} mm`],
     ["Trilho de abastecimento", `${fmt(p.AB)} mm · C1, vão C2–C3 e lateral (${fmt(p.AL)} mm a ${fmt(p.AX)} mm da esteira 1)`],
-    ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre o DWG (${fmt(E2.lenDwg)} mm) · `
+    ["Esteira 2", `${fmt(E2.len)} mm · aumento de +${fmt(E2_AUMENTO)} mm sobre os ${fmt(E2.lenBase)} mm medidos (DWG: ${fmt(E2.lenDwg)} mm) · `
       + ({ dwg:`defasada ${fmt(E2.ini)} mm, medida em campo (DWG: ${fmt(E2.iniDwg)} mm)`, alinhada:"alinhada com a esteira 1", lateral:"encostada no trilho lateral" })[p.pos2]],
     ["Barracão", r.barracao
       ? `${fmt(p.BC)} mm de comprimento · ${p.pos === "parede" ? "encostado na parede esquerda" : "posição do DWG"}`
@@ -1404,15 +1404,14 @@ function linhasConferencia(r){
     L("Largura interna do barracão", p.BL,
       "Deduzida das três medidas de campo com os comprimentos de trilho atuais — conferir com trena", true),
     L("Fim da esteira 2 → parede do fundo", barracao ? barracao.sobraX : 0,
-      "Derivado, agora com as duas pontas conferidas — só herda o comprimento da esteira 2, "
-      + "que ainda vem do DWG. Decide se o aumento de 5 m cabe", true),
+      "Derivado de medidas de campo, do começo ao fim — decide se o aumento de 5 m cabe"),
     L("Defasagem entre a esteira 1 e a esteira 2", e2.ini, "Campo"),
     L("Distância entre a esteira 1 e a esteira 2, no sentido dos trilhos",
       p.L2 + GAP_COL + p.L3, "Derivado de C2 + corredor + C3 — as esteiras são fixas, conferir", true),
     L("Comprimento da esteira 1", E1.len,
-      "DWG — define quantas pistas cabem na esteira 1", true),
-    L("Comprimento da esteira 2, sem o aumento", E2.lenDwg,
-      "DWG — define as pistas da esteira 2 e é o que a sobra do fundo ainda herda", true),
+      `Campo, CONFERIDO — o DWG cotava ${fmt(E1.lenDwg)}`),
+    L("Comprimento da esteira 2, sem o aumento", E2.lenBase,
+      `Campo, CONFERIDO — o DWG cotava ${fmt(E2.lenDwg)}; as duas esteiras medem igual`),
     L("Largura das esteiras", E1.larg, "DWG (840), adotado 850"),
     L("Vão entre as colunas C2 e C3", GAP_COL, "DWG"),
     L("Trilho da C1", p.L1, "Campo, confirma o DWG"),
