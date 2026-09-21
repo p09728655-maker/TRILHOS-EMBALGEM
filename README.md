@@ -79,21 +79,29 @@ Os limites são os das regras de aviso: `GE_MIN` (500 mm de circulação entre p
 (50 mm dentro do par, informado pela Produção), `PASS_MIN` (800 mm de passagem) e `FOLGA_MIN`
 (30 mm da prancha no trilho). Cada arranjo descartado aparece com o motivo. Com os valores atuais:
 
-| Arranjo | Pistas | Metragem | Apoio | Passagem | Situação |
-|---|---:|---:|---:|---:|---|
-| Versão 1 · par 200 · vão 500 | 90 | 410 m | 1.200 mm | 1.140 mm | apto, 8 pistas a menos |
-| Versão 2 · par encostado · vão 500 | 102 | 466 m | 1.000 mm | 940 mm | fora: par de 0 mm |
-| Versão 3 · sem par · vão 500 | 77 | 351 m | 1.500 mm | 940 mm | apto, 21 pistas a menos |
-| Versão 4 · par 50 · vão 500 | 98 | 444 m | 1.050 mm | 1.690 mm | **recomendado** |
-| Passo do DWG · par 200 · vão 400 | 96 | 438 m | 1.200 mm | 740 mm | fora: vão 400 e passagem 740 |
+| Arranjo | Pistas | Metragem | Passagem | Situação |
+|---|---:|---:|---:|---|
+| Versão 1 · par 200 · vão 500 | 90 | 410 m | 1.140 mm | apto, 8 pistas a menos |
+| Versão 2 · par encostado · vão 500 | 102 | 466 m | 940 mm | fora: par de 0 mm |
+| Versão 3 · sem par · vão 500 | 77 | 351 m | 940 mm | apto, 21 pistas a menos |
+| Versão 4 · par 50 · vão 500 | 98 | 444 m | 1.690 mm | **recomendado** |
+| Passo do DWG · par 200 · vão 400 | 96 | 438 m | 740 mm | fora: vão 400 e passagem 740 |
 
 Os botões seguem a sequência das versões, não o ranking — a Versão 4 é a quarta na barra mesmo
 sendo a recomendada.
 
-**O apoio da peça larga não é limite, é comparação.** A largura da peça mais larga apoiada em dois
-trilhos nunca foi levantada, e os 1.200 mm do arranjo de hoje são só o que ele entrega — não um
-requisito. Usá-lo como corte reprovaria arranjos por um número que ninguém confirmou. Ele aparece
-no comparativo para a decisão ser tomada com ele à vista.
+**A base da peça larga apoiada em dois trilhos saiu da tela.** O campo informa que praticamente
+toda peça entra num trilho só de 500 mm, então esse número não decidia nada e ocupava um indicador
+fixo na faixa, uma linha em cada arranjo do comparativo e um pedaço do aviso do par fechado. Nunca
+foi limite — a largura da peça mais larga também nunca foi levantada —, e agora nem comparação é.
+O valor continua calculado e sai no **cabeçalho da impressão completa** e na **folha de conferência**,
+e o critério da recomendação registra por que ele ficou de fora.
+
+> **Ponto em aberto para a Produção.** O único efeito declarado do vão dentro do par era justamente
+> a base da peça larga. Se ela não pesa, o limite de 50 mm fica sem justificativa escrita — e é ele,
+> sozinho, que separa a Versão 4 da Versão 2 (**+4 pistas e +22 m**). Vale confirmar com a Produção
+> se os 50 mm existem por outro motivo (montagem, limpeza, fixação, pé entre trilhos) antes de
+> tratar a Versão 2 como disponível.
 
 Quando o arranjo com mais pistas cai por um único limite, a tela diz qual é e quanto custa
 mantê-lo, **em pistas e em metros**. Hoje é a Versão 2: 4 pistas e 22 m a mais, fora só pelo
@@ -121,12 +129,10 @@ Com os valores padrão, fechar o par de 200 para 0 mm rende **+56 m e +12 pistas
 de 410 m); contra trilhos soltos, o par rende **+115 m e +25 pistas**. Até os 50 mm que a Produção
 aceita são **+34 m e +8 pistas**.
 
-**O ganho vem com conta a pagar, e ela aparece na mesma linha.** Trilhos mais juntos deixam a peça
-larga com menos base: 1.500 mm soltos, 1.200 mm no par de 200, 1.050 mm no par de 50 e 1.000 mm
-encostados. E metro de trilho a mais é capacidade a mais, mas também trilho a instalar — não é
-economia, é investimento em ocupação. Pela mesma razão o aviso do par abaixo de 50 mm, que antes
-só dizia o que se perde, passou a dizer também o que se ganha: a troca aparece inteira, no lugar
-onde a decisão é tomada.
+**O ganho vem com conta a pagar, e ela aparece na mesma linha:** metro de trilho a mais é
+capacidade a mais, mas também trilho a instalar — não é economia, é investimento em ocupação.
+A base da peça larga já esteve aqui como o outro lado da troca e saiu: com praticamente toda peça
+entrando num trilho só, ela não é preço de nada.
 
 ## Áreas e máquinas
 
@@ -230,7 +236,6 @@ como constantes nomeadas no início do script e valem para todos os cenários.
 | Distância entre as esteiras (`DIST_E1E2`) | 9.100 mm | `C2 + corredor + C3` saiu da distância real entre as esteiras. O aviso diz quanto a esteira 2 teria que se deslocar, ou para quanto o corredor central fecharia. |
 | Passagem para retirar prancha (`PASS_MIN`) | 800 mm | Não passa uma pessoa carregando prancha. |
 | Folga da prancha no trilho (`FOLGA_MIN`) | 30 mm | Sem guia lateral, a prancha desalinha e trava. |
-| Apoio da peça larga hoje (`APOIO_HOJE`) | 1.200 mm | Referência do arranjo atual para comparar a base da peça apoiada em dois trilhos. Não reprova arranjo: é comparação, não limite. |
 | Trilho de abastecimento no vão (`GAP_COL`) | 2.100 mm | A faixa do carrinho não cabe entre C2 e C3. |
 | Conjunto dentro do barracão | sobra ≥ 0 no comprimento | O conjunto ultrapassa a parede do fundo; o aviso diz quantos mm faltam. Na largura não há aviso: ela é calculada e fecha sempre. |
 
@@ -247,7 +252,11 @@ fora da faixa, inclusive os que chegam pelo link compartilhado, são limitados a
   medida e vinda dessa mesma fonte — está marcada na folha de conferência.
 - O DWG erra na posição das coisas (parede, defasagem das esteiras) e acerta nos comprimentos de
   trilho. Vale como regra ao ler o desenho: desconfiar de onde ele coloca, não de quanto ele mede.
-- A largura da peça mais larga apoiada nos dois trilhos ainda não foi levantada.
+- A largura da peça mais larga apoiada nos dois trilhos ainda não foi levantada, mas **deixou de
+  pesar na escolha do arranjo**: o campo informa que praticamente toda peça entra num trilho só de
+  500 mm. Continua na folha de conferência, sem destaque, para confirmar com trena antes de fechar
+  o par. Com isso, **o limite de 50 mm dentro do par ficou sem justificativa escrita** — era a base
+  da peça larga — e é ele que separa a Versão 4 da Versão 2. Confirmar com a Produção o motivo real.
 - **A largura do barracão passou a ser resultado, não entrada.** Os três afastamentos foram medidos
   (850, 500 e 1.450 mm) e, com a altura do conjunto, fecham em 21.850 mm. A hipótese anterior de
   24.900 mm, tirada da linha de pilares do DWG, sobrava 3.050 mm sem explicação e foi abandonada.
