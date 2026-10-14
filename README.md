@@ -384,19 +384,3 @@ HTML autocontido, arquivo único, sem etapa de build e sem dependência externa.
 PWA com service worker para uso offline. Publicado na Vercel.
 
 Coordenação de PPCP — Patrimar Móveis.
-
-## Conversor de mapas de trilhos (`/mapas`)
-
-Página separada (`mapas/index.html`), arquivo único, sem build. Lê a planilha antiga do
-**mapa dos trilhos** de um produto (.xlsx) e gera o mapa novo para a linha:
-
-- caixa principal (CX 1/1) vai para a faixa do topo — início da esteira, não ocupa trilho;
-- a **ordem das peças não muda**;
-- modo padrão **separar operadores ao máximo**: os postos são espalhados por todos os trilhos,
-  com o espaço livre dividido por igual entre eles; modo alternativo mantém os trilhos atuais;
-- **trilho duplo A/B** sugerido (no máximo um par por posto, peças maiores e de maior consumo),
-  editável peça a peça; isomanta marcada só no trilho A;
-- saída: impressão A4 e Excel com aba `MAPA NOVO` (formatada) e aba `DADOS` (lista para conferência e Power BI).
-
-Bibliotecas por CDN: SheetJS 0.18.5 (leitura) e ExcelJS 4.4.0 (exportação). A planilha é lida no
-navegador e não sai do computador. Abre com a Penteadeira Princesa como exemplo.
